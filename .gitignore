@@ -1,0 +1,22 @@
+# Rust
+/target/
+**/*.rs.bk
+*.pdb
+
+# Run artifacts (journals, autosaves, recovered runs)
+/runs/
+
+# Bench/profiling output
+/criterion/
+*.prof*
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp
+
+# Environment
+.env*

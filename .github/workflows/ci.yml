@@ -1,0 +1,92 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master", "[0-9][0-9][0-9]-*"]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  # Determinism: forbid FP-behaviour-altering flag injection (research R7).
+  RUSTFLAGS: ""
+
+jobs:
+  lint:
+    name: fmt + clippy + deny (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.96.0
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --all -- --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: dependency audit (no UI crates, licences)
+        uses: EmbarkStudios/cargo-deny-action@v2
+        if: runner.os == 'Linux'
+
+  test:
+    name: tests (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.96.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --workspace
+
+  determinism:
+    name: determinism suite (${{ matrix.os }})
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.96.0
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build -p sojourn-harness --release
+      - name: data validation
+        run: cargo run -q -p sojourn-harness --release -- validate-data data/kernel
+      - name: double-run determinism (smoke + interrupts)
+        run: |
+          cargo run -q -p sojourn-harness --release -- verify scenarios/smoke_decade.ron
+          cargo run -q -p sojourn-harness --release -- verify scenarios/interrupts.ron
+      - name: save/load round-trip
+        run: cargo run -q -p sojourn-harness --release -- roundtrip scenarios/smoke_decade.ron --save-at-ticks 2592000,15000000,94608000
+      - name: mutation gate has teeth
+        run: cargo run -q -p sojourn-harness --release -- mutate --all
+      - name: crash recovery
+        run: cargo run -q -p sojourn-harness --release -- killtest scenarios/smoke_decade.ron --trials 12
+      - name: module conformance
+        run: |
+          cargo run -q -p sojourn-harness --release -- conformance --module toy
+          cargo run -q -p sojourn-harness --release -- conformance --module synthetic
+
+  # Architecture audit: the core must carry no presentation-layer dependency.
+  audit:
+    name: dependency + scope audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.96.0
+      - name: no UI/Tauri/render crates in the core tree
+        run: |
+          if cargo tree -p sojourn-core --prefix none 2>/dev/null | grep -Ei '^(tauri|wry|tao|winit|wgpu|egui|webview2)' ; then
+            echo "::error::presentation-layer crate found in sojourn-core dependency tree (FR-CORE-702)"
+            exit 1
+          fi
+          echo "core dependency tree is presentation-free"

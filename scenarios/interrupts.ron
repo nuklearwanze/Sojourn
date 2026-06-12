@@ -1,0 +1,24 @@
+// Interrupt-storm scenario (T039): anomalies that pause, used to exercise
+// interrupt-and-pause and watch behaviour through the harness driver.
+Scenario(
+    name: "interrupts",
+    seed: 7,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: Some((
+        entities: 50,
+        events_per_year: 120,
+        cadence_ticks: 1800,
+        milestone_every: 5,
+        anomaly_every: 4,
+    )),
+    toy: false,
+    commands: [
+        (tick: 0, command: RegisterWatch(spec: (expr: Leaf(template: "synthetic-entities-below", value: U64(45))))),
+    ],
+    checkpoints: [
+        15768000,
+        47304000,
+    ],
+    until_tick: 63072000,
+)

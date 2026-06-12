@@ -1,0 +1,19 @@
+// Kernel event-class registry (FR-CORE-403). Content slices register additional
+// classes through the same mechanism. `default_pause` is the out-of-the-box policy;
+// players adjust per class at runtime (journaled SetPausePolicy commands).
+// No plausibility-bearing values here; `source` records design provenance.
+(
+    classes: [
+        (id: "maneuver-node",     default_pause: Interrupt, source: "design/00-OVERVIEW.md §5"),
+        (id: "mission-milestone", default_pause: Interrupt, source: "design/00-OVERVIEW.md §5"),
+        (id: "anomaly",           default_pause: Interrupt, source: "design/05-WORLD.md §5"),
+        (id: "program-review",    default_pause: Interrupt, source: "design/01-RESEARCH.md §2"),
+        (id: "budget-vote",       default_pause: Interrupt, source: "design/03-ECONOMY.md §2"),
+        (id: "discovery",         default_pause: Interrupt, source: "design/05-WORLD.md §4"),
+        (id: "watch-fired",       default_pause: Interrupt, source: "specs/002-sim-core FR-CORE-406"),
+        (id: "command-rejected",  default_pause: LogOnly,   source: "specs/002-sim-core FR-CORE-304"),
+        (id: "end-of-horizon",    default_pause: Interrupt, source: "specs/002-sim-core FR-CORE-102"),
+        (id: "module-command",    default_pause: LogOnly,   source: "specs/002-sim-core command routing"),
+        (id: "kernel-diagnostic", default_pause: LogOnly,   source: "specs/002-sim-core FR-CORE-403"),
+    ],
+)

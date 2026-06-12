@@ -1,0 +1,35 @@
+# cargo-deny configuration: licence allow-list (free/open-source only) and the
+# architectural ban on presentation-layer crates in the dependency tree (FR-CORE-702).
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Apache-2.0 WITH LLVM-exception",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "ISC",
+    "Zlib",
+    "Unicode-3.0",
+]
+
+[bans]
+multiple-versions = "warn"
+deny = [
+    # The simulation core must never depend on UI/webview/render technology.
+    { name = "tauri" },
+    { name = "wry" },
+    { name = "tao" },
+    { name = "webview2-com" },
+    { name = "winit" },
+    { name = "wgpu" },
+    { name = "egui" },
+]
+
+[advisories]
+yanked = "warn"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"

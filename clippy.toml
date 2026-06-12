@@ -1,0 +1,29 @@
+# Determinism lints (research R7/R8). These make the spec's forbidden constructs
+# mechanical: hash-order iteration, wall-clock reads and platform-libm transcendentals
+# are compile-time failures in simulation code. The journal durability layer carries a
+# single documented #[allow] for its wall-clock flush timer (research R10).
+
+disallowed-types = [
+    { path = "std::collections::HashMap", reason = "hash-order iteration is nondeterministic in sim logic; use BTreeMap/Vec/slotmap (FR-CORE-205, research R8)" },
+    { path = "std::collections::HashSet", reason = "hash-order iteration is nondeterministic in sim logic; use BTreeSet/Vec (FR-CORE-205, research R8)" },
+]
+
+disallowed-methods = [
+    { path = "std::time::Instant::now", reason = "wall-clock is forbidden in sim logic (FR-CORE-105); only journal durability may use it, with a documented allow (research R10)" },
+    { path = "std::time::SystemTime::now", reason = "wall-clock is forbidden in sim logic (FR-CORE-105)" },
+    { path = "f64::sin", reason = "platform libm varies across toolchains; use libm::sin (float policy, research R7)" },
+    { path = "f64::cos", reason = "use libm::cos (research R7)" },
+    { path = "f64::tan", reason = "use libm::tan (research R7)" },
+    { path = "f64::asin", reason = "use libm::asin (research R7)" },
+    { path = "f64::acos", reason = "use libm::acos (research R7)" },
+    { path = "f64::atan", reason = "use libm::atan (research R7)" },
+    { path = "f64::atan2", reason = "use libm::atan2 (research R7)" },
+    { path = "f64::exp", reason = "use libm::exp (research R7)" },
+    { path = "f64::ln", reason = "use libm::log (research R7)" },
+    { path = "f64::log2", reason = "use libm::log2 (research R7)" },
+    { path = "f64::log10", reason = "use libm::log10 (research R7)" },
+    { path = "f64::powf", reason = "use libm::pow (research R7)" },
+    { path = "f64::sinh", reason = "use libm::sinh (research R7)" },
+    { path = "f64::cosh", reason = "use libm::cosh (research R7)" },
+    { path = "f64::tanh", reason = "use libm::tanh (research R7)" },
+]

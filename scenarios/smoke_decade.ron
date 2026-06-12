@@ -1,0 +1,27 @@
+// Smoke scenario (T029): a decade of simulated time under the synthetic module,
+// with a few commands and fingerprint checkpoints. Used by verify/roundtrip/replay.
+Scenario(
+    name: "smoke_decade",
+    seed: 20260612,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: Some((
+        entities: 100,
+        events_per_year: 40,
+        cadence_ticks: 3600,
+        milestone_every: 10,
+        anomaly_every: 7,
+    )),
+    toy: true,
+    commands: [
+        (tick: 2592000,  command: ModuleCommand(module: "synthetic", key: "set", value: 11)),
+        (tick: 31536000, command: ModuleCommand(module: "synthetic", key: "emit-milestone", value: 1)),
+        (tick: 63072000, command: SetPausePolicy(class: "anomaly", policy: LogOnly)),
+    ],
+    checkpoints: [
+        31536000,   // 1 year
+        157680000,  // 5 years
+        315360000,  // 10 years
+    ],
+    until_tick: 315360000,
+)

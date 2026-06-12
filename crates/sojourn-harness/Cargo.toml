@@ -1,0 +1,28 @@
+[package]
+name = "sojourn-harness"
+description = "Headless CLI harness and determinism test suite for the Sojourn simulation kernel."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+serde = { workspace = true }
+postcard = { workspace = true }
+ron = { workspace = true }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+clap = { workspace = true }
+rand_core = { workspace = true }
+slotmap = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true }
+
+[lints]
+workspace = true
+
+[[bench]]
+name = "kernel"
+harness = false

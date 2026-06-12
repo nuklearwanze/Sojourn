@@ -1,0 +1,13 @@
+# Normalize all text to LF in the repository and working tree.
+# Deterministic byte content matters: data files are hashed into DataVersionId.
+* text=auto eol=lf
+
+# Windows scripts that genuinely need CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# Binary
+*.png binary
+*.ico binary
+*.sjs binary
+*.sjl binary

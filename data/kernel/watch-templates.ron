@@ -1,0 +1,50 @@
+// Starter watch-condition template catalogue (FR-CORE-406, clarified 2026-06-12:
+// curated catalogue + AND/OR composition, no free-form expressions).
+// Starter templates bind kernel/status views only; content slices add templates
+// binding their own published views through this same data mechanism.
+(
+    templates: [
+        (
+            id: "date-reached",
+            view: "kernel/status",
+            field: "sim_time_ns",
+            op: Ge,
+            param: I64,
+            source: "specs/002-sim-core FR-CORE-406 (kernel clock binding)",
+        ),
+        (
+            id: "tick-reached",
+            view: "kernel/status",
+            field: "tick",
+            op: Ge,
+            param: U64,
+            source: "specs/002-sim-core FR-CORE-406 (kernel clock binding)",
+        ),
+        (
+            id: "pending-interrupts-above",
+            view: "kernel/status",
+            field: "pending_interrupts",
+            op: Gt,
+            param: U64,
+            source: "specs/002-sim-core FR-CORE-406 (kernel status binding)",
+        ),
+        // Synthetic-module bindings used by the harness/test suite. They live in data
+        // (not code) deliberately: they exercise the exact path content slices will use.
+        (
+            id: "synthetic-entities-below",
+            view: "synthetic/stats",
+            field: "entity_count",
+            op: Lt,
+            param: U64,
+            source: "specs/002-sim-core FR-CORE-704 (synthetic load module)",
+        ),
+        (
+            id: "synthetic-value-above",
+            view: "synthetic/stats",
+            field: "last_value",
+            op: Gt,
+            param: I64,
+            source: "specs/002-sim-core FR-CORE-704 (synthetic load module)",
+        ),
+    ],
+)

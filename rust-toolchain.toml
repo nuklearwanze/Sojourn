@@ -1,0 +1,5 @@
+# Pinned toolchain: the determinism guarantee is per platform + build (umbrella
+# clarification 2026-06-12), so the toolchain version is part of the guarantee.
+[toolchain]
+channel = "1.96.0"
+components = ["rustfmt", "clippy"]

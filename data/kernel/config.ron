@@ -1,0 +1,23 @@
+// Kernel tunables (Principle V: data, not code constants). Values here are
+// engineering defaults for the kernel slice, tunable without recompiling logic.
+(
+    // Exact duration of one tick. 1 s — fine-step activities run at 1-tick resolution;
+    // module cadences are integer multiples of this.
+    base_tick_ns: 1000000000,
+
+    // Autosave every N ticks of simulated time (in addition to every interrupt).
+    // 604800 s = 7 simulated days.
+    autosave_interval_ticks: 604800,
+
+    // Journal background flush bound, wall-clock milliseconds (FR-CORE-303 ≤ 5 s).
+    journal_flush_wall_ms: 5000,
+
+    // HASHMARK frame cadence in ticks (divergence-diagnosis anchors).
+    // 2592000 s = 30 simulated days.
+    hash_mark_interval_ticks: 2592000,
+
+    // Events kept in the in-memory recent window before spilling to disk tiers.
+    event_memory_window: 65536,
+
+    source: "specs/002-sim-core plan.md (kernel engineering defaults; not plausibility-bearing)",
+)
