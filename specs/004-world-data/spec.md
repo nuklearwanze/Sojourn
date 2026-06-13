@@ -31,22 +31,15 @@ do we believe is here, how certain are we").
 **This slice does NOT deliver**: missions, instruments or vehicles (FA-04+ fly the surveys —
 this slice defines the observation interface they will drive); the economy's use of resources
 (FA-06 prices what this slice describes); faction definitions (FA-09 — belief states are keyed
-by opaque faction identity now); UI rendering of any of it (FA-10); and — pending the open
-clarification — the planetary-protection *consequence* mechanics and the staged astrobiology
-*evidence process* of umbrella FR-WLD-008…011 (the data fields and seeded ground truth those
-mechanics need are in scope either way). [NEEDS CLARIFICATION: Where does FA-03 end on
-planetary protection and astrobiology? The umbrella places FR-WLD-008 (COSPAR categories with
-sterilisation costs, forward/back contamination consequences), FR-WLD-009 (seeded astrobiology
-ground truth), FR-WLD-010 (staged probabilistic evidence process) and FR-WLD-011 (life as
-science object) inside FA-03. Your slice brief covers the planetary-protection *category* as a
-site property and the truth/belief machinery, but contamination consequences touch politics
-(FA-09) and the evidence process is a mission-driven loop. Options: (a) this slice ships the
-**data and seeding**: PP categories on bodies/sites, seeded astrobiology ground truth per
-candidate world (from the kernel's seeded streams), and belief fields for both — while the
-evidence-staging process and contamination-consequence mechanics arrive with the
-mission/politics slices that can actually drive them; (b) this slice also implements the full
-staged evidence pipeline and contamination consequence logic now, driven through the
-observation interface.]
+by opaque faction identity now); UI rendering of any of it (FA-10); and the
+planetary-protection *consequence* mechanics plus the staged astrobiology *evidence process*.
+**Clarified 2026-06-13**: this slice ships the **data and seeding** halves of umbrella
+FR-WLD-008…011 — COSPAR planetary-protection categories on bodies and sites, seeded
+astrobiology ground truth per candidate world (drawn from sourced plausibility distributions
+via kernel streams at world creation, mostly-negative per the design), and belief fields for
+both — while the evidence-staging pipeline and contamination-consequence mechanics arrive with
+the mission/politics slices that can actually drive them. This umbrella traceability split is
+recorded deliberately.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -243,7 +236,8 @@ schema-validated data files with `source` provenance (Principles I, V); the engi
 
 - **FR-WORLD-101**: The shipped catalogue MUST contain the Sun, the 8 planets, Pluto and the major dwarf planets (at minimum Ceres, Eris, Haumea, Makemake), ≥140 significant moons and ≥2,800 catalogued small bodies, each with real orbital elements derived from published authoritative data (JPL/MPC-class sources) and provenance recorded per entry. *(FR-WLD-001)*
 - **FR-WORLD-102**: Each body MUST carry sourced physical data sufficient for FA-02 and later slices: gravitational parameter (or mass), radius, rotation, J2 where significant, atmosphere model where present, gravitating/divertible flags per the FA-02 rules, and bulk composition class. *(FR-WLD-004)*
-- **FR-WORLD-103**: Rail ephemerides from the shipped elements MUST reproduce published reference positions for major bodies within documented per-body accuracy bounds across 2026–2126, validated by CI checks against committed reference values. *(FR-WLD-002)* [NEEDS CLARIFICATION: How is the real catalogue produced and maintained? Options: (a) an **offline data-build tool** (part of the repo, run by developers) that queries public datasets (JPL SBDB, planetary fact sheets, MPC) and emits the committed, schema-validated data files with per-entry provenance and a recorded snapshot date — the game ships only committed data, fully offline; (b) hand-curated data files without a generator (lighter now, painful at 3,000 bodies and for updates); (c) a runtime downloader (violates the fully-offline posture). This decides repo tooling, data refresh workflow, and how the ~3,000-body file stays honest.]
+- **FR-WORLD-103**: Rail ephemerides from the shipped elements MUST reproduce published reference positions for major bodies within documented per-body accuracy bounds across 2026–2126, validated by CI checks against committed reference values. *(FR-WLD-002)*
+- **FR-WORLD-106**: The catalogue MUST be produced by an **offline data-build tool** in the repository (clarified 2026-06-13): developers run it against public datasets (JPL SBDB, planetary fact sheets, MPC) to emit the committed, schema-validated data files with per-entry provenance and a recorded snapshot date; the shipped game contains only committed data (fully offline); refreshes are development-time acts re-running the tool; CI validates the committed output, never the network.
 - **FR-WORLD-104**: The catalogue MUST implement FA-02's body-catalogue contract so the propagator, SOI machinery and planners run unchanged against the real world; the FA-02 test fixture remains for physics tests.
 - **FR-WORLD-105**: The 2026 baseline MUST match the umbrella's clarified world: real government assets context, fictional commercial sector (no real-company small-body naming conflicts; real IAU body names are used for natural bodies). *(FR-WLD-012)*
 
@@ -257,8 +251,9 @@ schema-validated data files with `source` provenance (Principles I, V); the engi
 - **FR-WORLD-301**: Ground truth for all surveyable properties MUST be held separately from belief: seeded where the design calls for per-game variation (resource grades, hazard details — drawn from sourced plausibility distributions via kernel streams at world creation), fixed where reality fixes it (orbits, radii, documented compositions).
 - **FR-WORLD-302**: Belief state MUST be per-faction (opaque faction ids now; FA-09 binds them later): per surveyable property, an estimate + uncertainty, initialised from documented priors (real 2026 knowledge: well-known for major bodies, wide for unsurveyed sites/small bodies).
 - **FR-WORLD-303**: No faction-facing query may return ground truth for an unsurveyed property; truth access is restricted to engine-internal resolution and explicitly privileged test interfaces. A standing audit test MUST enforce this for the whole query surface. *(Principle VIII)*
-- **FR-WORLD-304**: Observations MUST be journaled commands parameterised by (faction, target, observation class, instrument quality): remote-sensing, in-situ and sample-grade classes with documented uncertainty floors per class; each observation moves the faction's estimate toward truth with seeded noise and narrows uncertainty per a documented refinement model; information never decreases; repeated observations converge to the class floor. [NEEDS CLARIFICATION: In this slice, what validates an observation command? Options: (a) **trust-the-caller**: any faction may observe any target (mission slices later enforce "you must actually be there with an instrument" before issuing the command) — simplest honest seam, matching how the research-gate stand-in worked in FA-02; (b) proximity-validated now: the world module checks a craft of that faction is within range via FA-02 state (requires new cross-module data flows — craft positions aren't in published views — and craft have no faction identity until FA-09); (c) trust-the-caller plus a declared validation hook interface that mission slices will implement. This decides cross-module coupling now versus later.]
+- **FR-WORLD-304**: Observations MUST be journaled commands parameterised by (faction, target, observation class, instrument quality): remote-sensing, in-situ and sample-grade classes with documented uncertainty floors per class; each observation moves the faction's estimate toward truth with seeded noise and narrows uncertainty per a documented refinement model; information never decreases; repeated observations converge to the class floor. Validation is **trust-the-caller** in this slice (clarified 2026-06-13): structural validity (target exists, class/quality valid) is checked; *entitlement* (a craft of that faction actually being there with a capable instrument) is enforced by the mission slices that will issue these commands — the same honest-seam pattern as FA-02's research gate.
 - **FR-WORLD-305**: Mission-derived knowledge MUST also flow per the umbrella: per-body Geoscience understanding grows primarily from observation events (the FA-05 research slice will consume these; this slice emits them as kernel events with class/quality payloads).
+- **FR-WORLD-306**: Astrobiology ground truth MUST be seeded at world creation per candidate world (Mars subsurface, Europa, Enceladus, Titan, Ceres brines, Venus clouds) from sourced plausibility-bounded distributions via kernel streams — mostly negative, rarely more than one or two positives per game — held in the engine-private truth store with belief fields initialised to honest 2026 priors. The staged evidence process that resolves it arrives with the mission slices (clarified 2026-06-13); this slice guarantees the truth exists, is deterministic per seed, and leaks through no query. *(Umbrella FR-WLD-009 data half)*
 
 ### Sites (FR-WLD-007)
 
@@ -332,13 +327,15 @@ schema-validated data files with `source` provenance (Principles I, V); the engi
 - Resource extraction, pricing, ISRU economics (FA-06); base building (FA-07).
 - Faction definitions, politics, AI behaviour (FA-09); data trade between factions.
 - All UI (FA-10) — including Sojournal rendering and map display.
-- Planetary-protection consequence mechanics and the staged astrobiology evidence process — pending the scope clarification above (data + seeding are in scope under option (a)).
+- Planetary-protection consequence mechanics and the staged astrobiology evidence process — the data + seeding halves ship here (clarified 2026-06-13); the mechanics arrive with the mission/politics slices.
 - Real-time data updates from live astronomy services (offline posture; data refresh is a development-time act).
 
-## Open Clarifications Summary
+## Clarifications
 
-Three items are marked [NEEDS CLARIFICATION], in priority order:
+### Session 2026-06-13
 
-1. **Scope Boundary — planetary protection & astrobiology**: data + seeded ground truth here with mechanics later (a), or the full evidence/consequence machinery now (b)? (Umbrella FR-WLD-008…011 traceability.)
-2. **FR-WORLD-304 — observation validation**: trust-the-caller (a), proximity-validated now (b), or trust + declared validation hook (c)? (Cross-module coupling now vs later.)
-3. **FR-WORLD-103 — catalogue production pipeline**: offline data-build tool emitting committed files (a), hand-curated (b), or runtime download (c)? (Tooling, refresh workflow, data honesty at 3,000 bodies.)
+- Q: Where does FA-03 end on planetary protection & astrobiology? → A: Data + seeding here (PP categories on bodies/sites; seeded astrobiology ground truth per candidate world, mostly-negative, deterministic, leak-proof; belief fields for both); the staged evidence process and contamination-consequence mechanics arrive with the mission/politics slices. (Scope Boundary, FR-WORLD-306)
+- Q: What validates an observation command in this slice? → A: Trust-the-caller — structural validity checked here; entitlement (being there with an instrument) enforced by the mission slices that issue the commands. (FR-WORLD-304)
+- Q: How is the ~3,000-body catalogue produced? → A: An offline data-build tool in the repo queries public datasets and emits committed, schema-validated files with per-entry provenance and a snapshot date; the game ships only committed data, fully offline. (FR-WORLD-106)
+
+No open [NEEDS CLARIFICATION] markers remain.

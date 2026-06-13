@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain — **3 markers open** (Scope Boundary PP/astrobiology split; FR-WORLD-304 observation validation; FR-WORLD-103 catalogue pipeline). Presented for user decision / `/speckit-clarify`.
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -33,6 +33,8 @@
 
 - Child spec of the umbrella (FA-03), the production implementer of FA-02's body-catalogue
   contract, built on the FA-01 kernel contracts. Traceability to FR-WLD-### annotated inline.
-- Constitution requires clarification before planning for world-data features — the 3 open
-  markers block `/speckit-plan` until answered.
 - Validation iteration 1 (2026-06-13): all items pass except the 3 intentional open markers.
+- Validation iteration 2 (2026-06-13): user answered Q1: A, Q2: A, Q3: A — markers resolved
+  (Scope Boundary + FR-WORLD-306 data/seeding split; FR-WORLD-304 trust-the-caller;
+  FR-WORLD-106 offline data-build tool). Recorded under `## Clarifications / Session
+  2026-06-13`. **All items pass.**
