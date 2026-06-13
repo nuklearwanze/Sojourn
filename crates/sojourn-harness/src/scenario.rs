@@ -35,6 +35,9 @@ pub struct TimedCommand {
     /// A vehicle command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub vehicle: Option<sojourn_vehicle::VehicleCommand>,
+    /// An economy command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub economy: Option<sojourn_economy::EconomyCommand>,
 }
 
 impl TimedCommand {
@@ -46,14 +49,16 @@ impl TimedCommand {
             &self.world,
             &self.research,
             &self.vehicle,
+            &self.economy,
         ) {
-            (Some(c), None, None, None, None) => Ok(c.clone()),
-            (None, Some(a), None, None, None) => Ok(sojourn_astro::astro_payload(a)),
-            (None, None, Some(w), None, None) => Ok(sojourn_world::world_payload(w)),
-            (None, None, None, Some(r), None) => Ok(sojourn_research::research_payload(r)),
-            (None, None, None, None, Some(v)) => Ok(sojourn_vehicle::vehicle_payload(v)),
+            (Some(c), None, None, None, None, None) => Ok(c.clone()),
+            (None, Some(a), None, None, None, None) => Ok(sojourn_astro::astro_payload(a)),
+            (None, None, Some(w), None, None, None) => Ok(sojourn_world::world_payload(w)),
+            (None, None, None, Some(r), None, None) => Ok(sojourn_research::research_payload(r)),
+            (None, None, None, None, Some(v), None) => Ok(sojourn_vehicle::vehicle_payload(v)),
+            (None, None, None, None, None, Some(e)) => Ok(sojourn_economy::economy_payload(e)),
             _ => bail!(
-                "each scenario command needs exactly one of `command`, `astro`, `world`, `research` or `vehicle`"
+                "each scenario command needs exactly one of `command`, `astro`, `world`, `research`, `vehicle` or `economy`"
             ),
         }
     }
@@ -89,6 +94,9 @@ pub struct Scenario {
     /// Install the FA-04 vehicle module (loads `data/vehicle`).
     #[serde(default)]
     pub vehicle: bool,
+    /// Install the FA-06 economy module (loads `data/econ`).
+    #[serde(default)]
+    pub economy: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -143,6 +151,11 @@ impl Scenario {
         if self.vehicle {
             let module = sojourn_vehicle::VehicleModule::load(Path::new("data/vehicle"))
                 .map_err(|e| anyhow::anyhow!("loading vehicle data: {e}"))?;
+            mods.push(Box::new(module));
+        }
+        if self.economy {
+            let module = sojourn_economy::EconomyModule::load(Path::new("data/econ"))
+                .map_err(|e| anyhow::anyhow!("loading economy data: {e}"))?;
             mods.push(Box::new(module));
         }
         Ok(mods)

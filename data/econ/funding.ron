@@ -1,0 +1,20 @@
+// Per-faction funding profiles (FR-EC-301…304). Agency appropriations vs private
+// cash-runway — asymmetry as data, not different physics. Funds in a common
+// accounting unit. (Faction 0 = an agency archetype; faction 1 = a private one.)
+(
+    profiles: [
+        (faction: 0, profile: Agency(
+            baseline_funds: 25000000000.0,
+            volatility: 0.1,
+            directed: [(amount: 2000000000.0, label: "heavy-lift line item")],
+            carry_over: UseItOrLoseIt,
+            caretaker_floor: 5000000000.0,
+            period_days: 365,
+        ), source: "NASA ~$25B/yr congressional appropriation, use-it-or-lose-it (design/00-OVERVIEW.md §3.1, 03-ECONOMY.md §2.1)"),
+        (faction: 1, profile: Private(
+            starting_cash: 1000000000.0,
+            daily_burn: 3000000.0,
+            financing: [Equity, Debt, OwnerInjection],
+        ), source: "private launch-startup runway/burn model (design/03-ECONOMY.md §2.2)"),
+    ],
+)

@@ -1,0 +1,37 @@
+// FA-06 economy scenario: opening balances + stocks, a windowed in-space shipment,
+// an ISRU plant operated through its scale-up ramp (seeded grade draw), and a
+// service contract awarded + fulfilled. Exercises the ledger, logistics, ISRU and
+// market/contract paths for the double-run determinism + save/load gates.
+(
+    name: "economy-logistics",
+    seed: 7,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    economy: true,
+    commands: [
+        (tick: 0, economy: Some(SetBalance(faction: 0, currency: DeltaV, amount: 100000.0))),
+        (tick: 0, economy: Some(SetBalance(faction: 0, currency: MassToOrbit, amount: 50000.0))),
+        (tick: 0, economy: Some(SetBalance(faction: 0, currency: Funds, amount: 30000000000.0))),
+        (tick: 0, economy: Some(SetStock(commodity: "water", location: "leo", amount: 5000.0))),
+        (tick: 0, economy: Some(RegisterFunding(faction: 0, period_end_tick: 31536000))),
+        (tick: 100, economy: Some(DispatchShipment(
+            faction: 0, edge: "leo-eml1", cargo: [("water", 1000.0)],
+            vehicle: (propellant_kg: 8000.0, dv_capacity_mps: 4000.0, payload_kg: 2000.0, reusable: true, kind: Tug),
+            edge_price: (dv_mps: 3200.0, tof_s: 259200.0, next_window_tick: 0, window_open: true),
+        ))),
+        (tick: 200, economy: Some(SiteIsruPlant(faction: 0, node: "shackleton", process: "lunar-ice-electrolysis"))),
+        (tick: 300, economy: Some(OperateIsru(
+            faction: 0, plant: 0, days: 200,
+            grade: (resource_id: "water-ice", believed_grade: 0.8, certainty: 0.5), power_factor: 1.0,
+        ))),
+        (tick: 400, economy: Some(PostRfp(
+            issuer: 0, node: "shackleton", commodity: "lox", amount: 100.0,
+            reward_funds: 50000000.0, heritage: 1.0, penalty: 5000000.0,
+        ))),
+        (tick: 500, economy: Some(AwardContract(contract: 0, winner: 0))),
+        (tick: 600, economy: Some(ReportContract(contract: 0, success: true))),
+    ],
+    checkpoints: [100, 300000, 900000],
+    until_tick: 900000,
+)

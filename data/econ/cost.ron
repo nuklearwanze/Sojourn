@@ -1,0 +1,10 @@
+// Cost-uncertainty + learning params (FR-EC-401…403). P80 sits a fraction above
+// P50; the seeded realisation can overrun up to overrun_max; unit cost falls with
+// cumulative production along the Wright's-law exponent.
+(
+    p80_spread: 0.4,
+    overrun_max: 0.6,
+    learning_exponent: 0.15,
+    immaturity_penalty: 1.0,
+    source: "P50/P80 cost-uncertainty + Wright's-law learning (design/01-RESEARCH.md §4.2, 03-ECONOMY.md §2.3)",
+)

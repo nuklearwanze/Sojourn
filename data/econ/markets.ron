@@ -1,0 +1,12 @@
+// RFP-generation, partnership-trust, and niche-market params (FR-EC-602…604).
+// Niche markets carry finite sizes + price ceilings (no infinite revenue).
+(
+    rfp_period_days: 90,
+    trust_decay_on_renege: 0.5,
+    shock_threshold: 0.025,
+    niche: [
+        (id: "tourism-orbital", size_cap: 500000000.0, price_ceiling: 55000000.0),
+        (id: "ism-zblan", size_cap: 100000000.0, price_ceiling: 1000000.0),
+    ],
+    source: "CLPS/COTS RFP cadence; orbital-tourism (~$55M/seat) & ZBLAN market sizing (design/03-ECONOMY.md §5)",
+)

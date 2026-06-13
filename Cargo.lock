@@ -732,6 +732,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "sojourn-economy"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-astro",
+ "sojourn-core",
+ "thiserror",
+]
+
+[[package]]
 name = "sojourn-harness"
 version = "0.1.0"
 dependencies = [
@@ -747,6 +762,7 @@ dependencies = [
  "slotmap",
  "sojourn-astro",
  "sojourn-core",
+ "sojourn-economy",
  "sojourn-research",
  "sojourn-vehicle",
  "sojourn-world",

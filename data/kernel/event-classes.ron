@@ -34,5 +34,14 @@
         (id: "publish",           default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-402"),
         // FA-04 vehicle-designer classes (specs/006-vehicle-designer contracts/vehicle-commands.md)
         (id: "vehicle-produced",  default_pause: LogOnly,   source: "specs/006-vehicle-designer FR-VD-502 (host bridges to FA-05 heritage)"),
+        // FA-06 economy & logistics classes (specs/007-economy-logistics contracts/economy-commands.md)
+        (id: "budget-cycle",       default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-301 (fiscal period roll-over)"),
+        (id: "contract-awarded",   default_pause: Interrupt, source: "specs/007-economy-logistics FR-EC-602 (RFP award)"),
+        (id: "bankruptcy",         default_pause: Interrupt, source: "specs/007-economy-logistics FR-EC-302 (private cash exhausted)"),
+        (id: "agency-gutted",      default_pause: Interrupt, source: "specs/007-economy-logistics FR-EC-303 (appropriation below caretaker floor)"),
+        (id: "shipment-arrived",   default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-202 (cargo delivered)"),
+        (id: "isru-online",        default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-503 (plant reaches production)"),
+        (id: "market-shock",       default_pause: Interrupt, source: "specs/007-economy-logistics FR-EC-601 (launch-price shock)"),
+        (id: "ops-oversubscribed", default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-206 (ops/comms pool exceeded)"),
     ],
 )

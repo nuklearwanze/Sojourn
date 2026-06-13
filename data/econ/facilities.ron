@@ -1,0 +1,17 @@
+// Capital facilities + ground segment (FR-EC-701…703). Capacity gates the rate of
+// the activity; ground-segment facilities (mission control, DSN, relays) size the
+// finite ops/comms pool.
+(
+    facilities: [
+        (id: "mission-control", kind: MissionControl, capex: 200000000.0, opex_per_day: 50000.0, capacity: 20.0,
+         source: "agency mission-control ops capacity (design/03-ECONOMY.md §7)"),
+        (id: "dsn", kind: DeepSpaceNetwork, capex: 500000000.0, opex_per_day: 100000.0, capacity: 30.0,
+         source: "Deep Space Network antenna time (design/03-ECONOMY.md §7)"),
+        (id: "relay", kind: Relay, capex: 150000000.0, opex_per_day: 20000.0, capacity: 15.0,
+         source: "relay constellation comms capacity (design/03-ECONOMY.md §7)"),
+        (id: "prod-line", kind: ProductionLine, capex: 300000000.0, opex_per_day: 80000.0, capacity: 10.0,
+         source: "integration/production line throughput (design/03-ECONOMY.md §7)"),
+        (id: "pad", kind: Pad, capex: 400000000.0, opex_per_day: 60000.0, capacity: 12.0,
+         source: "launch pad cadence (design/03-ECONOMY.md §7)"),
+    ],
+)

@@ -1,0 +1,14 @@
+// Analytic validation cases for `validate-data econ` (contracts/economy-data.md).
+// The harness computes break-even at the two horizons (expecting a sign flip),
+// checks P50<P80 from cost.ron, and the launch-price elasticity sign.
+(
+    isru_break_even: (
+        process: "lunar-ice-electrolysis",
+        yield_per_day: 100.0,
+        price_per_kg_saved: 2700.0,
+        delivery_price_per_kg: 2700.0,
+        days_below: 10.0,
+        days_above: 3650.0,
+    ),
+    source: "FA-06 analytic validation cases (specs/007-economy-logistics/contracts/economy-data.md)",
+)

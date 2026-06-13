@@ -1,0 +1,12 @@
+// Strategic-material supply caps (FR-EC-106). The cap is enforced by ledger
+// conservation; `policy_gate` is carried for FA-09 (political cost out of scope).
+(
+    supplies: [
+        (id: "pu238", annual_production_cap: 1.5, world_stock: 35.0, policy_gate: "civil-pu238",
+         source: "DOE Pu-238 production restart target ~1.5 kg/yr; constrained stock (design/03-ECONOMY.md §3.2)"),
+        (id: "heu", annual_production_cap: 0.0, world_stock: 200.0, policy_gate: "heu",
+         source: "highly-enriched uranium: policy-gated, no new civil production (design/03-ECONOMY.md §3.2)"),
+        (id: "leu", annual_production_cap: 2000.0, world_stock: 8000.0, policy_gate: "leu",
+         source: "low-enriched uranium: available, performance cost vs HEU (design/03-ECONOMY.md §3.2)"),
+    ],
+)

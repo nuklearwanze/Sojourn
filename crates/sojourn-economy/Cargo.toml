@@ -1,0 +1,25 @@
+[package]
+name = "sojourn-economy"
+description = "Sojourn economy & logistics (FA-06): six-currency ledger, location-addressed resources, a delta-v-priced transport graph, funding models, P50/P80 cost + learning, ISRU break-even, markets/contracts, and capital facilities. SimModule on the sojourn-core kernel; cross-slice physics flows in as composed values (dep core only)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[dev-dependencies]
+# Test-only: the one astro-priced integration test reaches the real FA-02 planner.
+# No production crate edge, no cycle — production code stays core-only (R1).
+sojourn-astro = { path = "../sojourn-astro" }
+
+[lints]
+workspace = true

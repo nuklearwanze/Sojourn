@@ -348,6 +348,25 @@ fn main() -> Result<()> {
                         .map(|b| format!("{b:02x}"))
                         .collect::<String>()
                 );
+            } else if dir.join("commodities.ron").exists() {
+                // FA-06 economy data (FR-EC-801): schema + sources + ref resolution
+                // (in load) plus the analytic gates (break-even sign, P50<P80,
+                // launch-price elasticity).
+                let m = sojourn_economy::EconomyModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("economy data invalid: {e}"))?;
+                economy_analytic_gates(&m)?;
+                println!(
+                    "DATA VALID (economy): {} commodities, {} network nodes, {} isru processes, \
+                     {} facility types; analytic gates PASS; econ hash {}",
+                    m.commodities.by_id.len(),
+                    m.network.nodes.len(),
+                    m.isru.by_id.len(),
+                    m.facility_defs.by_id.len(),
+                    m.content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
             } else if dir.join("test-catalog.ron").exists() {
                 let module = sojourn_astro::AstroModule::load(&dir)
                     .map_err(|e| anyhow::anyhow!("astro data invalid: {e}"))?;
@@ -398,8 +417,14 @@ fn main() -> Result<()> {
                             .expect("vehicle data loads"),
                     )
                 }),
+                "economy" => Box::new(|| {
+                    Box::new(
+                        sojourn_economy::EconomyModule::load(std::path::Path::new("data/econ"))
+                            .expect("economy data loads"),
+                    )
+                }),
                 other => bail!(
-                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research' or 'vehicle')"
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle' or 'economy')"
                 ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
@@ -414,6 +439,63 @@ fn main() -> Result<()> {
             }
             println!("CONFORMANCE PASS '{module}'");
         }
+    }
+    Ok(())
+}
+
+/// FA-06 analytic validation gates (FR-EC-801, contracts/economy-data.md): ISRU
+/// break-even sign flip, P50<P80, and the launch-price elasticity sign.
+fn economy_analytic_gates(m: &sojourn_economy::EconomyModule) -> Result<()> {
+    use sojourn_economy::ids::OrbitClass;
+    use sojourn_economy::isru;
+
+    // 1. ISRU break-even sign: negative below break-even, positive above.
+    let proc = m
+        .isru
+        .by_id
+        .values()
+        .next()
+        .context("no ISRU process to validate")?;
+    let leo = m
+        .launch_market
+        .price_at(
+            &OrbitClass("leo".into()),
+            m.launch_market.reference_capacity,
+        )
+        .context("no LEO launch price")?;
+    let yield_per_day = proc.base_yield_per_day; // nameplate
+    let below = isru::break_even(proc, yield_per_day, leo, leo, 10.0);
+    let above = isru::break_even(proc, yield_per_day, leo, leo, 3650.0);
+    if below.net >= 0.0 || above.net <= 0.0 {
+        bail!(
+            "ISRU break-even gate failed: below.net={} (want <0), above.net={} (want >0)",
+            below.net,
+            above.net
+        );
+    }
+
+    // 2. P50 < P80 from the cost params (spread > 0).
+    if m.cost.p80_spread <= 0.0 {
+        bail!("cost gate failed: p80_spread must be > 0 so P50 < P80");
+    }
+
+    // 3. Launch-price elasticity sign: raising world capacity lowers $/kg.
+    let base = m
+        .launch_market
+        .price_at(
+            &OrbitClass("leo".into()),
+            m.launch_market.reference_capacity,
+        )
+        .context("no LEO price")?;
+    let cheaper = m
+        .launch_market
+        .price_at(
+            &OrbitClass("leo".into()),
+            m.launch_market.reference_capacity * 2.0,
+        )
+        .context("no LEO price")?;
+    if cheaper >= base {
+        bail!("elasticity gate failed: doubling capacity did not lower $/kg ({cheaper} >= {base})");
     }
     Ok(())
 }

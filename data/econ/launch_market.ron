@@ -1,0 +1,15 @@
+// Launch market (FR-EC-601). $/kg by orbit class moves with a world-capacity
+// index (price ∝ (reference/index)^elasticity): widespread reuse lowers $/kg and
+// raises ISRU's relative value. Sourced base prices.
+(
+    base_price_per_kg: {
+        "leo": 2700.0,
+        "gto": 5000.0,
+        "geo": 9000.0,
+        "tli": 12000.0,
+    },
+    reference_capacity: 1.0,
+    elasticity: 0.5,
+    fluctuation: 0.03,
+    source: "commercial launch price sheets ~$2,700/kg to LEO (Falcon 9-class); capacity-elasticity design-intent (design/03-ECONOMY.md §5)",
+)

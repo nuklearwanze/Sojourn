@@ -1,0 +1,27 @@
+// ISRU process models (FR-EC-501…503). Yield, plant mass, power, operating cost,
+// and a pilot->production scale-up/reliability ramp. Sourced; break-even is
+// computed against the launch-cost-saved (never free fuel).
+(
+    processes: [
+        (id: "lunar-ice-electrolysis",
+         input: "water", output: "lox",
+         base_yield_per_day: 100.0, power_demand_w: 10000.0, plant_mass_kg: 2000.0,
+         operate_cost_per_day: 5000.0, ramp_days_per_level: 90,
+         scaleup_curve: [
+            (yield_mult: 0.3, reliability: 0.6),
+            (yield_mult: 0.7, reliability: 0.85),
+            (yield_mult: 1.0, reliability: 0.97),
+         ],
+         source: "lunar polar ice ISRU + cislunar propellant-market studies (design/03-ECONOMY.md §4)"),
+        (id: "mars-sabatier",
+         input: "co2", output: "ch4",
+         base_yield_per_day: 50.0, power_demand_w: 8000.0, plant_mass_kg: 1500.0,
+         operate_cost_per_day: 4000.0, ramp_days_per_level: 120,
+         scaleup_curve: [
+            (yield_mult: 0.3, reliability: 0.6),
+            (yield_mult: 0.7, reliability: 0.85),
+            (yield_mult: 1.0, reliability: 0.95),
+         ],
+         source: "MOXIE + Mars Sabatier ISRU architectures (design/03-ECONOMY.md §4)"),
+    ],
+)

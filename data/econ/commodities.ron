@@ -1,0 +1,42 @@
+// FA-06 tradable-commodity taxonomy (FR-EC-107). Raw materials reference FA-03
+// resource taxonomy ids; the set is extended with processed/manufactured/
+// consumable/strategic goods and services. Sourced; no combat commodity.
+(
+    commodities: [
+        // --- raw in-situ (reference FA-03 resource ids) ---
+        (id: "water", kind: Raw(resource_ref: "water-ice"), unit: Kg,
+         source: "lunar polar water ice; FA-03 resource taxonomy (design/05-WORLD.md)"),
+        (id: "regolith", kind: Raw(resource_ref: "regolith"), unit: Kg,
+         source: "lunar/Mars regolith feedstock; FA-03 resource taxonomy"),
+        (id: "co2", kind: Raw(resource_ref: "mars-atmosphere-co2"), unit: Kg,
+         source: "Mars atmospheric CO2 (~95%); MOXIE feedstock (design/03-ECONOMY.md §4)"),
+
+        // --- processed (propellants, metals) ---
+        (id: "lox", kind: Processed(from: "water"), unit: Kg,
+         source: "LOX from water electrolysis (design/03-ECONOMY.md §4)"),
+        (id: "lh2", kind: Processed(from: "water"), unit: Kg,
+         source: "LH2 from water electrolysis (design/03-ECONOMY.md §4)"),
+        (id: "ch4", kind: Processed(from: "co2"), unit: Kg,
+         source: "CH4 from Mars Sabatier (CO2 + H2 -> CH4 + H2O) (design/03-ECONOMY.md §4)"),
+        (id: "metals", kind: Processed(from: "regolith"), unit: Kg,
+         source: "structural metals from regolith reduction (design/03-ECONOMY.md §4)"),
+
+        // --- manufactured / consumable ---
+        (id: "spares", kind: Manufactured, unit: Kg,
+         source: "maintenance spares (design/03-ECONOMY.md §3.1)"),
+        (id: "zblan", kind: Manufactured, unit: Kg,
+         source: "ZBLAN optical fibre, micro-g manufacture (design/03-ECONOMY.md §5)"),
+        (id: "food", kind: Consumable, unit: Kg,
+         source: "crew consumables (design/04-SPACEFLIGHT.md §6)"),
+
+        // --- strategic (capped) ---
+        (id: "pu238", kind: Strategic(cap_ref: "pu238"), unit: Kg,
+         source: "Pu-238 RTG fuel, globally scarce (design/03-ECONOMY.md §3.2)"),
+
+        // --- services (intangible) ---
+        (id: "launch-service", kind: Service, unit: Service,
+         source: "launch market service (design/03-ECONOMY.md §5)"),
+        (id: "data-license", kind: Service, unit: Service,
+         source: "science-data / IP licensing (design/03-ECONOMY.md §5)"),
+    ],
+)

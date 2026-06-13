@@ -1,0 +1,32 @@
+// Curated transport-graph node set (referencing FA-03 world location ids) + edge
+// templates (FR-EC-201). The ~3,000-body catalogue stays a prospecting layer;
+// nodes are added as factions begin operating at new Sites. Pricing is supplied
+// at dispatch as a composed EdgePrice (not in data).
+(
+    nodes: [
+        (id: "earth-surface", location: "earth-surface", role: Staging,
+         source: "design/03-ECONOMY.md §6 (Earth surface)"),
+        (id: "leo", location: "earth-leo", role: Staging,
+         source: "design/03-ECONOMY.md §6 (LEO)"),
+        (id: "eml1", location: "earth-moon-l1", role: Staging,
+         source: "design/03-ECONOMY.md §6 (EML-1 staging)"),
+        (id: "llo", location: "moon-llo", role: Staging,
+         source: "design/03-ECONOMY.md §6 (low lunar orbit)"),
+        (id: "shackleton", location: "moon-shackleton-rim", role: Site,
+         source: "design/05-WORLD.md (Shackleton rim polar-ice site)"),
+        (id: "depot-eml1", location: "earth-moon-l1", role: Depot,
+         source: "design/03-ECONOMY.md §6 (EML-1 propellant depot)"),
+    ],
+    edges: [
+        (id: "launch-leo", from: "earth-surface", to: "leo", kind: Launch(orbit_class: "leo"),
+         source: "design/03-ECONOMY.md §6 (surface->LEO launch)"),
+        (id: "leo-eml1", from: "leo", to: "eml1", kind: InSpace,
+         source: "design/04-SPACEFLIGHT.md §1 (LEO->EML-1 transfer)"),
+        (id: "eml1-llo", from: "eml1", to: "llo", kind: InSpace,
+         source: "design/04-SPACEFLIGHT.md §1 (EML-1->LLO transfer)"),
+        (id: "llo-shackleton", from: "llo", to: "shackleton", kind: InSpace,
+         source: "design/04-SPACEFLIGHT.md §5 (LLO->surface descent)"),
+        (id: "eml1-depot", from: "eml1", to: "depot-eml1", kind: InSpace,
+         source: "design/03-ECONOMY.md §6.depots (EML-1 depot delivery)"),
+    ],
+)
