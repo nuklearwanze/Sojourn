@@ -14,7 +14,8 @@ use sojourn_core::{
 use std::collections::BTreeMap;
 use std::path::Path;
 
-/// A command at a tick: a kernel command OR an astro command (exactly one).
+/// A command at a tick: a kernel command, an astro command, or a world command
+/// (exactly one).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimedCommand {
     /// Tick at which the driver submits it.
@@ -25,15 +26,19 @@ pub struct TimedCommand {
     /// An astro command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub astro: Option<sojourn_astro::AstroCommand>,
+    /// A world command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub world: Option<sojourn_world::WorldCommand>,
 }
 
 impl TimedCommand {
     /// The kernel command this entry submits.
     pub fn to_kernel(&self) -> Result<Command> {
-        match (&self.command, &self.astro) {
-            (Some(c), None) => Ok(c.clone()),
-            (None, Some(a)) => Ok(sojourn_astro::astro_payload(a)),
-            _ => bail!("each scenario command needs exactly one of `command` or `astro`"),
+        match (&self.command, &self.astro, &self.world) {
+            (Some(c), None, None) => Ok(c.clone()),
+            (None, Some(a), None) => Ok(sojourn_astro::astro_payload(a)),
+            (None, None, Some(w)) => Ok(sojourn_world::world_payload(w)),
+            _ => bail!("each scenario command needs exactly one of `command`, `astro` or `world`"),
         }
     }
 }
@@ -58,6 +63,10 @@ pub struct Scenario {
     /// Install the astrodynamics module (loads `data/astro`).
     #[serde(default)]
     pub astro: bool,
+    /// Install the FA-03 world stack: the astro propagator on the real catalogue
+    /// (`data/world`) plus the world module (belief/sites/locations/prospecting).
+    #[serde(default)]
+    pub world: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -95,6 +104,14 @@ impl Scenario {
             let module = sojourn_astro::AstroModule::load(Path::new("data/astro"))
                 .map_err(|e| anyhow::anyhow!("loading astro data: {e}"))?;
             mods.push(Box::new(module));
+        }
+        if self.world {
+            let astro = sojourn_astro::AstroModule::load(Path::new("data/world"))
+                .map_err(|e| anyhow::anyhow!("loading astro on real catalogue: {e}"))?;
+            let world = sojourn_world::WorldModule::load(Path::new("data/world"))
+                .map_err(|e| anyhow::anyhow!("loading world data: {e}"))?;
+            mods.push(Box::new(astro));
+            mods.push(Box::new(world));
         }
         Ok(mods)
     }

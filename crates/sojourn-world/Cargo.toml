@@ -1,0 +1,30 @@
+[package]
+name = "sojourn-world"
+description = "Sojourn world data & belief state (FA-03): the real Solar-System catalogue, per-faction belief over engine-private ground truth, surveyable sites, dynamical locations, prospecting fields and the Sojournal. SimModule on the sojourn-core kernel, above sojourn-astro."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+sojourn-astro = { path = "../sojourn-astro" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[features]
+# Exposes explicitly-privileged ground-truth accessors for tests/inspection.
+# NEVER enabled in the shipped game; the honesty audit runs without it.
+privileged = []
+
+[dev-dependencies]
+rand_chacha = { workspace = true }
+rand_core = { workspace = true }
+
+[lints]
+workspace = true

@@ -9,6 +9,10 @@ use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 use std::path::Path;
 
+fn normalize(text: &str) -> String {
+    text.replace("\r\n", "\n")
+}
+
 /// Stable body identity within a catalogue version.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
@@ -94,20 +98,71 @@ pub struct Catalog {
 }
 
 impl Catalog {
-    /// Load and validate the catalogue from `test-catalog.ron` in `dir`.
+    /// Load and validate the catalogue from `dir`. FA-03 production form: if a
+    /// `catalog/` subdirectory exists, every `*.ron` in it (in sorted filename
+    /// order) is parsed as a `CatalogFile` and the bodies are merged — the real
+    /// multi-file Solar-System catalogue. Otherwise the single FA-02
+    /// `test-catalog.ron` fixture is loaded (unchanged behaviour, byte-identical
+    /// content hash).
     pub fn load_dir(dir: &Path) -> Result<Catalog, String> {
-        let path = dir.join("test-catalog.ron");
-        let text = std::fs::read_to_string(&path)
-            .map_err(|e| format!("reading {}: {e}", path.display()))?;
-        Self::from_source(&text)
+        let catalog_dir = dir.join("catalog");
+        if catalog_dir.is_dir() {
+            let mut files: Vec<std::path::PathBuf> = std::fs::read_dir(&catalog_dir)
+                .map_err(|e| format!("reading {}: {e}", catalog_dir.display()))?
+                .filter_map(|e| e.ok().map(|e| e.path()))
+                .filter(|p| p.extension().is_some_and(|x| x == "ron"))
+                .collect();
+            files.sort();
+            if files.is_empty() {
+                return Err(format!("no .ron catalogue files in {}", catalog_dir.display()));
+            }
+            let mut combined = String::new();
+            let mut all_bodies = Vec::new();
+            for f in &files {
+                let text = std::fs::read_to_string(f)
+                    .map_err(|e| format!("reading {}: {e}", f.display()))?;
+                let cf: CatalogFile =
+                    ron::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
+                combined.push_str(&normalize(&text));
+                combined.push('\n');
+                all_bodies.extend(cf.bodies);
+            }
+            Self::from_bodies(all_bodies, &combined)
+        } else {
+            let path = dir.join("test-catalog.ron");
+            let text = std::fs::read_to_string(&path)
+                .map_err(|e| format!("reading {}: {e}", path.display()))?;
+            Self::from_source(&text)
+        }
     }
 
-    /// Build from file content.
+    /// Build from a single file's content (the FA-02 fixture path).
     pub fn from_source(text: &str) -> Result<Catalog, String> {
-        let file: CatalogFile =
-            ron::from_str(text).map_err(|e| format!("test-catalog.ron: {e}"))?;
+        let file: CatalogFile = ron::from_str(text).map_err(|e| format!("catalogue: {e}"))?;
+        Self::from_bodies(file.bodies, &normalize(text))
+    }
+
+    /// A clone of this catalogue extended with runtime-generated bodies
+    /// (prospecting products, FR-WORLD-502). The content hash is **unchanged** —
+    /// generated bodies are deterministic journalled runtime state pinned by the
+    /// world slice, not part of the immutable data version. Used to build
+    /// planning-query snapshots in which a generated body is a first-class target.
+    pub fn with_generated(&self, extra: impl IntoIterator<Item = BodyDef>) -> Catalog {
+        let mut bodies = self.bodies.clone();
+        for b in extra {
+            bodies.insert(b.id, b);
+        }
+        Catalog {
+            bodies,
+            content_hash: self.content_hash,
+        }
+    }
+
+    /// Validate a body set and build the catalogue. `hash_text` is the canonical
+    /// (newline-normalised) source text whose BLAKE3 the slice pins.
+    fn from_bodies(bodies_vec: Vec<BodyDef>, hash_text: &str) -> Result<Catalog, String> {
         let mut bodies = BTreeMap::new();
-        for b in file.bodies {
+        for b in bodies_vec {
             if b.source.trim().is_empty() {
                 return Err(format!("body '{}' has an empty source field", b.name_id));
             }
@@ -158,14 +213,18 @@ impl Catalog {
                     }
                 }
             }
-            if b.divertible && (b.gravitating || b.radius > 1.0e5) {
+            // Divertibility is flag-driven (body-catalogue contract): a divertible
+            // body must not gravitate far-field. The FA-02 fixture-only radius
+            // heuristic is dropped — real small bodies are validated by the data
+            // build tool (FR-WORLD-106), not a magic radius here.
+            if b.divertible && b.gravitating {
                 return Err(format!(
-                    "body '{}': divertible is restricted to non-gravitating small bodies",
+                    "body '{}': a divertible body must not gravitate far-field",
                     b.name_id
                 ));
             }
         }
-        let content_hash = *blake3::hash(text.replace("\r\n", "\n").as_bytes()).as_bytes();
+        let content_hash = *blake3::hash(hash_text.as_bytes()).as_bytes();
         Ok(Catalog {
             bodies,
             content_hash,

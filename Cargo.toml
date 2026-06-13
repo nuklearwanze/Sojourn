@@ -1,6 +1,12 @@
 [workspace]
 resolver = "2"
-members = ["crates/sojourn-core", "crates/sojourn-astro", "crates/sojourn-harness"]
+members = [
+    "crates/sojourn-core",
+    "crates/sojourn-astro",
+    "crates/sojourn-world",
+    "crates/sojourn-worldbuild",
+    "crates/sojourn-harness",
+]
 
 [workspace.package]
 version = "0.1.0"

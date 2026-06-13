@@ -1,0 +1,13 @@
+// Astrobiology candidate worlds (FR-WORLD-306). Seeded ground truth is mostly negative;
+// presence_prob reflects sourced, honest 2026 plausibility (kept low). The staged evidence
+// process and any contamination mechanics arrive with the mission/politics slices.
+(
+    candidates: [
+        (body: 4,   presence_prob: 0.10, tier: Subsurface,  source: "Mars subsurface: possible extant chemolithotrophic life in deep aquifers (Michalski et al.); low prior"),
+        (body: 111, presence_prob: 0.12, tier: Ocean,       source: "Europa subglacial ocean: habitable conditions (Galileo/Hubble plumes); low prior"),
+        (body: 121, presence_prob: 0.12, tier: Ocean,       source: "Enceladus ocean: H2 + organics in plumes (Cassini INMS); low prior"),
+        (body: 120, presence_prob: 0.05, tier: Atmospheric, source: "Titan: exotic/non-water solvent chemistry hypotheses; very low prior"),
+        (body: 10,  presence_prob: 0.04, tier: Brine,       source: "Ceres briny subsurface: organics + carbonates (Dawn); very low prior"),
+        (body: 2,   presence_prob: 0.03, tier: Atmospheric, source: "Venus cloud layer: contested phosphine/habitability claims; very low prior"),
+    ],
+)

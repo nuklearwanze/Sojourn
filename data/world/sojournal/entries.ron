@@ -1,0 +1,42 @@
+// Sojournal encyclopedia data (FR-WORLD-601/602). Entries describe the real world and the
+// game's honest mechanics only — never per-game seeded truths. Every entry is cited; every
+// link resolves to a catalogue body, site, location or another entry (CI-enforced).
+(
+    entries: [
+        (
+            id: "sol", kind: Body, subject_ref: Some(Body(0)),
+            title_id: "sj.sol.title",
+            body_text: "sj.sol.body",
+            citations: [(source: "NASA Sun fact sheet; IAU 2015 nominal solar values")],
+            links: [Body(3), Body(5)],
+        ),
+        (
+            id: "terra", kind: Body, subject_ref: Some(Body(3)),
+            title_id: "sj.terra.title",
+            body_text: "sj.terra.body",
+            citations: [(source: "NASA Earth fact sheet; EGM2008 gravity model")],
+            links: [Body(100), Location("leo"), Location("geo")],
+        ),
+        (
+            id: "ares", kind: Body, subject_ref: Some(Body(4)),
+            title_id: "sj.ares.title",
+            body_text: "sj.ares.body",
+            citations: [(source: "NASA Mars fact sheet; MOLA topography; MEDA/MOXIE results")],
+            links: [Site("ares-jezero"), Site("ares-midlat-ice")],
+        ),
+        (
+            id: "luna", kind: Body, subject_ref: Some(Body(100)),
+            title_id: "sj.luna.title",
+            body_text: "sj.luna.body",
+            citations: [(source: "NASA Moon fact sheet; LRO/LCROSS polar volatiles")],
+            links: [Site("luna-shackleton"), Location("llo"), Location("eml1")],
+        ),
+        (
+            id: "concept-belief-and-survey", kind: Concept, subject_ref: None,
+            title_id: "sj.belief.title",
+            body_text: "sj.belief.body",
+            citations: [(source: "Remote sensing vs in-situ vs sample-return information content (planetary science methodology)")],
+            links: [Entry("terra"), Entry("ares")],
+        ),
+    ],
+)

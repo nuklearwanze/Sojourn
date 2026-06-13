@@ -255,6 +255,38 @@ fn main() -> Result<()> {
                     ds.watch_templates.len(),
                     ds.version().hex()
                 );
+            } else if dir.join("priors.ron").exists() {
+                // FA-03 world data (FR-WORLD-801): catalogue + sites + locations +
+                // prospecting + Sojournal (citations, link resolution, major-body
+                // coverage). The build-tool-produced catalogue is validated here,
+                // never the network.
+                let m = sojourn_world::WorldModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("world data invalid: {e}"))?;
+                // Naming check (FR-WORLD-105): no fictional-commercial collisions —
+                // generated-id range is reserved; real entries use real designations.
+                for b in m.catalog.bodies() {
+                    if b.id.0 >= sojourn_world::GENERATED_ID_BASE {
+                        bail!("catalogue body '{}' uses a reserved generated id", b.name_id);
+                    }
+                }
+                // Major-body Sojournal coverage: Sun, Earth, Mars (curated subset).
+                let majors: Vec<sojourn_astro::BodyId> =
+                    [0u32, 3, 4].iter().map(|&i| sojourn_astro::BodyId(i)).collect();
+                m.sojournal
+                    .validate(&m.catalog, &m.sites, &m.locations, &majors)
+                    .map_err(|e| anyhow::anyhow!("sojournal invalid: {e}"))?;
+                m.locations
+                    .validate_refs(&m.catalog)
+                    .map_err(|e| anyhow::anyhow!("locations invalid: {e}"))?;
+                println!(
+                    "DATA VALID (world): {} bodies, {} sites, {} locations, {} sojournal entries, \
+                     world hash {}",
+                    m.catalog.bodies().count(),
+                    m.sites.all().count(),
+                    m.locations.ids().count(),
+                    m.sojournal.entries().len(),
+                    m.world_hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+                );
             } else if dir.join("test-catalog.ron").exists() {
                 let module = sojourn_astro::AstroModule::load(&dir)
                     .map_err(|e| anyhow::anyhow!("astro data invalid: {e}"))?;
@@ -270,7 +302,7 @@ fn main() -> Result<()> {
                 );
             } else {
                 bail!(
-                    "{} contains neither kernel nor astro data files",
+                    "{} contains neither kernel, world nor astro data files",
                     dir.display()
                 );
             }
@@ -287,7 +319,15 @@ fn main() -> Result<()> {
                             .expect("astro data loads"),
                     )
                 }),
-                other => bail!("unknown module '{other}' (use 'toy', 'synthetic' or 'astro')"),
+                "world" => Box::new(|| {
+                    Box::new(
+                        sojourn_world::WorldModule::load(std::path::Path::new("data/world"))
+                            .expect("world data loads"),
+                    )
+                }),
+                other => {
+                    bail!("unknown module '{other}' (use 'toy', 'synthetic', 'astro' or 'world')")
+                }
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
             for p in &report.passed {

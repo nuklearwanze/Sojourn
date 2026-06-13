@@ -746,6 +746,32 @@ dependencies = [
  "slotmap",
  "sojourn-astro",
  "sojourn-core",
+ "sojourn-world",
+]
+
+[[package]]
+name = "sojourn-world"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_chacha",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-astro",
+ "sojourn-core",
+ "thiserror",
+]
+
+[[package]]
+name = "sojourn-worldbuild"
+version = "0.1.0"
+dependencies = [
+ "ron",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

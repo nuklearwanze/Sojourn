@@ -22,5 +22,8 @@
         (id: "plan-invalidated",     default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-302"),
         (id: "propellant-exhausted", default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-307"),
         (id: "aero-violation",       default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-407"),
+        // FA-03 world-data classes (specs/004-world-data contracts/observation-commands.md)
+        (id: "body-catalogued",  default_pause: LogOnly, source: "specs/004-world-data FR-WORLD-502/703"),
+        (id: "survey-milestone", default_pause: LogOnly, source: "specs/004-world-data FR-WORLD-305/703"),
     ],
 )

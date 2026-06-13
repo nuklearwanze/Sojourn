@@ -1,0 +1,13 @@
+// Resource taxonomy (FR-WORLD assumption: sourced resource-type list; FA-06 prices it).
+(
+    kinds: [
+        (id: "water-ice",     name_id: "res.water-ice",     source: "Lunar polar / asteroidal water ice (LCROSS, M3, carbonaceous chondrite hydration)"),
+        (id: "regolith-o2",   name_id: "res.regolith-o2",   source: "Oxygen from regolith oxides (ilmenite/anorthite reduction; MOXIE on Mars)"),
+        (id: "metals",        name_id: "res.metals",        source: "Native/oxide metals: Fe-Ni, Pt-group (M-type asteroids; Psyche)"),
+        (id: "silicates",     name_id: "res.silicates",     source: "Silicate regolith feedstock (S-type asteroids, lunar mare/highland)"),
+        (id: "volatiles",     name_id: "res.volatiles",     source: "C/N/H volatiles (carbonaceous bodies, comets, Ceres)"),
+        (id: "organics",      name_id: "res.organics",      source: "Complex organics (carbonaceous chondrites, Bennu/Ryugu samples)"),
+        (id: "rare-isotopes", name_id: "res.rare-isotopes", source: "He-3 in lunar regolith (Apollo sample assays)"),
+    ],
+    source: "Resource taxonomy compiled from ISRU literature (NASA ISRU roadmaps; meteoritics)",
+)

@@ -1,0 +1,73 @@
+{
+  "out": "planets",
+  "epoch_ns": 0,
+  "snapshot_date": "J2000.0 (2451545.0 TDB)",
+  "provenance": "JPL 'Keplerian Elements for Approximate Positions of the Major Planets' (J2000, 1800-2050 set); GM and mean radii from JPL planetary physical-parameter fact sheets; transcribed 2026-06-13",
+  "bodies": [
+    { "id": 0, "name_id": "sol", "mu": 1.32712440018e20, "radius": 6.9634e8, "gravitating": true,
+      "rotation_period_s": 2192832.0, "parent": null,
+      "source": "Sun: GM_sun = 1.32712440018e20 m^3/s^2 (IAU 2009 / JPL DE); mean radius 6.9634e8 m (IAU)" },
+
+    { "id": 1, "name_id": "mercury", "mu": 2.2032e13, "radius": 2.4397e6, "gravitating": true, "parent": 0,
+      "a_au": 0.38709927, "e": 0.20563593, "i_deg": 7.00497902, "node_deg": 48.33076593,
+      "peri_long_deg": 77.45779628, "mean_long_deg": 252.25032350,
+      "source": "Mercury: JPL approximate elements (J2000); GM 2.2032e13; radius 2.4397e6 m (JPL fact sheet)" },
+
+    { "id": 2, "name_id": "venus", "mu": 3.24859e14, "radius": 6.0518e6, "gravitating": true, "parent": 0,
+      "rotation_period_s": 20996760.0,
+      "atmosphere": { "interface_alt_m": 250000.0, "drag_alt_m": 350000.0, "rho0": 65.0, "scale_height_m": 15900.0,
+        "source": "Venus surface density ~65 kg/m^3, scale height ~15.9 km (NASA Venus fact sheet)" },
+      "a_au": 0.72333566, "e": 0.00677672, "i_deg": 3.39467605, "node_deg": 76.67984255,
+      "peri_long_deg": 131.60246718, "mean_long_deg": 181.97909950,
+      "source": "Venus: JPL approximate elements (J2000); GM 3.24859e14; radius 6.0518e6 m (JPL fact sheet)" },
+
+    { "id": 3, "name_id": "terra", "mu": 3.986004418e14, "radius": 6.371e6, "gravitating": true, "parent": 0,
+      "j2": 1.08263e-3, "rotation_period_s": 86164.0,
+      "atmosphere": { "interface_alt_m": 120000.0, "drag_alt_m": 600000.0, "rho0": 1.225, "scale_height_m": 8500.0,
+        "source": "Earth sea-level density 1.225 kg/m^3, scale height ~8.5 km (US Standard Atmosphere 1976)" },
+      "a_au": 1.00000261, "e": 0.01671123, "i_deg": -0.00001531, "node_deg": 0.0,
+      "peri_long_deg": 102.93768193, "mean_long_deg": 100.46457166,
+      "source": "Earth-Moon barycentre: JPL approximate elements (J2000); GM_earth 3.986004418e14; J2 1.08263e-3 (EGM); radius 6.371e6 m (mean)" },
+
+    { "id": 4, "name_id": "ares", "mu": 4.282837e13, "radius": 3.3895e6, "gravitating": true, "parent": 0,
+      "j2": 1.96045e-3, "rotation_period_s": 88642.7,
+      "atmosphere": { "interface_alt_m": 120000.0, "drag_alt_m": 250000.0, "rho0": 0.020, "scale_height_m": 11100.0,
+        "source": "Mars surface density ~0.020 kg/m^3, scale height ~11.1 km (NASA Mars fact sheet)" },
+      "a_au": 1.52371034, "e": 0.09339410, "i_deg": 1.84969142, "node_deg": 49.55953891,
+      "peri_long_deg": -23.94362959, "mean_long_deg": -4.55343205,
+      "source": "Mars: JPL approximate elements (J2000); GM 4.282837e13; J2 1.96045e-3; radius 3.3895e6 m (JPL fact sheet)" },
+
+    { "id": 5, "name_id": "jupiter", "mu": 1.26686534e17, "radius": 6.9911e7, "gravitating": true, "parent": 0,
+      "j2": 1.4736e-2, "rotation_period_s": 35730.0,
+      "a_au": 5.20288700, "e": 0.04838624, "i_deg": 1.30439695, "node_deg": 100.47390909,
+      "peri_long_deg": 14.72847983, "mean_long_deg": 34.39644051,
+      "source": "Jupiter: JPL approximate elements (J2000); GM 1.26686534e17; J2 1.4736e-2; radius 6.9911e7 m (equatorial, JPL fact sheet)" },
+
+    { "id": 6, "name_id": "saturn", "mu": 3.7931187e16, "radius": 5.8232e7, "gravitating": true, "parent": 0,
+      "j2": 1.6298e-2, "rotation_period_s": 38362.0,
+      "a_au": 9.53667594, "e": 0.05386179, "i_deg": 2.48599187, "node_deg": 113.66242448,
+      "peri_long_deg": 92.59887831, "mean_long_deg": 49.95424423,
+      "source": "Saturn: JPL approximate elements (J2000); GM 3.7931187e16; J2 1.6298e-2; radius 5.8232e7 m (equatorial, JPL fact sheet)" },
+
+    { "id": 7, "name_id": "uranus", "mu": 5.793939e15, "radius": 2.5362e7, "gravitating": true, "parent": 0,
+      "j2": 3.343e-3,
+      "a_au": 19.18916464, "e": 0.04725744, "i_deg": 0.77263783, "node_deg": 74.01692503,
+      "peri_long_deg": 170.95427630, "mean_long_deg": 313.23810451,
+      "source": "Uranus: JPL approximate elements (J2000); GM 5.793939e15; J2 3.343e-3; radius 2.5362e7 m (equatorial, JPL fact sheet)" },
+
+    { "id": 8, "name_id": "neptune", "mu": 6.836529e15, "radius": 2.4622e7, "gravitating": true, "parent": 0,
+      "j2": 3.411e-3,
+      "a_au": 30.06992276, "e": 0.00859048, "i_deg": 1.77004347, "node_deg": 131.78422574,
+      "peri_long_deg": 44.96476227, "mean_long_deg": -55.12002969,
+      "source": "Neptune: JPL approximate elements (J2000); GM 6.836529e15; J2 3.411e-3; radius 2.4622e7 m (equatorial, JPL fact sheet)" },
+
+    { "id": 9, "name_id": "pluto", "mu": 8.71e11, "radius": 1.1883e6, "gravitating": true, "parent": 0,
+      "a_au": 39.48211675, "e": 0.24882730, "i_deg": 17.14001206, "node_deg": 110.30393684,
+      "peri_long_deg": 224.06891629, "mean_long_deg": 238.92903833,
+      "source": "Pluto (dwarf planet): JPL approximate elements (J2000); GM 8.71e11; radius 1.1883e6 m (New Horizons)" },
+
+    { "id": 10, "name_id": "ceres", "mu": 6.26325e10, "radius": 4.69e5, "gravitating": true, "parent": 0,
+      "a_au": 2.7658, "e": 0.0785, "i_deg": 10.593, "node_deg": 80.31, "argp_deg": 73.60, "ma_deg": 95.99,
+      "source": "Ceres (dwarf planet): JPL SBDB osculating elements (epoch ~J2000); GM 6.26325e10 (Dawn); mean radius 4.69e5 m" }
+  ]
+}

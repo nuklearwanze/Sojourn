@@ -9,6 +9,7 @@ rust-version.workspace = true
 [dependencies]
 sojourn-core = { path = "../sojourn-core" }
 sojourn-astro = { path = "../sojourn-astro" }
+sojourn-world = { path = "../sojourn-world" }
 serde = { workspace = true }
 postcard = { workspace = true }
 ron = { workspace = true }

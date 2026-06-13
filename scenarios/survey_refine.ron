@@ -1,0 +1,22 @@
+// FA-03 world scenario: survey refinement + prospecting under the real catalogue.
+// Drives observation commands of increasing quality against a seeded site and a
+// prospecting campaign, then checks double-run determinism (verify) and save/load
+// round-trip. The world stack (astro on data/world + world module) is installed.
+(
+    name: "survey-refine",
+    seed: 42,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    world: true,
+    commands: [
+        (tick: 100, world: Some(Observe(faction: 0, site: "luna-shackleton", property: Some(Grade), class: RemoteSensing, quality: 0.4))),
+        (tick: 200, world: Some(Observe(faction: 0, site: "luna-shackleton", property: Some(Grade), class: InSitu, quality: 0.7))),
+        (tick: 300, world: Some(Observe(faction: 0, site: "luna-shackleton", property: Some(Grade), class: SampleGrade, quality: 0.95))),
+        (tick: 300, world: Some(Observe(faction: 1, site: "ares-jezero", property: None, class: RemoteSensing, quality: 0.5))),
+        (tick: 400, world: Some(Prospect(faction: 0, field: "main-belt", effort: 6.0))),
+        (tick: 500, world: Some(Prospect(faction: 1, field: "nea", effort: 4.0))),
+    ],
+    checkpoints: [350, 600, 1000],
+    until_tick: 1000,
+)

@@ -1,0 +1,23 @@
+// Dynamical locations (FR-WORLD-201): first-class queryable nodes resolved over time via
+// FA-02 frames. Orbit bands are radial shells; L-points first-order collinear; staging
+// orbits characterised regions; surface anchors body-fixed points.
+(
+    locations: [
+        (id: "leo", kind: OrbitBand(body: 3, alt_lo_m: 160000.0, alt_hi_m: 2000000.0, inclination_class: "any"),
+         source: "Low Earth orbit band (ISS/operational LEO altitudes)"),
+        (id: "geo", kind: OrbitBand(body: 3, alt_lo_m: 35586000.0, alt_hi_m: 35986000.0, inclination_class: "equatorial"),
+         source: "Geostationary band (~35786 km altitude)"),
+        (id: "llo", kind: OrbitBand(body: 100, alt_lo_m: 50000.0, alt_hi_m: 200000.0, inclination_class: "any"),
+         source: "Low lunar orbit band (Apollo/LRO altitudes)"),
+        (id: "eml1", kind: LagrangePoint(primary: 3, secondary: 100, point: L1),
+         source: "Earth-Moon L1 (cislunar staging)"),
+        (id: "eml2", kind: LagrangePoint(primary: 3, secondary: 100, point: L2),
+         source: "Earth-Moon L2 (lunar far-side relay / Gateway NRHO vicinity)"),
+        (id: "sel2", kind: LagrangePoint(primary: 0, secondary: 3, point: L2),
+         source: "Sun-Earth L2 (JWST/observatory staging, ~1.5e6 km anti-sunward)"),
+        (id: "gateway-nrho", kind: StagingOrbit(primary: 100, kind: Nrho, char_radius_m: 70000000.0),
+         source: "Lunar near-rectilinear halo orbit (Artemis Gateway), characterised region"),
+        (id: "shackleton-anchor", kind: SurfaceAnchor(body: 100, lat: -89.9, lon: 0.0),
+         source: "Surface anchor at Shackleton crater (lunar south pole)"),
+    ],
+)

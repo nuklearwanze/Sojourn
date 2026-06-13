@@ -1,0 +1,19 @@
+[package]
+name = "sojourn-worldbuild"
+description = "Dev-only offline data-build tool (FA-03, FR-WORLD-106): transforms local public-dataset snapshots (JPL SBDB / MPC / fact-sheet exports) into the committed, schema-validated catalogue with per-entry provenance. NOT part of the shipped game's dependency tree; network-free (reads local snapshots only)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "sojourn-worldbuild"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+ron = { workspace = true }
+
+[lints]
+workspace = true

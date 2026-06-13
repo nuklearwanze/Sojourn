@@ -1,0 +1,27 @@
+{
+  "out": "small-bodies",
+  "epoch_ns": 0,
+  "snapshot_date": "JPL SBDB osculating elements (epoch ~J2000)",
+  "provenance": "JPL Small-Body Database osculating heliocentric elements; GM/diameter from radar/spacecraft characterisation; transcribed 2026-06-13. A curated real subset — the full ~2,800-body population is produced by re-running this tool over the complete SBDB export (see sources/README.md).",
+  "bodies": [
+    { "id": 1000, "name_id": "vesta", "mu": 1.7289e10, "radius": 2.627e5, "gravitating": false, "divertible": false, "parent": 0,
+      "a_au": 2.3617, "e": 0.0887, "i_deg": 7.142, "node_deg": 103.81, "argp_deg": 151.20, "ma_deg": 20.86,
+      "source": "(4) Vesta: SBDB elements; GM 1.7289e10 (Dawn); mean radius 262.7 km" },
+
+    { "id": 1001, "name_id": "eros", "mu": 4.463e5, "radius": 8.42e3, "gravitating": false, "divertible": true, "parent": 0,
+      "a_au": 1.4583, "e": 0.2227, "i_deg": 10.829, "node_deg": 304.30, "argp_deg": 178.82, "ma_deg": 320.0,
+      "source": "(433) Eros: SBDB elements; GM 4.463e5 (NEAR); mean radius ~8.42 km" },
+
+    { "id": 1002, "name_id": "bennu", "mu": 4.892, "radius": 2.45e2, "gravitating": false, "divertible": true, "parent": 0,
+      "a_au": 1.1264, "e": 0.2037, "i_deg": 6.035, "node_deg": 2.061, "argp_deg": 66.22, "ma_deg": 101.7,
+      "source": "(101955) Bennu: SBDB elements; GM 4.892 (OSIRIS-REx); mean radius 245 m" },
+
+    { "id": 1003, "name_id": "ryugu", "mu": 30.0, "radius": 4.48e2, "gravitating": false, "divertible": true, "parent": 0,
+      "a_au": 1.1896, "e": 0.1902, "i_deg": 5.884, "node_deg": 251.62, "argp_deg": 211.43, "ma_deg": 96.0,
+      "source": "(162173) Ryugu: SBDB elements; GM ~30 (Hayabusa2); mean radius 448 m" },
+
+    { "id": 1004, "name_id": "itokawa", "mu": 2.1e0, "radius": 1.65e2, "gravitating": false, "divertible": true, "parent": 0,
+      "a_au": 1.3241, "e": 0.2803, "i_deg": 1.622, "node_deg": 69.08, "argp_deg": 162.82, "ma_deg": 30.0,
+      "source": "(25143) Itokawa: SBDB elements; GM ~2.1 (Hayabusa); mean radius 165 m" }
+  ]
+}

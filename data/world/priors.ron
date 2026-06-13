@@ -1,0 +1,23 @@
+// Belief priors, per-class uncertainty floors and per-property refinement parameters
+// (FR-WORLD-302/304, contracts/belief-model.md). Sigmas are in each property's estimator
+// space (log-space for Grade). Class floors order remote > in-situ > sample-grade.
+(
+    // Per observation class: best achievable sigma (floor) and sigma at quality 0.
+    remote:      (floor: 0.30, sigma0: 0.90),
+    insitu:      (floor: 0.12, sigma0: 0.50),
+    samplegrade: (floor: 0.03, sigma0: 0.20),
+
+    properties: [
+        // Resource grade: positive ⇒ log-space; wide prior (~10% with factor-e spread).
+        (property: Grade,        prior_mean: -2.30, prior_var: 1.00, log_space: true,  scale: 1.0,  classes: [RemoteSensing, InSitu, SampleGrade]),
+        // Illumination fraction [0,1]: remote + in-situ sense it.
+        (property: Illumination, prior_mean: 0.50,  prior_var: 0.04, log_space: false, scale: 0.30, classes: [RemoteSensing, InSitu]),
+        // Surface slope (deg).
+        (property: Slope,        prior_mean: 15.0,  prior_var: 100.0, log_space: false, scale: 1.0,  classes: [RemoteSensing, InSitu, SampleGrade]),
+        // Thermal environment (K).
+        (property: Thermal,      prior_mean: 200.0, prior_var: 2500.0, log_space: false, scale: 30.0, classes: [RemoteSensing, InSitu]),
+        // Hazard severity (ordinal as a scalar); needs in-situ/sample-grade.
+        (property: HazardLevel,  prior_mean: 2.0,   prior_var: 4.0,  log_space: false, scale: 1.0,  classes: [InSitu, SampleGrade]),
+    ],
+    source: "Refinement parameters are engineering defaults calibrated so remote sensing yields ~rough, in-situ ~good, and returned-sample ~tight constraints; not plausibility-bearing physical constants",
+)

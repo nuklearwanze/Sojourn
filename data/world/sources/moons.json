@@ -1,0 +1,46 @@
+{
+  "out": "moons",
+  "epoch_ns": 0,
+  "snapshot_date": "J2000.0 mean orbital elements",
+  "provenance": "JPL planetary-satellite mean orbital + physical parameter fact sheets; transcribed 2026-06-13. Node/argument/mean-anomaly are mean elements at the reference epoch.",
+  "bodies": [
+    { "id": 100, "name_id": "luna", "mu": 4.9048695e12, "radius": 1.7374e6, "gravitating": true, "parent": 3,
+      "rotation_period_s": 2360592.0,
+      "a_m": 3.84400e8, "e": 0.0549, "i_deg": 5.145, "node_deg": 125.08, "argp_deg": 318.15, "ma_deg": 135.27,
+      "source": "Moon: a 384400 km, e 0.0549, i 5.145 deg (mean, JPL); GM 4.9048695e12; radius 1737.4 km" },
+
+    { "id": 101, "name_id": "phobos", "mu": 7.11e5, "radius": 1.11e4, "gravitating": false, "parent": 4,
+      "a_m": 9.376e6, "e": 0.0151, "i_deg": 1.082, "node_deg": 0.0, "argp_deg": 0.0, "ma_deg": 0.0,
+      "source": "Phobos: a 9376 km, e 0.0151, i 1.08 deg (JPL satellite elements); GM 7.11e5; mean radius 11.1 km" },
+
+    { "id": 102, "name_id": "deimos", "mu": 9.8e4, "radius": 6.2e3, "gravitating": false, "parent": 4,
+      "a_m": 2.3463e7, "e": 0.00033, "i_deg": 1.791, "node_deg": 0.0, "argp_deg": 0.0, "ma_deg": 180.0,
+      "source": "Deimos: a 23463 km, e 0.00033, i 1.79 deg (JPL satellite elements); GM 9.8e4; mean radius 6.2 km" },
+
+    { "id": 110, "name_id": "io", "mu": 5.959916e12, "radius": 1.8216e6, "gravitating": true, "parent": 5,
+      "a_m": 4.217e8, "e": 0.0041, "i_deg": 0.050, "node_deg": 43.98, "argp_deg": 84.13, "ma_deg": 342.0,
+      "source": "Io: a 421700 km, e 0.0041, i 0.05 deg (JPL); GM 5.959916e12; mean radius 1821.6 km" },
+
+    { "id": 111, "name_id": "europa", "mu": 3.202739e12, "radius": 1.5608e6, "gravitating": true, "parent": 5,
+      "a_m": 6.71034e8, "e": 0.0094, "i_deg": 0.471, "node_deg": 219.11, "argp_deg": 88.97, "ma_deg": 171.0,
+      "source": "Europa: a 671034 km, e 0.0094, i 0.47 deg (JPL); GM 3.202739e12; mean radius 1560.8 km" },
+
+    { "id": 112, "name_id": "ganymede", "mu": 9.887834e12, "radius": 2.6341e6, "gravitating": true, "parent": 5,
+      "a_m": 1.070412e9, "e": 0.0013, "i_deg": 0.204, "node_deg": 63.55, "argp_deg": 192.42, "ma_deg": 317.0,
+      "source": "Ganymede: a 1070412 km, e 0.0013, i 0.20 deg (JPL); GM 9.887834e12; mean radius 2634.1 km" },
+
+    { "id": 113, "name_id": "callisto", "mu": 7.179289e12, "radius": 2.4103e6, "gravitating": true, "parent": 5,
+      "a_m": 1.882709e9, "e": 0.0074, "i_deg": 0.205, "node_deg": 298.85, "argp_deg": 52.64, "ma_deg": 181.0,
+      "source": "Callisto: a 1882709 km, e 0.0074, i 0.19 deg (JPL); GM 7.179289e12; mean radius 2410.3 km" },
+
+    { "id": 120, "name_id": "titan", "mu": 8.978137e12, "radius": 2.5747e6, "gravitating": true, "parent": 6,
+      "atmosphere": { "interface_alt_m": 600000.0, "drag_alt_m": 1000000.0, "rho0": 5.3, "scale_height_m": 40000.0,
+        "source": "Titan surface density ~5.3 kg/m^3, scale height ~40 km (Huygens HASI / NASA Titan fact sheet)" },
+      "a_m": 1.221870e9, "e": 0.0288, "i_deg": 0.348, "node_deg": 28.06, "argp_deg": 180.53, "ma_deg": 120.0,
+      "source": "Titan: a 1221870 km, e 0.0288, i 0.35 deg (JPL); GM 8.978137e12; mean radius 2574.7 km" },
+
+    { "id": 121, "name_id": "enceladus", "mu": 7.211e9, "radius": 2.521e5, "gravitating": false, "parent": 6,
+      "a_m": 2.37948e8, "e": 0.0047, "i_deg": 0.009, "node_deg": 0.0, "argp_deg": 0.0, "ma_deg": 0.0,
+      "source": "Enceladus: a 237948 km, e 0.0047, i 0.009 deg (JPL); GM 7.211e9; mean radius 252.1 km" }
+  ]
+}

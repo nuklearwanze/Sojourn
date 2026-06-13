@@ -1,0 +1,79 @@
+// Surveyable starter sites (FR-WORLD-401/402). Each anchored to a catalogued body by id;
+// PP category is catalogue-level; per-property truth is seeded from the sourced distributions.
+// Grade is a mass-fraction in log-space; Illumination [0,1]; Slope deg; Thermal K; Hazard ordinal.
+(
+    sites: [
+        (
+            id: "luna-shackleton", body: 100, placement: Surface(lat: -89.9, lon: 0.0),
+            pp_category: II, resource: "water-ice",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -3.0, sd_log: 0.6)),
+                (property: Illumination, dist: Fixed(0.02)),
+                (property: Slope,        dist: Uniform(lo: 5.0, hi: 20.0)),
+                (property: Thermal,      dist: Fixed(40.0)),
+                (property: HazardLevel,  dist: Fixed(2.0)),
+            ],
+            source: "Shackleton crater PSR (lunar south pole): water-ice cold trap (LCROSS/LRO); ~40 K floor",
+        ),
+        (
+            id: "luna-peak-light", body: 100, placement: Surface(lat: 89.7, lon: 100.0),
+            pp_category: II, resource: "rare-isotopes",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -5.0, sd_log: 0.4)),
+                (property: Illumination, dist: Fixed(0.9)),
+                (property: Slope,        dist: Uniform(lo: 2.0, hi: 10.0)),
+                (property: Thermal,      dist: Fixed(220.0)),
+                (property: HazardLevel,  dist: Fixed(1.0)),
+            ],
+            source: "Peak of (near-)eternal light near lunar north pole: high illumination, He-3 in mature regolith",
+        ),
+        (
+            id: "ares-jezero", body: 4, placement: Surface(lat: 18.4, lon: 77.5),
+            pp_category: IV, resource: "volatiles",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -2.5, sd_log: 0.5)),
+                (property: Illumination, dist: Uniform(lo: 0.3, hi: 0.6)),
+                (property: Slope,        dist: Uniform(lo: 2.0, hi: 12.0)),
+                (property: Thermal,      dist: Fixed(210.0)),
+                (property: HazardLevel,  dist: Fixed(2.0)),
+            ],
+            source: "Jezero crater delta (Mars): ancient lacustrine deposits (Perseverance landing site)",
+        ),
+        (
+            id: "ares-midlat-ice", body: 4, placement: Surface(lat: -40.0, lon: 90.0),
+            pp_category: IV, resource: "water-ice",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -1.5, sd_log: 0.5)),
+                (property: Illumination, dist: Uniform(lo: 0.3, hi: 0.6)),
+                (property: Slope,        dist: Uniform(lo: 5.0, hi: 20.0)),
+                (property: Thermal,      dist: Fixed(200.0)),
+                (property: HazardLevel,  dist: Fixed(3.0)),
+            ],
+            source: "Mars mid-latitude shallow ground ice (SWIM/SHARAD): subsurface water-ice deposits",
+        ),
+        (
+            id: "bennu-regolith", body: 1002, placement: Surface(lat: 0.0, lon: 0.0),
+            pp_category: I, resource: "organics",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -2.0, sd_log: 0.4)),
+                (property: Illumination, dist: Uniform(lo: 0.4, hi: 0.6)),
+                (property: Slope,        dist: Uniform(lo: 10.0, hi: 30.0)),
+                (property: Thermal,      dist: Fixed(250.0)),
+                (property: HazardLevel,  dist: Fixed(2.0)),
+            ],
+            source: "Bennu surface: hydrated carbonaceous regolith with organics (OSIRIS-REx sample analysis)",
+        ),
+        (
+            id: "ceres-occator", body: 10, placement: Surface(lat: 19.8, lon: 239.3),
+            pp_category: II, resource: "volatiles",
+            properties: [
+                (property: Grade,        dist: LogNormal(mean_log: -1.8, sd_log: 0.5)),
+                (property: Illumination, dist: Uniform(lo: 0.3, hi: 0.6)),
+                (property: Slope,        dist: Uniform(lo: 5.0, hi: 25.0)),
+                (property: Thermal,      dist: Fixed(160.0)),
+                (property: HazardLevel,  dist: Fixed(2.0)),
+            ],
+            source: "Occator crater bright faculae (Ceres): sodium-carbonate brine deposits (Dawn)",
+        ),
+    ],
+)
