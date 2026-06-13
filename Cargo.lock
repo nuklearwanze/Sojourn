@@ -778,6 +778,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "sojourn-astro"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-core",
+ "thiserror",
+]
+
+[[package]]
 name = "sojourn-core"
 version = "0.1.0"
 dependencies = [
@@ -805,6 +819,7 @@ dependencies = [
  "serde",
  "serde_json",
  "slotmap",
+ "sojourn-astro",
  "sojourn-core",
 ]
 

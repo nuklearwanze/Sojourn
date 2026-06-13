@@ -1,0 +1,31 @@
+// Astro coast scenario (T023): a craft in a high orbit coasts a simulated year
+// through real multi-body gravity; checkpoints prove warp invariance with the
+// astro module installed.
+Scenario(
+    name: "astro_coast",
+    seed: 314,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    toy: false,
+    astro: true,
+    commands: [
+        (tick: 0, astro: Some(SpawnCraft(
+            name_id: "coaster",
+            dominant: 1,
+            state: (r: (x: 3.0e8, y: 0.0, z: 0.0), v: (x: 0.0, y: 1152.679, z: 0.0)),
+            dry_mass: 500.0,
+            propellant: 0.0,
+            engine: "chem-hydrolox",
+            available_power_w: 0.0,
+            drag_area_m2: 0.0,
+            srp_area_m2: 2.0,
+        ))),
+    ],
+    checkpoints: [
+        2592000,    // 30 days
+        15768000,   // 6 months
+        31536000,   // 1 year
+    ],
+    until_tick: 31536000,
+)

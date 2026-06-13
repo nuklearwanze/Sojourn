@@ -14,7 +14,7 @@ Scenario(
     )),
     toy: false,
     commands: [
-        (tick: 0, command: RegisterWatch(spec: (expr: Leaf(template: "synthetic-entities-below", value: U64(45))))),
+        (tick: 0, command: Some(RegisterWatch(spec: (expr: Leaf(template: "synthetic-entities-below", value: U64(45)))))),
     ],
     checkpoints: [
         15768000,

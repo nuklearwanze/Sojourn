@@ -59,9 +59,10 @@ quantities only. All entries carry `source` fields referencing the design/spec s
 
 ## Published views (flat scalars, kernel rules)
 
-`astro/status`: craft_count, active_burns, diverted_count, worst_divergence_m, next_node_tick,
-any_fine_tier (escalation binding). Per-craft detail beyond flat scalars flows through the
-planning-query surface, not views.
+`astro/status`: craft_count, active_burns, diverted_count, next_node_tick, fine_needed
+(the escalation binding). Per-craft detail beyond flat scalars flows through the
+planning-query surface, not views. (As-built note: divergence is surfaced via
+kernel-diagnostic events and the `reconcile_report` query rather than a view scalar.)
 
 KNOWN FOLLOW-UP: watch conditions bind views only, so per-craft thresholds (e.g.
 "propellant below X") are not watchable in this slice; adding bounded per-craft views +

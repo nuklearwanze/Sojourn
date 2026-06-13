@@ -35,7 +35,7 @@ pub fn roundtrip(scenario: &Scenario, data: &DataSet, save_at: &[u64]) -> Result
         let bytes = run.save()?;
 
         // Load must restore bit-identically.
-        let mut loaded = SimCore::load(&bytes, &resolver, scenario.modules(None))?;
+        let mut loaded = SimCore::load(&bytes, &resolver, scenario.modules(None)?)?;
         let loaded_fp = loaded.fingerprint()?;
         if loaded_fp != save_fp {
             bail!(

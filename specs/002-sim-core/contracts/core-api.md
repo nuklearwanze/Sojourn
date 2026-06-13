@@ -75,9 +75,18 @@ impl SimCore {
 }
 ```
 
-Kernel command set in this slice: `RegisterWatch`, `ModifyWatch`, `RemoveWatch`,
-`SetPausePolicy`, `AcknowledgeInterrupt`, `ContinueSandbox` (+ cfg-gated `Synthetic` for the
-harness). Module slices extend the command enum via the registry without changing this surface.
+Kernel command set: `RegisterWatch`, `ModifyWatch`, `RemoveWatch`, `SetPausePolicy`,
+`AcknowledgeInterrupt`, `ContinueSandbox`, `ModuleCommand { module, key, value }` (simple
+key/value routing as a `module-command` event), and — added by the FA-02 amendment
+(specs/003-astrodynamics, research R11) — `ModulePayload { module, kind, payload: Vec<u8> }`:
+an opaque, module-defined encoded command routed to `SimModule::on_command` at application
+time. The kernel never decodes the payload (FR-CORE-505); malformed payloads are deterministic
+`Rejected` outcomes, journaled like any command.
+
+Additionally (FA-02 amendment): `SimCore::with_slice(module, f)` grants **read-only** access
+to a module's slice at the current tick boundary — the channel module-specific query surfaces
+(e.g. astrodynamics planning snapshots) use. It obeys all query rules (between steps only,
+never mutating).
 
 ## Queries (read-only, complete coverage — FR-CORE-701)
 

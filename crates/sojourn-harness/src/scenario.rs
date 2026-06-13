@@ -14,13 +14,28 @@ use sojourn_core::{
 use std::collections::BTreeMap;
 use std::path::Path;
 
-/// A command at a tick.
+/// A command at a tick: a kernel command OR an astro command (exactly one).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TimedCommand {
     /// Tick at which the driver submits it.
     pub tick: u64,
-    /// The command.
-    pub command: Command,
+    /// A kernel command.
+    #[serde(default)]
+    pub command: Option<Command>,
+    /// An astro command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub astro: Option<sojourn_astro::AstroCommand>,
+}
+
+impl TimedCommand {
+    /// The kernel command this entry submits.
+    pub fn to_kernel(&self) -> Result<Command> {
+        match (&self.command, &self.astro) {
+            (Some(c), None) => Ok(c.clone()),
+            (None, Some(a)) => Ok(sojourn_astro::astro_payload(a)),
+            _ => bail!("each scenario command needs exactly one of `command` or `astro`"),
+        }
+    }
 }
 
 /// A scenario script.
@@ -40,6 +55,9 @@ pub struct Scenario {
     /// Install the toy reference module.
     #[serde(default)]
     pub toy: bool,
+    /// Install the astrodynamics module (loads `data/astro`).
+    #[serde(default)]
+    pub astro: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -62,7 +80,7 @@ impl Scenario {
     }
 
     /// Build the module set this scenario declares.
-    pub fn modules(&self, mutation: Option<Mutation>) -> Vec<Box<dyn SimModule>> {
+    pub fn modules(&self, mutation: Option<Mutation>) -> Result<Vec<Box<dyn SimModule>>> {
         let mut mods: Vec<Box<dyn SimModule>> = Vec::new();
         if let Some(cfg) = &self.synthetic {
             mods.push(Box::new(SyntheticModule {
@@ -73,7 +91,12 @@ impl Scenario {
         if self.toy {
             mods.push(Box::new(ToyModule));
         }
-        mods
+        if self.astro {
+            let module = sojourn_astro::AstroModule::load(Path::new("data/astro"))
+                .map_err(|e| anyhow::anyhow!("loading astro data: {e}"))?;
+            mods.push(Box::new(module));
+        }
+        Ok(mods)
     }
 
     /// Run configuration.
@@ -97,10 +120,10 @@ impl Scenario {
             Some(dir) => SimCore::create_persistent(
                 self.run_config(),
                 data.clone(),
-                self.modules(mutation),
+                self.modules(mutation)?,
                 dir,
             )?,
-            None => SimCore::create(self.run_config(), data.clone(), self.modules(mutation))?,
+            None => SimCore::create(self.run_config(), data.clone(), self.modules(mutation)?)?,
         };
         Ok(core)
     }
@@ -183,7 +206,7 @@ pub fn drive_resumed(
         // Submit all commands due at this tick, then apply them with a zero-step.
         let mut submitted = false;
         while cmd_i < commands.len() && commands[cmd_i].tick == now {
-            core.submit(commands[cmd_i].command.clone())?;
+            core.submit(commands[cmd_i].to_kernel()?)?;
             cmd_i += 1;
             submitted = true;
         }
@@ -235,7 +258,7 @@ pub fn drive_resumed(
                 // Unattended scenarios continue into sandbox only if the script
                 // says so via an explicit ContinueSandbox command; otherwise stop.
                 if cmd_i < commands.len()
-                    && matches!(commands[cmd_i].command, Command::ContinueSandbox)
+                    && matches!(commands[cmd_i].command, Some(Command::ContinueSandbox))
                 {
                     continue;
                 }

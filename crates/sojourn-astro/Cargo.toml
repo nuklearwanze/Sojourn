@@ -1,0 +1,20 @@
+[package]
+name = "sojourn-astro"
+description = "Sojourn astrodynamics (FA-02): authoritative deterministic propagation, manoeuvre planning, and the analytic planning tier. SimModule on the sojourn-core kernel."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[lints]
+workspace = true

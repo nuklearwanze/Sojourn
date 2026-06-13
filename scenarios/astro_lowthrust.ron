@@ -1,0 +1,31 @@
+// Astro low-thrust scenario (T040): an ion-engine spiral under a tangential
+// guidance arc — power-limited thrust, months of patience.
+Scenario(
+    name: "astro_lowthrust",
+    seed: 161,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    toy: false,
+    astro: true,
+    commands: [
+        (tick: 0, astro: Some(SpawnCraft(
+            name_id: "ion-tug",
+            dominant: 1,
+            state: (r: (x: 7.0e6, y: 0.0, z: 0.0), v: (x: 0.0, y: 7546.05, z: 0.0)),
+            dry_mass: 50.0,
+            propellant: 10.0,
+            engine: "ep-ion",
+            available_power_w: 2300.0,
+            drag_area_m2: 0.0,
+            srp_area_m2: 0.0,
+        ))),
+        (tick: 60, astro: Some(SetGuidanceArc(craft: 0, law: Tangential(sign: 1), end: TargetRadius(9.0e6)))),
+    ],
+    checkpoints: [
+        86400,
+        259200,
+        500000,
+    ],
+    until_tick: 500000,
+)

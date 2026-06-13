@@ -1,0 +1,26 @@
+// Fixture propulsion endpoints (contracts/propulsion-interface.md). These stand in for FA-04's
+// real engine implementations; parameters are sourced real-engine-class values. SI units.
+(
+    engines: [
+        (
+            id: "chem-hydrolox",
+            isp_s: 450.5,
+            max_thrust_n: 110000.0,
+            throttle_min: 0.5,
+            throttle_max: 1.0,
+            power_limited: false,
+            rated_power_w: 0.0,
+            source: "RL10C-class hydrolox upper-stage engine: Isp ~450.5 s, thrust ~110 kN (Aerojet Rocketdyne RL10 fact sheet); deep-throttle floor idealised at 0.5 for landing-engine tests",
+        ),
+        (
+            id: "ep-ion",
+            isp_s: 3100.0,
+            max_thrust_n: 0.092,
+            throttle_min: 0.0,
+            throttle_max: 1.0,
+            power_limited: true,
+            rated_power_w: 2300.0,
+            source: "NSTAR-class gridded ion thruster (Deep Space 1/Dawn): Isp ~3100 s, thrust ~92 mN at 2.3 kW (NASA GRC NSTAR data)",
+        ),
+    ],
+)

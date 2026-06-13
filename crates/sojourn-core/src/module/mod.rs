@@ -71,6 +71,24 @@ pub trait SimModule {
         let _ = (slice, ev, ctx);
     }
 
+    /// Apply a typed module command (`Command::ModulePayload` routed here at
+    /// command-application time, step 1 of the tick order). The outcome is
+    /// journaled like any command; a malformed payload MUST be a deterministic
+    /// `Rejected`, never a panic. Modules that accept no typed commands keep
+    /// this default.
+    fn on_command(
+        &self,
+        slice: &mut dyn StateSlice,
+        kind: &str,
+        payload: &[u8],
+        ctx: &mut ctx::StepCtx<'_>,
+    ) -> crate::command::CommandOutcome {
+        let _ = (slice, payload, ctx);
+        crate::command::CommandOutcome::Rejected(format!(
+            "module accepts no typed commands (kind '{kind}')"
+        ))
+    }
+
     /// Publish the read-only view(s) of the slice at a tick boundary. Must emit
     /// exactly the views declared in `publishes`.
     fn publish(&self, slice: &dyn StateSlice) -> Vec<ViewSnapshot>;

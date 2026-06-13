@@ -308,6 +308,27 @@ impl SimCore {
         calendar::datetime_at(t)
     }
 
+    /// Read-only access to a module's slice at the current tick boundary — the
+    /// channel module-specific query surfaces (e.g. astrodynamics planning
+    /// snapshots) use to extract their inputs. Like every query, this answers
+    /// between step calls only and can never mutate state.
+    pub fn with_slice<R>(
+        &self,
+        module: &str,
+        f: impl FnOnce(&dyn StateSlice) -> R,
+    ) -> Result<R, CoreError> {
+        let i = self
+            .registry
+            .manifests
+            .iter()
+            .position(|m| m.id == module)
+            .ok_or_else(|| CoreError::Unknown {
+                kind: "module".into(),
+                id: module.into(),
+            })?;
+        Ok(f(self.slices[i].as_ref()))
+    }
+
     // ---------------------------------------------------------------- commands
 
     /// Validate and accept a command; it applies at the current tick boundary,
@@ -349,7 +370,7 @@ impl SimCore {
                 }
                 Ok(())
             }
-            Command::ModuleCommand { module, .. } => {
+            Command::ModuleCommand { module, .. } | Command::ModulePayload { module, .. } => {
                 if !self.registry.manifests.iter().any(|m| &m.id == module) {
                     return Err(CoreError::CommandInvalid {
                         reason: format!("unknown module '{module}'"),
@@ -670,9 +691,10 @@ impl SimCore {
         let pending = std::mem::take(&mut self.kernel.commands_pending);
         let tick = self.kernel.clock.tick.0;
         let mut queue: VecDeque<PendingEvent> = VecDeque::new();
+        let mut reacted = vec![false; self.registry.modules.len()];
 
         for env in pending {
-            let outcome = self.apply_one(&env, &mut queue);
+            let outcome = self.apply_one(&env, &mut queue, &mut reacted);
             self.journal.outcome(
                 tick,
                 &OutcomeBody {
@@ -691,7 +713,6 @@ impl SimCore {
                 });
             }
         }
-        let mut reacted = vec![false; self.registry.modules.len()];
         self.drain_queue(&mut queue, &mut reacted, new_events)?;
         self.publish_touched(&reacted);
         publish_kernel_view(&mut self.kernel);
@@ -699,10 +720,13 @@ impl SimCore {
     }
 
     /// Deterministic application of one command (state validity → Rejected).
+    /// `touched` marks modules whose slices a typed command mutated, so their
+    /// views republish at this boundary.
     fn apply_one(
         &mut self,
         env: &CommandEnvelope,
         queue: &mut VecDeque<PendingEvent>,
+        touched: &mut [bool],
     ) -> CommandOutcome {
         match &env.payload {
             Command::RegisterWatch { spec } => {
@@ -764,6 +788,42 @@ impl SimCore {
                     ]),
                 });
                 CommandOutcome::Applied
+            }
+            Command::ModulePayload {
+                module,
+                kind,
+                payload,
+            } => {
+                // Route to the owning module's typed-command hook (FR-CORE-505:
+                // the kernel never decodes the payload). Module existence was
+                // validated at submission; absence here is a kernel bug.
+                let Some(i) = self.registry.manifests.iter().position(|m| &m.id == module) else {
+                    return CommandOutcome::Rejected(format!("module '{module}' not registered"));
+                };
+                let manifest = &self.registry.manifests[i];
+                let mut ctx = StepCtx {
+                    manifest,
+                    clock: &self.kernel.clock,
+                    rng: &mut self.kernel.rng,
+                    views: &self.kernel.views,
+                    emitted: Vec::new(),
+                    scheduled: Vec::new(),
+                };
+                let outcome = self.registry.modules[i].on_command(
+                    self.slices[i].as_mut(),
+                    kind,
+                    payload,
+                    &mut ctx,
+                );
+                touched[i] = true;
+                let (emitted, scheduled) = (ctx.emitted, ctx.scheduled);
+                for pe in emitted {
+                    queue.push_back(pe);
+                }
+                for (at, ev) in scheduled {
+                    self.kernel.scheduled.entry(at).or_default().push(ev);
+                }
+                outcome
             }
         }
     }

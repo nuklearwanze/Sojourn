@@ -14,9 +14,9 @@ Scenario(
     )),
     toy: true,
     commands: [
-        (tick: 2592000,  command: ModuleCommand(module: "synthetic", key: "set", value: 11)),
-        (tick: 31536000, command: ModuleCommand(module: "synthetic", key: "emit-milestone", value: 1)),
-        (tick: 63072000, command: SetPausePolicy(class: "anomaly", policy: LogOnly)),
+        (tick: 2592000,  command: Some(ModuleCommand(module: "synthetic", key: "set", value: 11))),
+        (tick: 31536000, command: Some(ModuleCommand(module: "synthetic", key: "emit-milestone", value: 1))),
+        (tick: 63072000, command: Some(SetPausePolicy(class: "anomaly", policy: LogOnly))),
     ],
     checkpoints: [
         31536000,   // 1 year

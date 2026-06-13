@@ -1,0 +1,56 @@
+// Analytic validation cases (FR-ASTRO-601, research R13) — the constitution's physics gate
+// made concrete. Each case names its parameters, tolerance and textbook source; the expected
+// values are computed from the cited closed-form expressions inside the test suite (no magic
+// output numbers), so the data here defines WHAT is checked and HOW tightly.
+(
+    cases: [
+        (
+            id: "two-body-period",
+            params: { "body": "terra", "sma_m": "7.0e6", "ecc": "0.0" },
+            tolerance_frac: 1.0e-4,
+            source: "Kepler's third law T = 2*pi*sqrt(a^3/mu): Curtis, Orbital Mechanics for Engineering Students (3rd ed.), eq. 2.83",
+        ),
+        (
+            id: "energy-drift",
+            params: { "body": "terra", "sma_m": "7.0e6", "ecc": "0.1", "years": "10" },
+            tolerance_frac: 1.0e-8,
+            source: "Specific orbital energy conservation in the two-body problem: Curtis ch. 2; bound per spec SC-002 (<=1e-8 relative drift per simulated year)",
+        ),
+        (
+            id: "hohmann-leo-geo",
+            params: { "body": "terra", "r1_m": "6.678e6", "r2_m": "4.2164e7" },
+            tolerance_frac: 1.0e-3,
+            source: "Hohmann transfer delta-v: Curtis ch. 6 (LEO 300 km to GEO worked example, total ~3.935 km/s)",
+        ),
+        (
+            id: "j2-nodal-regression",
+            params: { "body": "terra", "alt_m": "8.0e5", "inc_deg": "51.6", "days": "30" },
+            tolerance_frac: 5.0e-3,
+            source: "Secular RAAN rate due to J2: Vallado, Fundamentals of Astrodynamics and Applications (4th ed.), eq. 9-37",
+        ),
+        (
+            id: "hyperbolic-flyby",
+            params: { "body": "luna", "v_inf_m_s": "1000.0", "periapsis_m": "2.0e6" },
+            tolerance_frac: 5.0e-3,
+            source: "Hyperbolic encounter turn angle delta = 2*asin(1/e), e = 1 + rp*vinf^2/mu: Curtis ch. 8 (interplanetary trajectories)",
+        ),
+        (
+            id: "lambert-self-consistency",
+            params: { "from": "terra", "to": "ares", "tof_days": "200", "depart_day": "100" },
+            tolerance_frac: 1.0e-6,
+            source: "Lambert problem (universal variables): Curtis ch. 5, Algorithm 5.2; checked by propagating the solved departure state to the arrival position",
+        ),
+        (
+            id: "edelbaum-spiral",
+            params: { "body": "terra", "r1_m": "7.0e6", "r2_m": "9.0e6" },
+            tolerance_frac: 5.0e-2,
+            source: "Low-thrust circular-to-circular spiral delta-v ~ |v1 - v2| (Edelbaum 1961); duration from constant-thrust rocket equation",
+        ),
+        (
+            id: "synodic-recurrence",
+            params: { "from": "terra", "to": "ares" },
+            tolerance_frac: 2.0e-2,
+            source: "Synodic period 1/T_syn = |1/T_1 - 1/T_2|: Curtis ch. 8; porkchop minima must recur at this interval with no scripted window data",
+        ),
+    ],
+)

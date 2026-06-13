@@ -15,5 +15,12 @@
         (id: "end-of-horizon",    default_pause: Interrupt, source: "specs/002-sim-core FR-CORE-102"),
         (id: "module-command",    default_pause: LogOnly,   source: "specs/002-sim-core command routing"),
         (id: "kernel-diagnostic", default_pause: LogOnly,   source: "specs/002-sim-core FR-CORE-403"),
+        // FA-02 astrodynamics classes (specs/003-astrodynamics contracts/astro-commands-events.md)
+        (id: "soi-crossing",         default_pause: LogOnly,   source: "specs/003-astrodynamics FR-ASTRO-202"),
+        (id: "impact",               default_pause: Interrupt, source: "specs/003-astrodynamics edge case: surface intersection handoff"),
+        (id: "atmosphere-entry",     default_pause: Interrupt, source: "specs/003-astrodynamics scope boundary: EDL handoff (clarified 2026-06-13)"),
+        (id: "plan-invalidated",     default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-302"),
+        (id: "propellant-exhausted", default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-307"),
+        (id: "aero-violation",       default_pause: Interrupt, source: "specs/003-astrodynamics FR-ASTRO-407"),
     ],
 )

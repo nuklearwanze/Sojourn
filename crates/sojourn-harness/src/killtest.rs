@@ -61,7 +61,7 @@ pub fn killtest(
         let resolver = MemResolver {
             sets: vec![data.clone()],
         };
-        let factory = || scenario.modules(None);
+        let factory = || scenario.modules(None).expect("scenario modules");
         let (recovered, report) = SimCore::recover(&run_dir, &resolver, &factory)
             .with_context(|| format!("trial {trial}: recovery failed"))?;
         let recovered_fp = recovered.fingerprint()?;
@@ -75,7 +75,7 @@ pub fn killtest(
         let journal = std::fs::read(run_dir.join("journal.sjl"))
             .with_context(|| format!("trial {trial}: reading journal"))?;
         let (replayed, _) =
-            SimCore::replay(&journal, &resolver, scenario.modules(None), None, false)
+            SimCore::replay(&journal, &resolver, scenario.modules(None)?, None, false)
                 .with_context(|| format!("trial {trial}: replay cross-check failed"))?;
         let replay_fp = replayed.fingerprint()?;
         if recovered_fp != replay_fp {

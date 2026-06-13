@@ -182,7 +182,7 @@ fn main() -> Result<()> {
                 sets: vec![data.clone()],
             };
             let (_core, report) =
-                SimCore::replay(&bytes, &resolver, s.modules(None), until_tick, verify)?;
+                SimCore::replay(&bytes, &resolver, s.modules(None)?, until_tick, verify)?;
             match &report.first_divergence {
                 None => println!(
                     "REPLAY {} '{}': {} commands → tick {}{}",
@@ -244,14 +244,36 @@ fn main() -> Result<()> {
             println!("MUTATE PASS: every injected nondeterminism was caught by the gate");
         }
         Cmd::ValidateData { dir } => {
-            let ds = DataSet::load_dir(&dir)?;
-            ds.validate()?;
-            println!(
-                "DATA VALID: {} event classes, {} watch templates, version {}",
-                ds.event_classes.len(),
-                ds.watch_templates.len(),
-                ds.version().hex()
-            );
+            // Kernel data dirs carry event-classes.ron; astro data dirs carry
+            // test-catalog.ron. Validate whichever this is.
+            if dir.join("event-classes.ron").exists() {
+                let ds = DataSet::load_dir(&dir)?;
+                ds.validate()?;
+                println!(
+                    "DATA VALID (kernel): {} event classes, {} watch templates, version {}",
+                    ds.event_classes.len(),
+                    ds.watch_templates.len(),
+                    ds.version().hex()
+                );
+            } else if dir.join("test-catalog.ron").exists() {
+                let module = sojourn_astro::AstroModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("astro data invalid: {e}"))?;
+                println!(
+                    "DATA VALID (astro): {} bodies, catalogue hash {}",
+                    module.catalog.bodies().count(),
+                    module
+                        .catalog
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
+            } else {
+                bail!(
+                    "{} contains neither kernel nor astro data files",
+                    dir.display()
+                );
+            }
         }
         Cmd::Conformance { module, ticks } => {
             let factory: Box<dyn Fn() -> Box<dyn sojourn_core::SimModule>> = match module.as_str() {
@@ -259,7 +281,13 @@ fn main() -> Result<()> {
                 "synthetic" => {
                     Box::new(|| Box::new(synthetic::SyntheticModule::new(Default::default())))
                 }
-                other => bail!("unknown module '{other}' (use 'toy' or 'synthetic')"),
+                "astro" => Box::new(|| {
+                    Box::new(
+                        sojourn_astro::AstroModule::load(std::path::Path::new("data/astro"))
+                            .expect("astro data loads"),
+                    )
+                }),
+                other => bail!("unknown module '{other}' (use 'toy', 'synthetic' or 'astro')"),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
             for p in &report.passed {

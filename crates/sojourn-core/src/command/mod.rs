@@ -59,6 +59,19 @@ pub enum Command {
         /// Instruction value (module-defined).
         value: i64,
     },
+    /// Typed module command: an opaque, module-defined payload routed to
+    /// [`crate::module::SimModule::on_command`] at application time. The kernel
+    /// never decodes `payload` (no domain logic in the kernel, FR-CORE-505);
+    /// malformed payloads are deterministic `Rejected` outcomes, journaled like
+    /// any command. Added for FA-02 (specs/003-astrodynamics, research R11).
+    ModulePayload {
+        /// Target module id (validated to exist at submission).
+        module: String,
+        /// Module-defined command kind (diagnostics/filtering; not interpreted).
+        kind: String,
+        /// Module-defined encoded command (postcard by convention).
+        payload: Vec<u8>,
+    },
 }
 
 /// A validated, accepted command awaiting application at the next tick boundary.

@@ -26,6 +26,13 @@ pub trait SimModule {
 
     /// React to subscribed events (delivered in deterministic order within the tick).
     fn on_event(&self, slice: &mut dyn StateSlice, ev: &EventRecord, ctx: &mut StepCtx);
+
+    /// Apply a typed module command (`Command::ModulePayload` routed here at
+    /// command-application time; FA-02 amendment). The outcome is journaled like
+    /// any command; malformed payloads MUST be deterministic `Rejected` outcomes,
+    /// never panics. Default: rejects all kinds (modules opt in).
+    fn on_command(&self, slice: &mut dyn StateSlice, kind: &str, payload: &[u8],
+                  ctx: &mut StepCtx) -> CommandOutcome { /* default-rejecting */ }
 }
 
 pub trait StateSlice: erased Serialize/Deserialize {
