@@ -58,14 +58,20 @@ pub fn grow_domain(
     rp: f64,
     world: f64,
 ) {
-    let Some(d) = data.domains.get(dom) else { return };
+    let Some(d) = data.domains.get(dom) else {
+        return;
+    };
     let cur = ground_ul(ul, f, dom);
     let dr = dr_factor(cur, d.dr_knee, d.dr_steepness);
     let syn = synergy_bonus(ul, f, d);
     let catchup = 1.0 + params.catchup_per_level * (world - cur).max(0.0);
     let delta = rp * params.ul_per_rp * dr * syn * catchup;
     // Catch-up cannot push a faction past the World UL by itself (edge case).
-    let cap = if cur < world { (cur + delta).min(world.max(cur)) } else { cur + delta };
+    let cap = if cur < world {
+        (cur + delta).min(world.max(cur))
+    } else {
+        cur + delta
+    };
     ul.insert((f, dom.clone()), cap.min(100.0));
 }
 

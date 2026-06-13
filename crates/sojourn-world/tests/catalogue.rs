@@ -13,13 +13,24 @@ fn real_catalogue_loads_with_sources_and_counts() {
     let m = world_module();
     // Sun + 8 planets + Pluto + Ceres present.
     for id in 0..=10u32 {
-        assert!(m.catalog.body(BodyId(id)).is_some(), "major body {id} present");
+        assert!(
+            m.catalog.body(BodyId(id)).is_some(),
+            "major body {id} present"
+        );
     }
     let (mut total, mut moons, mut small) = (0, 0, 0);
     for b in m.catalog.bodies() {
         total += 1;
-        assert!(!b.source.trim().is_empty(), "{} carries a source", b.name_id);
-        assert!(b.mu > 0.0 && b.radius > 0.0, "{} has positive mu/radius", b.name_id);
+        assert!(
+            !b.source.trim().is_empty(),
+            "{} carries a source",
+            b.name_id
+        );
+        assert!(
+            b.mu > 0.0 && b.radius > 0.0,
+            "{} has positive mu/radius",
+            b.name_id
+        );
         match b.parent {
             Some(p) if p != BodyId(0) => moons += 1,
             Some(_) if b.id.0 >= 1000 => small += 1,
@@ -38,11 +49,21 @@ fn divertibility_is_flag_driven_and_consistent() {
     let m = world_module();
     for b in m.catalog.bodies() {
         // The body-catalogue contract: a divertible body never gravitates far-field.
-        assert!(!(b.divertible && b.gravitating), "{} divertible⇒!gravitating", b.name_id);
+        assert!(
+            !(b.divertible && b.gravitating),
+            "{} divertible⇒!gravitating",
+            b.name_id
+        );
     }
     // Real NEAs are divertible; planets are not.
-    assert!(m.catalog.body(BodyId(1002)).unwrap().divertible, "Bennu divertible");
-    assert!(!m.catalog.body(BodyId(3)).unwrap().divertible, "Earth not divertible");
+    assert!(
+        m.catalog.body(BodyId(1002)).unwrap().divertible,
+        "Bennu divertible"
+    );
+    assert!(
+        !m.catalog.body(BodyId(3)).unwrap().divertible,
+        "Earth not divertible"
+    );
 }
 
 #[test]
@@ -56,7 +77,10 @@ fn heliocentric_distances_match_reality() {
         let r = st.absolute(BodyId(id)).r.norm() / AU;
         let lo = a_au * (1.0 - e) - 0.02;
         let hi = a_au * (1.0 + e) + 0.02;
-        assert!(r > lo && r < hi, "body {id} at {r:.3} AU, expected {a_au}±e");
+        assert!(
+            r > lo && r < hi,
+            "body {id} at {r:.3} AU, expected {a_au}±e"
+        );
     };
     check(&mut st, 3, 1.0, 0.017); // Earth
     check(&mut st, 4, 1.524, 0.093); // Mars
@@ -80,8 +104,7 @@ fn catalogue_loads_under_the_propagator_unchanged() {
         run_mode: RunMode::SaveAnywhere,
         difficulty_inputs: std::collections::BTreeMap::new(),
     };
-    let mut core =
-        SimCore::create(cfg, kernel_data(), vec![Box::new(astro)]).expect("core");
+    let mut core = SimCore::create(cfg, kernel_data(), vec![Box::new(astro)]).expect("core");
 
     let r0 = 6.771e6; // ~400 km LEO
     let v = libm::sqrt(mu_earth / r0);
@@ -108,7 +131,8 @@ fn catalogue_loads_under_the_propagator_unchanged() {
         if now >= to {
             break;
         }
-        if let StopReason::Interrupted(ids) = core.step(StepRequest::Ticks(to - now)).unwrap().stopped
+        if let StopReason::Interrupted(ids) =
+            core.step(StepRequest::Ticks(to - now)).unwrap().stopped
         {
             for id in ids {
                 core.acknowledge(id).unwrap();
@@ -119,5 +143,8 @@ fn catalogue_loads_under_the_propagator_unchanged() {
     let s = AstroSnapshot::from_core(&core, &twin).unwrap();
     let c = s.craft.get(&0).expect("craft");
     let r = c.state.r.norm();
-    assert!((r - r0).abs() / r0 < 0.02, "circular orbit radius ~conserved ({r:.0} vs {r0:.0})");
+    assert!(
+        (r - r0).abs() / r0 < 0.02,
+        "circular orbit radius ~conserved ({r:.0} vs {r0:.0})"
+    );
 }

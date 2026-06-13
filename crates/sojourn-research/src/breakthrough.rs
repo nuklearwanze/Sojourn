@@ -23,7 +23,9 @@ pub fn accrue(
     rp: f64,
     breakthrough_mult: f64,
 ) {
-    let Some(d) = data.domains.get(dom) else { return };
+    let Some(d) = data.domains.get(dom) else {
+        return;
+    };
     let weight = if d.basic_science { 1.0 } else { 0.1 };
     let cur = insight.get(&(f, dom.clone())).copied().unwrap_or(0.0);
     insight.insert(

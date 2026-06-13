@@ -108,7 +108,8 @@ pub fn advance(
     prog.actual_days += dt_days;
     // S-curve progress: DE advances toward 1.0 scaled by step cost.
     let mult = if target <= 5 { low_mult } else { qual_mult };
-    prog.step_progress += (de * mult / step.cost.max(1.0)) * (1.0 + step.scurve_k * prog.step_progress * (1.0 - prog.step_progress));
+    prog.step_progress += (de * mult / step.cost.max(1.0))
+        * (1.0 + step.scurve_k * prog.step_progress * (1.0 - prog.step_progress));
     prog.step_progress = prog.step_progress.min(1.0);
 
     // A step may only COMPLETE after its minimum duration (the floor) and full
@@ -118,7 +119,8 @@ pub fn advance(
     }
 
     // Test campaign at the step boundary.
-    let fail_prob = campaigns::fail_probability(params, target, prog.risk_index, is_dead_end, overrun_mult);
+    let fail_prob =
+        campaigns::fail_probability(params, target, prog.risk_index, is_dead_end, overrun_mult);
     if uniform() < fail_prob {
         // Failure-that-teaches.
         out.test_failed = Some(target == 7); // a TRL-7 flight demo is spectacular

@@ -35,7 +35,10 @@ fn unsurveyed_queries_return_the_prior_never_truth() {
             }
         }
     }
-    assert!(checked >= 20, "audited the whole site/property surface ({checked})");
+    assert!(
+        checked >= 20,
+        "audited the whole site/property surface ({checked})"
+    );
 }
 
 #[test]
@@ -55,12 +58,25 @@ fn surveying_refines_only_the_acting_faction() {
         );
     }
     let s = snap(&core, &m);
-    let c0 = s.certainty_site(FactionId(0), "luna-shackleton", Property::Grade).unwrap();
-    let c1 = s.certainty_site(FactionId(1), "luna-shackleton", Property::Grade).unwrap();
+    let c0 = s
+        .certainty_site(FactionId(0), "luna-shackleton", Property::Grade)
+        .unwrap();
+    let c1 = s
+        .certainty_site(FactionId(1), "luna-shackleton", Property::Grade)
+        .unwrap();
     assert!(c0 > 0.5, "faction 0 surveyed (certainty {c0:.3})");
-    assert!(c1.abs() < 1e-9, "faction 1's belief untouched (per-faction)");
-    assert!(!s.belief_delta_since(FactionId(0), 0).is_empty(), "faction 0 has belief deltas");
-    assert!(s.belief_delta_since(FactionId(1), 0).is_empty(), "faction 1 has none");
+    assert!(
+        c1.abs() < 1e-9,
+        "faction 1's belief untouched (per-faction)"
+    );
+    assert!(
+        !s.belief_delta_since(FactionId(0), 0).is_empty(),
+        "faction 0 has belief deltas"
+    );
+    assert!(
+        s.belief_delta_since(FactionId(1), 0).is_empty(),
+        "faction 1 has none"
+    );
 }
 
 #[test]
@@ -81,8 +97,19 @@ fn truth_leak_audit_holds_after_partial_survey() {
     }
     let s = snap(&core, &m);
     // Grade moved; Slope (unsurveyed) is still exactly the prior.
-    assert!(s.certainty_site(FactionId(0), "ares-jezero", Property::Grade).unwrap() > 0.0);
-    let slope = s.believed_site(FactionId(0), "ares-jezero", Property::Slope).unwrap();
-    let prior = m.priors.decode(Property::Slope, m.priors.prior_for(Property::Slope));
-    assert!((slope.value - prior.value).abs() < 1e-9, "unsurveyed property stays at prior");
+    assert!(
+        s.certainty_site(FactionId(0), "ares-jezero", Property::Grade)
+            .unwrap()
+            > 0.0
+    );
+    let slope = s
+        .believed_site(FactionId(0), "ares-jezero", Property::Slope)
+        .unwrap();
+    let prior = m
+        .priors
+        .decode(Property::Slope, m.priors.prior_for(Property::Slope));
+    assert!(
+        (slope.value - prior.value).abs() < 1e-9,
+        "unsurveyed property stays at prior"
+    );
 }

@@ -153,8 +153,10 @@ fn build(sources_dir: &str, out_dir: &str) -> Result<String, String> {
     let mut total = 0usize;
     let mut written = Vec::new();
     for f in &files {
-        let text = std::fs::read_to_string(f).map_err(|e| format!("reading {}: {e}", f.display()))?;
-        let src: SourceFile = serde_json::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
+        let text =
+            std::fs::read_to_string(f).map_err(|e| format!("reading {}: {e}", f.display()))?;
+        let src: SourceFile =
+            serde_json::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
         let mut bodies = Vec::new();
         for b in src.bodies {
             if b.source.trim().is_empty() {
@@ -164,7 +166,10 @@ fn build(sources_dir: &str, out_dir: &str) -> Result<String, String> {
                 None => None,
                 Some(_) => Some(convert_elements(&b, src.epoch_ns, f)?),
             };
-            let source = format!("{} [snapshot {}: {}]", b.source, src.snapshot_date, src.provenance);
+            let source = format!(
+                "{} [snapshot {}: {}]",
+                b.source, src.snapshot_date, src.provenance
+            );
             bodies.push(OutBody {
                 id: b.id,
                 name_id: b.name_id,
@@ -205,7 +210,13 @@ fn build(sources_dir: &str, out_dir: &str) -> Result<String, String> {
 
 fn convert_elements(b: &SrcBody, epoch_ns: i64, f: &Path) -> Result<OutElements, String> {
     let need = |o: Option<f64>, name: &str| {
-        o.ok_or_else(|| format!("{}: body {} missing orbital field '{name}'", f.display(), b.id))
+        o.ok_or_else(|| {
+            format!(
+                "{}: body {} missing orbital field '{name}'",
+                f.display(),
+                b.id
+            )
+        })
     };
     let sma = match (b.a_m, b.a_au) {
         (Some(m), _) => m,

@@ -36,7 +36,9 @@ pub fn seed<R: RngCore>(data: &ResearchData, rng: &mut R) -> (DeadEnds, Threshol
             if i == keep {
                 continue; // the guaranteed-viable path — never closed
             }
-            let Some(node) = data.nodes.get(tech) else { continue };
+            let Some(node) = data.nodes.get(tech) else {
+                continue;
+            };
             for step in &node.trl_steps {
                 if uniform(rng) < data.params.dead_end_rate {
                     dead_ends.insert((tech.clone(), step.trl), true);
@@ -58,7 +60,10 @@ pub fn seed<R: RngCore>(data: &ResearchData, rng: &mut R) -> (DeadEnds, Threshol
 
 /// Is `(tech, target_trl)` a seeded dead end?
 pub fn is_dead_end(dead_ends: &DeadEnds, tech: &TechId, target_trl: u8) -> bool {
-    dead_ends.get(&(tech.clone(), target_trl)).copied().unwrap_or(false)
+    dead_ends
+        .get(&(tech.clone(), target_trl))
+        .copied()
+        .unwrap_or(false)
 }
 
 /// Verify the constructive guarantee for a given seed: every capability category

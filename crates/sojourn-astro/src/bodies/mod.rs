@@ -114,7 +114,10 @@ impl Catalog {
                 .collect();
             files.sort();
             if files.is_empty() {
-                return Err(format!("no .ron catalogue files in {}", catalog_dir.display()));
+                return Err(format!(
+                    "no .ron catalogue files in {}",
+                    catalog_dir.display()
+                ));
             }
             let mut combined = String::new();
             let mut all_bodies = Vec::new();

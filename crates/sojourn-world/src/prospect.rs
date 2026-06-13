@@ -75,7 +75,8 @@ impl ProspectFields {
         let path = dir.join("prospecting-fields.ron");
         let text = std::fs::read_to_string(&path)
             .map_err(|e| format!("reading {}: {e}", path.display()))?;
-        let f: FieldsFile = ron::from_str(&text).map_err(|e| format!("prospecting-fields.ron: {e}"))?;
+        let f: FieldsFile =
+            ron::from_str(&text).map_err(|e| format!("prospecting-fields.ron: {e}"))?;
         let mut fields = BTreeMap::new();
         for fd in f.fields {
             if fd.source.trim().is_empty() {
@@ -86,7 +87,10 @@ impl ProspectFields {
             }
             let wsum: f64 = fd.type_mix.iter().map(|(_, w)| *w).sum();
             if wsum <= 0.0 {
-                return Err(format!("prospecting-fields.ron: '{}' type_mix sums to 0", fd.id));
+                return Err(format!(
+                    "prospecting-fields.ron: '{}' type_mix sums to 0",
+                    fd.id
+                ));
             }
             fields.insert(fd.id.clone(), fd);
         }
@@ -178,7 +182,10 @@ pub fn generate<R: RngCore>(
                 mean_anomaly_at_epoch: m0,
                 epoch_ns,
             }),
-            source: format!("generated: prospecting field '{}' ({})", field.id, field.source),
+            source: format!(
+                "generated: prospecting field '{}' ({})",
+                field.id, field.source
+            ),
         });
     }
     out
@@ -197,7 +204,10 @@ mod tests {
             sma_au: Range { lo: 2.1, hi: 3.3 },
             ecc: Range { lo: 0.0, hi: 0.3 },
             inc_deg: Range { lo: 0.0, hi: 20.0 },
-            diameter_m: Range { lo: 200.0, hi: 5000.0 },
+            diameter_m: Range {
+                lo: 200.0,
+                hi: 5000.0,
+            },
             density_kg_m3: 2000.0,
             type_mix: vec![("C".into(), 0.75), ("S".into(), 0.17), ("M".into(), 0.08)],
             source: "test".into(),
@@ -212,7 +222,11 @@ mod tests {
             let mut ids = GeneratedIds::default();
             generate(&f, 2.0, &mut rng, &mut ids, BodyId(0), 0)
         };
-        assert_eq!(run_once(99), run_once(99), "identical seed ⇒ identical bodies (ids/orbits)");
+        assert_eq!(
+            run_once(99),
+            run_once(99),
+            "identical seed ⇒ identical bodies (ids/orbits)"
+        );
     }
 
     #[test]
@@ -225,7 +239,10 @@ mod tests {
             for b in generate(&f, 5.0, &mut rng, &mut ids, BodyId(0), 0) {
                 assert!(GeneratedIds::is_generated(b.id), "id in generated range");
                 assert!(seen.insert(b.id.0), "ids never collide");
-                assert!(b.divertible && !b.gravitating, "generated bodies are divertible small bodies");
+                assert!(
+                    b.divertible && !b.gravitating,
+                    "generated bodies are divertible small bodies"
+                );
                 assert_eq!(b.parent, Some(BodyId(0)));
                 assert!(b.elements.is_some());
             }
@@ -248,6 +265,9 @@ mod tests {
         assert!(smas.len() > 1000, "enough samples ({})", smas.len());
         let mean: f64 = smas.iter().sum::<f64>() / smas.len() as f64;
         // Uniform[2.1, 3.3] ⇒ mean 2.7.
-        assert!((mean - 2.7).abs() < 0.05, "sma mean {mean} ≈ 2.7 within tolerance");
+        assert!(
+            (mean - 2.7).abs() < 0.05,
+            "sma mean {mean} ≈ 2.7 within tolerance"
+        );
     }
 }

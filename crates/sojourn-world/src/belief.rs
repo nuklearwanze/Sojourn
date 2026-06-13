@@ -348,7 +348,10 @@ mod tests {
         assert!(tight.var < prior.var);
         // A later, much worse observation must not widen the belief.
         let after_bad = refine(tight, -3.0, 10.0, 1e-6, 2);
-        assert!(after_bad.var <= tight.var + 1e-12, "information never decreases");
+        assert!(
+            after_bad.var <= tight.var + 1e-12,
+            "information never decreases"
+        );
     }
 
     #[test]
@@ -383,6 +386,9 @@ mod tests {
         for k in 0..1000 {
             remote = refine(remote, 1.0, 0.6, 0.36, k); // floor sigma 0.6
         }
-        assert!(remote.var >= 0.36 - 1e-9, "remote sensing stuck at its floor");
+        assert!(
+            remote.var >= 0.36 - 1e-9,
+            "remote sensing stuck at its floor"
+        );
     }
 }

@@ -100,8 +100,10 @@ impl Sojournal {
         let mut canonical = String::new();
         let mut entries = Vec::new();
         for f in &files {
-            let text = std::fs::read_to_string(f).map_err(|e| format!("reading {}: {e}", f.display()))?;
-            let file: SojournalFile = ron::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
+            let text =
+                std::fs::read_to_string(f).map_err(|e| format!("reading {}: {e}", f.display()))?;
+            let file: SojournalFile =
+                ron::from_str(&text).map_err(|e| format!("{}: {e}", f.display()))?;
             canonical.push_str(&text.replace("\r\n", "\n"));
             canonical.push('\n');
             entries.extend(file.entries);

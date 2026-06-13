@@ -266,12 +266,17 @@ fn main() -> Result<()> {
                 // generated-id range is reserved; real entries use real designations.
                 for b in m.catalog.bodies() {
                     if b.id.0 >= sojourn_world::GENERATED_ID_BASE {
-                        bail!("catalogue body '{}' uses a reserved generated id", b.name_id);
+                        bail!(
+                            "catalogue body '{}' uses a reserved generated id",
+                            b.name_id
+                        );
                     }
                 }
                 // Major-body Sojournal coverage: Sun, Earth, Mars (curated subset).
-                let majors: Vec<sojourn_astro::BodyId> =
-                    [0u32, 3, 4].iter().map(|&i| sojourn_astro::BodyId(i)).collect();
+                let majors: Vec<sojourn_astro::BodyId> = [0u32, 3, 4]
+                    .iter()
+                    .map(|&i| sojourn_astro::BodyId(i))
+                    .collect();
                 m.sojournal
                     .validate(&m.catalog, &m.sites, &m.locations, &majors)
                     .map_err(|e| anyhow::anyhow!("sojournal invalid: {e}"))?;
@@ -285,7 +290,10 @@ fn main() -> Result<()> {
                     m.sites.all().count(),
                     m.locations.ids().count(),
                     m.sojournal.entries().len(),
-                    m.world_hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+                    m.world_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
                 );
             } else if dir.join("domains.ron").exists() {
                 // FA-05 research data (FR-RESP-901): `dir` is data/research; the tech
@@ -299,12 +307,17 @@ fn main() -> Result<()> {
                 for seed in 0..200u64 {
                     let mut rng = ChaCha12Rng::seed_from_u64(seed);
                     let (dead_ends, _) = sojourn_research::seeding::seed(&module.data, &mut rng);
-                    if !sojourn_research::seeding::every_category_reachable(&module.data, &dead_ends) {
+                    if !sojourn_research::seeding::every_category_reachable(
+                        &module.data,
+                        &dead_ends,
+                    ) {
                         bricked += 1;
                     }
                 }
                 if bricked > 0 {
-                    bail!("reachability sweep FAILED: {bricked}/200 seeds bricked a capability category");
+                    bail!(
+                        "reachability sweep FAILED: {bricked}/200 seeds bricked a capability category"
+                    );
                 }
                 println!(
                     "DATA VALID (research): {} domains, {} tech nodes, {} categories, {} traits; \
@@ -313,7 +326,12 @@ fn main() -> Result<()> {
                     module.data.nodes.len(),
                     module.data.categories.len(),
                     module.data.traits.len(),
-                    module.data.content_hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+                    module
+                        .data
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
                 );
             } else if dir.join("test-catalog.ron").exists() {
                 let module = sojourn_astro::AstroModule::load(&dir)

@@ -125,10 +125,16 @@ impl WorldModule {
         // Cross-validate: site anchors and resources exist.
         for (_sid, d) in sites.all() {
             if catalog.body(d.body).is_none() {
-                return Err(format!("site '{}' anchors to unknown body {}", d.id, d.body.0));
+                return Err(format!(
+                    "site '{}' anchors to unknown body {}",
+                    d.id, d.body.0
+                ));
             }
             if !resources.has(&d.resource) {
-                return Err(format!("site '{}' references unknown resource '{}'", d.id, d.resource));
+                return Err(format!(
+                    "site '{}' references unknown resource '{}'",
+                    d.id, d.resource
+                ));
             }
         }
 
@@ -223,7 +229,11 @@ impl SimModule for WorldModule {
     ) -> CommandOutcome {
         let cmd: WorldCommand = match postcard::from_bytes(payload) {
             Ok(c) => c,
-            Err(e) => return CommandOutcome::Rejected(format!("malformed world payload (kind '{kind}'): {e}")),
+            Err(e) => {
+                return CommandOutcome::Rejected(format!(
+                    "malformed world payload (kind '{kind}'): {e}"
+                ));
+            }
         };
         let tick = ctx.tick().0;
         let s = self.slice_mut(slice);
@@ -270,7 +280,9 @@ impl SimModule for WorldModule {
                 effort,
             } => {
                 let Some(fld) = self.fields.get(&field) else {
-                    return CommandOutcome::Rejected(format!("unknown prospecting field '{field}'"));
+                    return CommandOutcome::Rejected(format!(
+                        "unknown prospecting field '{field}'"
+                    ));
                 };
                 if !(effort.is_finite() && effort >= 0.0) {
                     return CommandOutcome::Rejected("effort must be finite and ≥ 0".into());
@@ -314,8 +326,14 @@ impl SimModule for WorldModule {
         vec![ViewSnapshot {
             id: "world/status".into(),
             fields: BTreeMap::from([
-                ("belief_count".to_string(), ViewValue::U64(s.beliefs.len() as u64)),
-                ("generated_count".to_string(), ViewValue::U64(s.generated.len() as u64)),
+                (
+                    "belief_count".to_string(),
+                    ViewValue::U64(s.beliefs.len() as u64),
+                ),
+                (
+                    "generated_count".to_string(),
+                    ViewValue::U64(s.generated.len() as u64),
+                ),
             ]),
         }]
     }

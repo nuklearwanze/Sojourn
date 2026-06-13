@@ -12,12 +12,15 @@ fn queries_are_faction_scoped_and_flyability_gated() {
     let a2 = DomainId("A2".into());
     // Faction 0 builds A2; faction 1 does nothing.
     hire_scientists(&mut core, 0, "A2", 5.0, 6);
-    research(&mut core, SetAllocation {
-        faction: 0,
-        domain_splits: vec![(a2.clone(), 1.0)],
-        program_splits: vec![],
-        facilities: vec![],
-    });
+    research(
+        &mut core,
+        SetAllocation {
+            faction: 0,
+            domain_splits: vec![(a2.clone(), 1.0)],
+            program_splits: vec![],
+            facilities: vec![],
+        },
+    );
     advance_days(&mut core, 400);
     let s = snap(&core, &m);
 

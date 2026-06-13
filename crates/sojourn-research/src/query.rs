@@ -71,7 +71,10 @@ pub struct ResearchSnapshot {
 
 impl ResearchSnapshot {
     /// Extract a snapshot from a running kernel at the current tick boundary.
-    pub fn from_core(core: &SimCore, module: &crate::module::ResearchModule) -> Result<ResearchSnapshot, CoreError> {
+    pub fn from_core(
+        core: &SimCore,
+        module: &crate::module::ResearchModule,
+    ) -> Result<ResearchSnapshot, CoreError> {
         let tick = core.status().tick;
         core.with_slice("research", |slice| {
             let s = slice
@@ -106,7 +109,11 @@ impl ResearchSnapshot {
         let node = self.data.nodes.get(tech)?;
         let prog = self.best_program(f, tech);
         let trl = prog.map(|p| p.trl).unwrap_or(0);
-        let flight_units = self.heritage.get(&(f, tech.clone())).map(|h| h.flight_units).unwrap_or(0);
+        let flight_units = self
+            .heritage
+            .get(&(f, tech.clone()))
+            .map(|h| h.flight_units)
+            .unwrap_or(0);
         let tacit = self.tacit();
         let ul_margin = if node.ul_floors.is_empty() {
             50.0
@@ -117,9 +124,12 @@ impl ResearchSnapshot {
                 .sum::<f64>()
                 / node.ul_floors.len() as f64
         };
-        let lead = prog.and_then(|p| p.lead).and_then(|id| self.roster.get(&id));
+        let lead = prog
+            .and_then(|p| p.lead)
+            .and_then(|id| self.roster.get(&id));
         let trait_bonus = personnel::trait_bonus(&self.data, lead, |t| t.reliability_bonus);
-        let rel = reliability::reliability(&node.reliability, trl, flight_units, ul_margin, trait_bonus);
+        let rel =
+            reliability::reliability(&node.reliability, trl, flight_units, ul_margin, trait_bonus);
         Some(Maturity {
             trl,
             reliability: rel,
@@ -164,7 +174,10 @@ impl ResearchSnapshot {
             .filter(|n| {
                 n.tech_prereqs.iter().all(|p| {
                     p.kind == crate::tree::PrereqKind::UlSatisfiable
-                        || self.programs.values().any(|pr| pr.faction == f && pr.tech == p.tech && pr.trl >= 6)
+                        || self
+                            .programs
+                            .values()
+                            .any(|pr| pr.faction == f && pr.tech == p.tech && pr.trl >= 6)
                 })
             })
             .map(|n| n.id.clone())

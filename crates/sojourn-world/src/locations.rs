@@ -169,7 +169,10 @@ impl Locations {
             };
             for b in bodies {
                 if catalog.body(b).is_none() {
-                    return Err(format!("location '{}' references unknown body {}", d.id, b.0));
+                    return Err(format!(
+                        "location '{}' references unknown body {}",
+                        d.id, b.0
+                    ));
                 }
             }
             if let LocationKind::OrbitBand {

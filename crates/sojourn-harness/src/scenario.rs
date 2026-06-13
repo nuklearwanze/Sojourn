@@ -42,7 +42,9 @@ impl TimedCommand {
             (None, Some(a), None, None) => Ok(sojourn_astro::astro_payload(a)),
             (None, None, Some(w), None) => Ok(sojourn_world::world_payload(w)),
             (None, None, None, Some(r)) => Ok(sojourn_research::research_payload(r)),
-            _ => bail!("each scenario command needs exactly one of `command`, `astro`, `world` or `research`"),
+            _ => bail!(
+                "each scenario command needs exactly one of `command`, `astro`, `world` or `research`"
+            ),
         }
     }
 }

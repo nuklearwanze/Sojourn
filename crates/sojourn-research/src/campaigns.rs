@@ -25,6 +25,7 @@ pub fn fail_probability(
         _ => 0.5,
     };
     let dead_end_factor = if is_dead_end { 3.0 } else { 1.0 };
-    let p = params.test_fail_base * trl_factor * dead_end_factor * (1.0 + risk_index) * overrun_mult;
+    let p =
+        params.test_fail_base * trl_factor * dead_end_factor * (1.0 + risk_index) * overrun_mult;
     p.clamp(0.0, if is_dead_end { 0.98 } else { 0.9 })
 }

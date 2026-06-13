@@ -292,7 +292,9 @@ impl SimModule for ResearchModule {
         let cmd: ResearchCommand = match postcard::from_bytes(payload) {
             Ok(c) => c,
             Err(e) => {
-                return CommandOutcome::Rejected(format!("malformed research payload (kind '{kind}'): {e}"));
+                return CommandOutcome::Rejected(format!(
+                    "malformed research payload (kind '{kind}'): {e}"
+                ));
             }
         };
         let s = self.slice_mut(slice);
@@ -308,7 +310,10 @@ impl SimModule for ResearchModule {
         vec![ViewSnapshot {
             id: "research/status".into(),
             fields: BTreeMap::from([
-                ("programs".to_string(), ViewValue::U64(s.programs.len() as u64)),
+                (
+                    "programs".to_string(),
+                    ViewValue::U64(s.programs.len() as u64),
+                ),
                 ("matured".to_string(), ViewValue::U64(matured)),
                 ("people".to_string(), ViewValue::U64(s.roster.len() as u64)),
             ]),
@@ -320,12 +325,16 @@ impl SimModule for ResearchModule {
             .as_any()
             .downcast_ref::<ResearchSlice>()
             .expect("research slice type");
-        postcard::to_allocvec(s).map_err(|e| CoreError::Serialization { reason: e.to_string() })
+        postcard::to_allocvec(s).map_err(|e| CoreError::Serialization {
+            reason: e.to_string(),
+        })
     }
 
     fn load_slice(&self, bytes: &[u8]) -> Result<Box<dyn StateSlice>, CoreError> {
         let s: ResearchSlice =
-            postcard::from_bytes(bytes).map_err(|e| CoreError::Serialization { reason: e.to_string() })?;
+            postcard::from_bytes(bytes).map_err(|e| CoreError::Serialization {
+                reason: e.to_string(),
+            })?;
         if s.research_hash != self.data.content_hash {
             return Err(CoreError::DataVersionUnavailable {
                 pinned: s.research_hash.iter().map(|b| format!("{b:02x}")).collect(),
@@ -370,7 +379,11 @@ fn step_world(
             domains::grow_domain(&mut s.ul, data, params, *f, dom, rp, world);
             breakthrough::accrue(&mut s.insight, data, params, *f, dom, rp, 1.0);
             if breakthrough::check_trigger(&mut s.insight, &s.thresholds, *f, dom) {
-                let src = data.domains.get(dom).map(|d| d.source.clone()).unwrap_or_default();
+                let src = data
+                    .domains
+                    .get(dom)
+                    .map(|d| d.source.clone())
+                    .unwrap_or_default();
                 events.push((
                     "breakthrough".into(),
                     BTreeMap::from([
@@ -398,7 +411,9 @@ fn step_world(
                 let p = &s.programs[&pid];
                 (p.tech.clone(), p.trl, p.lead)
             };
-            let Some(node) = data.nodes.get(&tech) else { continue };
+            let Some(node) = data.nodes.get(&tech) else {
+                continue;
+            };
             let is_dead_end = seeding::is_dead_end(&s.dead_ends, &tech, trl + 1);
             let lead_p = lead.and_then(|id| s.roster.get(&PersonId(id.0)));
             let low_mult = personnel::trait_mult(data, lead_p, |t| t.low_trl_mult);
@@ -408,8 +423,18 @@ fn step_world(
 
             let p = s.programs.get_mut(&pid).expect("program");
             let out = programs::advance(
-                p, node, de, dt_days, ul_margin, is_dead_end, &alloc, params, low_mult, qual_mult,
-                overrun_mult, uniform,
+                p,
+                node,
+                de,
+                dt_days,
+                ul_margin,
+                is_dead_end,
+                &alloc,
+                params,
+                low_mult,
+                qual_mult,
+                overrun_mult,
+                uniform,
             );
             if let Some(trl) = out.trl_advanced {
                 events.push(("trl-advance".into(), prog_payload(pid, *f, Some(trl))));
@@ -432,8 +457,17 @@ fn step_world(
 
     // --- Tide ------------------------------------------------------------
     let publish = s.publish.clone();
-    let publishing = |f: FactionId, d: &DomainId| publish.get(&(f, d.clone())).copied().unwrap_or(false);
-    crate::tide::advance(&mut s.world_ul, &s.ul, data, params, &factions, &publishing, dt_days);
+    let publishing =
+        |f: FactionId, d: &DomainId| publish.get(&(f, d.clone())).copied().unwrap_or(false);
+    crate::tide::advance(
+        &mut s.world_ul,
+        &s.ul,
+        data,
+        params,
+        &factions,
+        &publishing,
+        dt_days,
+    );
 
     // --- Personnel aging / training -------------------------------------
     personnel::step_people(&mut s.roster, dt_days);
@@ -497,13 +531,20 @@ fn apply_command(
                 FactionId(faction),
                 Allocation {
                     domain_splits,
-                    program_splits: program_splits.into_iter().map(|(p, w)| (ProgramId(p), w)).collect(),
+                    program_splits: program_splits
+                        .into_iter()
+                        .map(|(p, w)| (ProgramId(p), w))
+                        .collect(),
                     facilities,
                 },
             );
             CommandOutcome::Applied
         }
-        StartProgram { faction, tech, lead } => {
+        StartProgram {
+            faction,
+            tech,
+            lead,
+        } => {
             let f = FactionId(faction);
             let Some(node) = data.nodes.get(&tech) else {
                 return reject(format!("unknown tech '{}'", tech.0));
@@ -531,7 +572,11 @@ fn apply_command(
                 .derivative_of
                 .as_ref()
                 .map(|parent| {
-                    let h = s.heritage.get(&(f, parent.clone())).map(|h| h.flight_units).unwrap_or(0);
+                    let h = s
+                        .heritage
+                        .get(&(f, parent.clone()))
+                        .map(|h| h.flight_units)
+                        .unwrap_or(0);
                     crate::reliability::derivative_start_trl(node.start_trl, h)
                 })
                 .unwrap_or(node.start_trl);
@@ -556,7 +601,11 @@ fn apply_command(
             s.programs.insert(id, prog);
             CommandOutcome::Applied
         }
-        SetPublishPolicy { faction, domain, publish } => {
+        SetPublishPolicy {
+            faction,
+            domain,
+            publish,
+        } => {
             if !data.domains.contains_key(&domain) {
                 return reject(format!("unknown domain '{}'", domain.0));
             }
@@ -573,8 +622,20 @@ fn apply_command(
             }
             CommandOutcome::Applied
         }
-        Hire { faction, role, discipline, skill, traits }
-        | Poach { faction, role, discipline, skill, traits } => {
+        Hire {
+            faction,
+            role,
+            discipline,
+            skill,
+            traits,
+        }
+        | Poach {
+            faction,
+            role,
+            discipline,
+            skill,
+            traits,
+        } => {
             if !data.domains.contains_key(&discipline) {
                 return reject(format!("unknown discipline '{}'", discipline.0));
             }
@@ -614,7 +675,10 @@ fn apply_command(
             }
             CommandOutcome::Applied
         }
-        InjectUnderstanding { faction, injections } => {
+        InjectUnderstanding {
+            faction,
+            injections,
+        } => {
             let f = FactionId(faction);
             for (dom, _) in &injections {
                 if !data.domains.contains_key(dom) {
@@ -626,15 +690,27 @@ fn apply_command(
             }
             CommandOutcome::Applied
         }
-        RegisterHeritage { faction, tech, units } => {
+        RegisterHeritage {
+            faction,
+            tech,
+            units,
+        } => {
             if !data.nodes.contains_key(&tech) {
                 return reject(format!("unknown tech '{}'", tech.0));
             }
             let e = s.heritage.entry((FactionId(faction), tech)).or_default();
-            *e = Heritage { flight_units: e.flight_units + units };
+            *e = Heritage {
+                flight_units: e.flight_units + units,
+            };
             CommandOutcome::Applied
         }
-        CrewFeedback { faction, astronaut, dose_delta, health_delta, psych_delta } => {
+        CrewFeedback {
+            faction,
+            astronaut,
+            dose_delta,
+            health_delta,
+            psych_delta,
+        } => {
             let _ = faction;
             let Some(p) = s.roster.get_mut(&PersonId(astronaut)) else {
                 return reject(format!("unknown person {astronaut}"));
@@ -642,9 +718,13 @@ fn apply_command(
             let Some(a) = &mut p.astronaut else {
                 return reject(format!("person {astronaut} is not an astronaut"));
             };
-            a.apply_feedback(dose_delta, health_delta, psych_delta, data.params.career_dose_limit);
+            a.apply_feedback(
+                dose_delta,
+                health_delta,
+                psych_delta,
+                data.params.career_dose_limit,
+            );
             CommandOutcome::Applied
         }
     }
 }
-

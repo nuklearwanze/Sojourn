@@ -4,14 +4,14 @@
 //! data and *no* ground-truth fields — so no query here can leak truth (R4). The
 //! standing audit (`tests/audit.rs`) enforces this over the whole surface.
 
-use crate::belief::{BeliefChange, FactionId, PropertyEstimate, Property, Target};
+use crate::belief::Priors;
+use crate::belief::{BeliefChange, FactionId, Property, PropertyEstimate, Target};
 use crate::catalogue::{BodyFilter, CatalogIndex};
 use crate::locations::{Locations, Resolved};
 use crate::module::WorldSlice;
 use crate::observe::BeliefMap;
-use crate::sites::{PpCategory, Placement, Sites};
+use crate::sites::{Placement, PpCategory, Sites};
 use crate::sojournal::{Sojournal, SojournalEntry};
-use crate::belief::Priors;
 use serde::{Deserialize, Serialize};
 use sojourn_astro::{BodyId, Catalog};
 use sojourn_core::{CoreError, SimCore};
@@ -83,7 +83,8 @@ impl WorldSnapshot {
                 .as_any()
                 .downcast_ref::<WorldSlice>()
                 .expect("world slice type");
-            let generated: std::collections::BTreeSet<BodyId> = s.generated.keys().copied().collect();
+            let generated: std::collections::BTreeSet<BodyId> =
+                s.generated.keys().copied().collect();
             let catalog = world.catalog.with_generated(s.generated.values().cloned());
             let index = CatalogIndex::build(&catalog);
             WorldSnapshot {
@@ -148,14 +149,16 @@ impl WorldSnapshot {
         self.sites
             .on_body(body)
             .iter()
-            .filter_map(|&sid| self.sites.def(sid).map(|d| SiteView {
-                id: d.id.clone(),
-                body: d.body,
-                placement: d.placement,
-                pp_category: d.pp_category,
-                resource: d.resource.clone(),
-                properties: d.properties.iter().map(|pt| pt.property).collect(),
-            }))
+            .filter_map(|&sid| {
+                self.sites.def(sid).map(|d| SiteView {
+                    id: d.id.clone(),
+                    body: d.body,
+                    placement: d.placement,
+                    pp_category: d.pp_category,
+                    resource: d.resource.clone(),
+                    properties: d.properties.iter().map(|pt| pt.property).collect(),
+                })
+            })
             .collect()
     }
 
@@ -163,7 +166,12 @@ impl WorldSnapshot {
 
     /// What faction `f` believes about `target`'s `property` (the honest default
     /// prior if it has never observed it). **Never** returns ground truth.
-    pub fn believed(&self, f: FactionId, target: Target, property: Property) -> Option<PropertyEstimate> {
+    pub fn believed(
+        &self,
+        f: FactionId,
+        target: Target,
+        property: Property,
+    ) -> Option<PropertyEstimate> {
         self.priors.model(property)?; // unknown property ⇒ None
         let est = self
             .beliefs
@@ -180,7 +188,12 @@ impl WorldSnapshot {
     }
 
     /// What faction `f` believes about a site's property (by site key).
-    pub fn believed_site(&self, f: FactionId, site_key: &str, property: Property) -> Option<PropertyEstimate> {
+    pub fn believed_site(
+        &self,
+        f: FactionId,
+        site_key: &str,
+        property: Property,
+    ) -> Option<PropertyEstimate> {
         let t = self.site_target(site_key)?;
         self.believed(f, t, property)
     }

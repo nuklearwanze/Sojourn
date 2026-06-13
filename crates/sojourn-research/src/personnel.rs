@@ -72,7 +72,11 @@ pub fn faction_de(roster: &Roster, params: &Params, f: FactionId) -> f64 {
 }
 
 /// Aggregate a trait modifier across a lead's traits (product of multipliers).
-pub fn trait_mult(data: &ResearchData, person: Option<&Person>, pick: impl Fn(&crate::tree::TraitDef) -> f64) -> f64 {
+pub fn trait_mult(
+    data: &ResearchData,
+    person: Option<&Person>,
+    pick: impl Fn(&crate::tree::TraitDef) -> f64,
+) -> f64 {
     let Some(p) = person else { return 1.0 };
     let mut m = 1.0;
     for t in &p.traits {
@@ -84,9 +88,17 @@ pub fn trait_mult(data: &ResearchData, person: Option<&Person>, pick: impl Fn(&c
 }
 
 /// Additive trait bonus (e.g. reliability) across a lead's traits.
-pub fn trait_bonus(data: &ResearchData, person: Option<&Person>, pick: impl Fn(&crate::tree::TraitDef) -> f64) -> f64 {
+pub fn trait_bonus(
+    data: &ResearchData,
+    person: Option<&Person>,
+    pick: impl Fn(&crate::tree::TraitDef) -> f64,
+) -> f64 {
     let Some(p) = person else { return 0.0 };
-    p.traits.iter().filter_map(|t| data.traits.get(t)).map(pick).sum()
+    p.traits
+        .iter()
+        .filter_map(|t| data.traits.get(t))
+        .map(pick)
+        .sum()
 }
 
 /// Tacit-knowledge penalty (FR-RESP-503): a domain with **no** active scientist of
@@ -99,7 +111,11 @@ pub fn tacit_penalty(roster: &Roster, params: &Params, f: FactionId, domain: &Do
             && p.training_days_left <= 0.0
             && &p.discipline == domain
     });
-    if has_specialist { 0.0 } else { params.tacit_per_head }
+    if has_specialist {
+        0.0
+    } else {
+        params.tacit_per_head
+    }
 }
 
 /// Advance training and aging for one step (days). Astronauts in training become

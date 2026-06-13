@@ -189,9 +189,7 @@ impl Sites {
 
     /// All sites, in load order.
     pub fn all(&self) -> impl Iterator<Item = (SiteId, &SiteDef)> {
-        self.defs
-            .iter()
-            .map(move |d| (self.id_of[&d.id], d))
+        self.defs.iter().map(move |d| (self.id_of[&d.id], d))
     }
 
     /// The truth distribution for `(site, property)`, if the site has it.

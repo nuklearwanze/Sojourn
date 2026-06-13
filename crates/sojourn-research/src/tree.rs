@@ -238,7 +238,8 @@ impl ResearchData {
 
         let domains_f: DomainsFile =
             ron::from_str(&domains_txt).map_err(|e| format!("domains.ron: {e}"))?;
-        let tech_f: TechFile = ron::from_str(&tech_txt).map_err(|e| format!("tech-tree.ron: {e}"))?;
+        let tech_f: TechFile =
+            ron::from_str(&tech_txt).map_err(|e| format!("tech-tree.ron: {e}"))?;
         let cats_f: CategoriesFile =
             ron::from_str(&cats_txt).map_err(|e| format!("capability-categories.ron: {e}"))?;
         let params: Params = ron::from_str(&params_txt).map_err(|e| format!("params.ron: {e}"))?;
@@ -290,25 +291,37 @@ impl ResearchData {
         for d in domains.values() {
             for (s, _) in &d.synergy {
                 if !domains.contains_key(s) {
-                    return Err(format!("domain '{}' synergy → unknown domain '{}'", d.id.0, s.0));
+                    return Err(format!(
+                        "domain '{}' synergy → unknown domain '{}'",
+                        d.id.0, s.0
+                    ));
                 }
             }
         }
         for n in nodes.values() {
             for (dom, _) in &n.ul_floors {
                 if !domains.contains_key(dom) {
-                    return Err(format!("tech '{}' UL floor → unknown domain '{}'", n.id.0, dom.0));
+                    return Err(format!(
+                        "tech '{}' UL floor → unknown domain '{}'",
+                        n.id.0, dom.0
+                    ));
                 }
             }
             for p in &n.tech_prereqs {
                 if !nodes.contains_key(&p.tech) {
-                    return Err(format!("tech '{}' prereq → unknown tech '{}'", n.id.0, p.tech.0));
+                    return Err(format!(
+                        "tech '{}' prereq → unknown tech '{}'",
+                        n.id.0, p.tech.0
+                    ));
                 }
             }
             if let Some(d) = &n.derivative_of
                 && !nodes.contains_key(d)
             {
-                return Err(format!("tech '{}' derivative_of unknown tech '{}'", n.id.0, d.0));
+                return Err(format!(
+                    "tech '{}' derivative_of unknown tech '{}'",
+                    n.id.0, d.0
+                ));
             }
             if !categories.contains_key(&n.capability_category) {
                 return Err(format!(

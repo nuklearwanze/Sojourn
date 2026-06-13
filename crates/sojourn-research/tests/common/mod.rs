@@ -27,13 +27,15 @@ pub fn core_with_research(seed: u64) -> (SimCore, ResearchModule) {
         run_mode: RunMode::SaveAnywhere,
         difficulty_inputs: BTreeMap::new(),
     };
-    let core = SimCore::create(cfg, kernel_data(), vec![Box::new(research_module())]).expect("core");
+    let core =
+        SimCore::create(cfg, kernel_data(), vec![Box::new(research_module())]).expect("core");
     (core, research_module())
 }
 
 /// Submit a research command and apply it at the boundary.
 pub fn research(core: &mut SimCore, cmd: ResearchCommand) {
-    core.submit(sojourn_research::research_payload(&cmd)).expect("submit");
+    core.submit(sojourn_research::research_payload(&cmd))
+        .expect("submit");
     let r = core.step(StepRequest::Ticks(0)).expect("apply");
     if let StopReason::Interrupted(ids) = r.stopped {
         for id in ids {
@@ -83,7 +85,11 @@ pub fn advance_days(core: &mut SimCore, days: u64) {
         if now >= to {
             return;
         }
-        if let StopReason::Interrupted(ids) = core.step(StepRequest::Ticks(to - now)).expect("step").stopped {
+        if let StopReason::Interrupted(ids) = core
+            .step(StepRequest::Ticks(to - now))
+            .expect("step")
+            .stopped
+        {
             for id in ids {
                 core.acknowledge(id).expect("ack");
             }

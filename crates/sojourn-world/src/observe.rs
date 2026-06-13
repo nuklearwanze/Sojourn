@@ -75,7 +75,9 @@ pub fn apply_observe<R: RngCore>(
             .collect(),
     };
     if props.is_empty() {
-        return reject(format!("class {class:?} senses no property of '{site_key}'"));
+        return reject(format!(
+            "class {class:?} senses no property of '{site_key}'"
+        ));
     }
 
     // --- Refinement ----------------------------------------------------------
@@ -156,8 +158,18 @@ mod tests {
         let mut rng = ChaCha12Rng::seed_from_u64(seed);
         for k in 0..n {
             let res = apply_observe(
-                &mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, k,
-                FactionId(0), "s1", Some(Property::Grade), class, quality,
+                &mut beliefs,
+                &truth,
+                &mut log,
+                &priors,
+                &sites,
+                &mut rng,
+                k,
+                FactionId(0),
+                "s1",
+                Some(Property::Grade),
+                class,
+                quality,
             );
             assert!(matches!(res.outcome, CommandOutcome::Applied));
         }
@@ -175,16 +187,33 @@ mod tests {
         let mut last = f64::INFINITY;
         for k in 0..80 {
             apply_observe(
-                &mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, k,
-                FactionId(0), "s1", Some(Property::Grade), ObsClass::SampleGrade, 0.9,
+                &mut beliefs,
+                &truth,
+                &mut log,
+                &priors,
+                &sites,
+                &mut rng,
+                k,
+                FactionId(0),
+                "s1",
+                Some(Property::Grade),
+                ObsClass::SampleGrade,
+                0.9,
             );
             let v = beliefs[&key].var;
             assert!(v <= last + 1e-12, "variance monotonically non-increasing");
             last = v;
         }
         let dec = priors.decode(Property::Grade, beliefs[&key]);
-        assert!((dec.value - 0.1).abs() < 0.03, "estimate converges toward truth 0.1 (got {})", dec.value);
-        assert!(last >= 0.03_f64.powi(2) - 1e-9, "never below the sample-grade floor");
+        assert!(
+            (dec.value - 0.1).abs() < 0.03,
+            "estimate converges toward truth 0.1 (got {})",
+            dec.value
+        );
+        assert!(
+            last >= 0.03_f64.powi(2) - 1e-9,
+            "never below the sample-grade floor"
+        );
     }
 
     #[test]
@@ -194,11 +223,19 @@ mod tests {
             let (priors, sites, _t) = setup();
             sid = sites.resolve("s1").unwrap();
             let _ = priors;
-            run(7, ObsClass::RemoteSensing, 1.0, 200).0[&(FactionId(0), Target::Site(sid), Property::Grade)].var
+            run(7, ObsClass::RemoteSensing, 1.0, 200).0
+                [&(FactionId(0), Target::Site(sid), Property::Grade)]
+                .var
         };
         // Remote floor 0.30 ⇒ floor var 0.09; sample-grade floor var 9e-4.
-        assert!(remote_var >= 0.30_f64.powi(2) - 1e-9, "remote sensing stuck at its floor");
-        assert!(remote_var > 0.03_f64.powi(2), "cannot reach sample-grade certainty");
+        assert!(
+            remote_var >= 0.30_f64.powi(2) - 1e-9,
+            "remote sensing stuck at its floor"
+        );
+        assert!(
+            remote_var > 0.03_f64.powi(2),
+            "cannot reach sample-grade certainty"
+        );
     }
 
     #[test]
@@ -216,16 +253,52 @@ mod tests {
         let mut log = Vec::new();
         let mut rng = ChaCha12Rng::seed_from_u64(1);
         // Unknown site.
-        let r1 = apply_observe(&mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, 0,
-            FactionId(0), "nope", Some(Property::Grade), ObsClass::InSitu, 0.5);
+        let r1 = apply_observe(
+            &mut beliefs,
+            &truth,
+            &mut log,
+            &priors,
+            &sites,
+            &mut rng,
+            0,
+            FactionId(0),
+            "nope",
+            Some(Property::Grade),
+            ObsClass::InSitu,
+            0.5,
+        );
         assert!(matches!(r1.outcome, CommandOutcome::Rejected(_)));
         // Out-of-range quality.
-        let r2 = apply_observe(&mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, 0,
-            FactionId(0), "s1", Some(Property::Grade), ObsClass::InSitu, 2.0);
+        let r2 = apply_observe(
+            &mut beliefs,
+            &truth,
+            &mut log,
+            &priors,
+            &sites,
+            &mut rng,
+            0,
+            FactionId(0),
+            "s1",
+            Some(Property::Grade),
+            ObsClass::InSitu,
+            2.0,
+        );
         assert!(matches!(r2.outcome, CommandOutcome::Rejected(_)));
         // Property the site does not expose.
-        let r3 = apply_observe(&mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, 0,
-            FactionId(0), "s1", Some(Property::Slope), ObsClass::InSitu, 0.5);
+        let r3 = apply_observe(
+            &mut beliefs,
+            &truth,
+            &mut log,
+            &priors,
+            &sites,
+            &mut rng,
+            0,
+            FactionId(0),
+            "s1",
+            Some(Property::Slope),
+            ObsClass::InSitu,
+            0.5,
+        );
         assert!(matches!(r3.outcome, CommandOutcome::Rejected(_)));
         assert!(beliefs.is_empty(), "no state change on rejection");
     }
@@ -238,8 +311,20 @@ mod tests {
         let mut log = Vec::new();
         let mut rng = ChaCha12Rng::seed_from_u64(5);
         for k in 0..10 {
-            apply_observe(&mut beliefs, &truth, &mut log, &priors, &sites, &mut rng, k,
-                FactionId(0), "s1", Some(Property::Grade), ObsClass::SampleGrade, 0.9);
+            apply_observe(
+                &mut beliefs,
+                &truth,
+                &mut log,
+                &priors,
+                &sites,
+                &mut rng,
+                k,
+                FactionId(0),
+                "s1",
+                Some(Property::Grade),
+                ObsClass::SampleGrade,
+                0.9,
+            );
         }
         // Faction 0 surveyed; faction 1 never did.
         assert!(beliefs.contains_key(&(FactionId(0), Target::Site(sid), Property::Grade)));

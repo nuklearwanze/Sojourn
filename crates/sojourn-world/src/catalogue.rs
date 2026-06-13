@@ -107,7 +107,10 @@ impl BodyMetaTable {
         let mut by_id = BTreeMap::new();
         for m in f.bodies {
             if m.source.trim().is_empty() {
-                return Err(format!("body-meta.ron: '{}' has empty source", m.designation));
+                return Err(format!(
+                    "body-meta.ron: '{}' has empty source",
+                    m.designation
+                ));
             }
             by_id.insert(m.id, m);
         }
@@ -164,11 +167,7 @@ impl CatalogIndex {
 
     /// Body ids matching the filter (intersection of the relevant indexes),
     /// resolved against `catalog`. Ordered.
-    pub fn query<'a>(
-        &self,
-        catalog: &'a Catalog,
-        filter: &BodyFilter,
-    ) -> Vec<&'a BodyDef> {
+    pub fn query<'a>(&self, catalog: &'a Catalog, filter: &BodyFilter) -> Vec<&'a BodyDef> {
         let candidate: Vec<BodyId> = match filter.parent {
             Some(p) => self.by_parent.get(&p).cloned().unwrap_or_default(),
             None => self.all.clone(),

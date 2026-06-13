@@ -52,7 +52,11 @@ pub fn advance(core: &mut SimCore, to: u64) {
         if now >= to {
             return;
         }
-        if let StopReason::Interrupted(ids) = core.step(StepRequest::Ticks(to - now)).expect("step").stopped {
+        if let StopReason::Interrupted(ids) = core
+            .step(StepRequest::Ticks(to - now))
+            .expect("step")
+            .stopped
+        {
             for id in ids {
                 core.acknowledge(id).expect("ack");
             }
