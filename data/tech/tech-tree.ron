@@ -1,0 +1,69 @@
+// Engineering tech-tree node subset (FR-RESP-702, clarified Q3:A): a representative,
+// sourced set exercising every mechanic — cross-branch gates, ≥2 paths per capability
+// category, leapfrog seams (UlSatisfiable prereqs), a derivative, and seeded dead ends.
+// The full ~150-node population is a documented data expansion behind this schema.
+// start_trl is real 2026 maturity; ul_floors gate availability; trl_steps carry
+// cost (DE-days), a min-duration floor, a facility gate, and S-curve steepness.
+(
+    nodes: [
+        // --- reusable-launch (2 paths) ---
+        (id: "H2", capability_category: "reusable-launch", start_trl: 8, ul_floors: [("A8", 40.0), ("A9", 40.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 9, cost: 400.0, min_duration_days: 365.0, facility: None, scurve_k: 1.0) ],
+         reliability: (ceiling: 0.99, trl6_floor: 0.7, ul_weight: 0.1, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md H2 partially reusable (boostback/droneship) — flying class"),
+        (id: "H3", capability_category: "reusable-launch", start_trl: 5, ul_floors: [("A9", 60.0)], tech_prereqs: [ (tech: "B1.5", kind: UlSatisfiable) ],
+         trl_steps: [ (trl: 6, cost: 500.0, min_duration_days: 365.0, facility: Some("test-stand"), scurve_k: 1.0), (trl: 7, cost: 700.0, min_duration_days: 540.0, facility: Some("test-stand"), scurve_k: 1.2), (trl: 8, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.98, trl6_floor: 0.5, ul_weight: 0.2, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md H3 fully reusable two-stage — order-of-magnitude $/kg drop"),
+
+        // --- methalox-propulsion (2 paths, + derivative) ---
+        (id: "B1.5", capability_category: "methalox-propulsion", start_trl: 6, ul_floors: [("A2", 60.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 7, cost: 450.0, min_duration_days: 365.0, facility: Some("test-stand"), scurve_k: 1.0), (trl: 8, cost: 400.0, min_duration_days: 365.0, facility: Some("test-stand"), scurve_k: 1.0), (trl: 9, cost: 350.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.99, trl6_floor: 0.6, ul_weight: 0.15, heritage_weight: 0.35), derivative_of: None,
+         source: "design/02-TECH-TREE.md B1.5 full-flow staged-combustion methalox — flying-class FFSC"),
+        (id: "B1.6", capability_category: "methalox-propulsion", start_trl: 7, ul_floors: [("A2", 60.0)], tech_prereqs: [ (tech: "B1.5", kind: Product) ],
+         trl_steps: [ (trl: 8, cost: 400.0, min_duration_days: 365.0, facility: Some("test-stand"), scurve_k: 1.0), (trl: 9, cost: 350.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.99, trl6_floor: 0.65, ul_weight: 0.15, heritage_weight: 0.35), derivative_of: Some("B1.5"),
+         source: "design/02-TECH-TREE.md B1.6 deep-throttle/restartable landing engines — precision EDL"),
+
+        // --- nuclear-thermal (2 paths) ---
+        (id: "B3.1", capability_category: "nuclear-thermal", start_trl: 5, ul_floors: [("A4", 55.0), ("A1", 60.0), ("A7", 55.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 6, cost: 700.0, min_duration_days: 540.0, facility: Some("nuclear-facility"), scurve_k: 1.2), (trl: 7, cost: 900.0, min_duration_days: 730.0, facility: Some("nuclear-facility"), scurve_k: 1.3), (trl: 8, cost: 700.0, min_duration_days: 540.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.97, trl6_floor: 0.45, ul_weight: 0.2, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md B3.1 solid-core NTR (NERVA-class, LEU) — DRACO/NTP heritage"),
+        (id: "B3.2", capability_category: "nuclear-thermal", start_trl: 4, ul_floors: [("A1", 70.0), ("A4", 60.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 5, cost: 800.0, min_duration_days: 540.0, facility: Some("nuclear-facility"), scurve_k: 1.3), (trl: 6, cost: 900.0, min_duration_days: 730.0, facility: Some("nuclear-facility"), scurve_k: 1.3), (trl: 7, cost: 1000.0, min_duration_days: 730.0, facility: Some("nuclear-facility"), scurve_k: 1.4), (trl: 8, cost: 800.0, min_duration_days: 540.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.97, trl6_floor: 0.45, ul_weight: 0.2, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md B3.2 CERMET-fuel high-temp NTR — higher Isp/thrust, reusable cores"),
+
+        // --- nuclear-electric (2 paths) ---
+        (id: "B4.1", capability_category: "nuclear-electric", start_trl: 5, ul_floors: [("A4", 55.0), ("A6", 55.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 6, cost: 600.0, min_duration_days: 540.0, facility: Some("nuclear-facility"), scurve_k: 1.2), (trl: 7, cost: 800.0, min_duration_days: 730.0, facility: None, scurve_k: 1.2), (trl: 8, cost: 600.0, min_duration_days: 540.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.98, trl6_floor: 0.5, ul_weight: 0.2, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md B4.1 space fission reactor 10–100 kWe (Kilopower/KRUSTY-derived)"),
+        (id: "B4.2", capability_category: "nuclear-electric", start_trl: 3, ul_floors: [("A4", 65.0), ("A5", 60.0), ("A6", 65.0)], tech_prereqs: [ (tech: "B4.1", kind: UlSatisfiable) ],
+         trl_steps: [ (trl: 4, cost: 700.0, min_duration_days: 540.0, facility: None, scurve_k: 1.3), (trl: 5, cost: 800.0, min_duration_days: 540.0, facility: Some("nuclear-facility"), scurve_k: 1.3), (trl: 6, cost: 900.0, min_duration_days: 730.0, facility: Some("nuclear-facility"), scurve_k: 1.3), (trl: 7, cost: 900.0, min_duration_days: 730.0, facility: None, scurve_k: 1.2), (trl: 8, cost: 700.0, min_duration_days: 540.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.97, trl6_floor: 0.45, ul_weight: 0.25, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md B4.2 100 kWe–1 MWe reactor + Brayton/Stirling conversion"),
+
+        // --- lunar-propellant (2 paths) ---
+        (id: "G2", capability_category: "lunar-propellant", start_trl: 3, ul_floors: [("A14", 55.0), ("A15", 40.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 4, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 1.2), (trl: 5, cost: 600.0, min_duration_days: 540.0, facility: None, scurve_k: 1.2), (trl: 6, cost: 700.0, min_duration_days: 540.0, facility: None, scurve_k: 1.2), (trl: 7, cost: 800.0, min_duration_days: 730.0, facility: None, scurve_k: 1.3), (trl: 8, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.96, trl6_floor: 0.4, ul_weight: 0.25, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md G2 lunar polar water-ice extraction (cold-trap thermal mining)"),
+        (id: "G3", capability_category: "lunar-propellant", start_trl: 4, ul_floors: [("A14", 60.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 5, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 1.2), (trl: 6, cost: 700.0, min_duration_days: 540.0, facility: None, scurve_k: 1.2), (trl: 7, cost: 800.0, min_duration_days: 730.0, facility: None, scurve_k: 1.3), (trl: 8, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.96, trl6_floor: 0.4, ul_weight: 0.25, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md G3 regolith oxygen extraction (molten regolith electrolysis / H2 reduction)"),
+
+        // --- closed-life-support (2 paths) ---
+        (id: "F2", capability_category: "closed-life-support", start_trl: 8, ul_floors: [("A12", 40.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 9, cost: 400.0, min_duration_days: 365.0, facility: None, scurve_k: 0.9) ],
+         reliability: (ceiling: 0.98, trl6_floor: 0.7, ul_weight: 0.15, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md F2 physico-chemical recycling ECLSS (ISS-derived)"),
+        (id: "F3", capability_category: "closed-life-support", start_trl: 5, ul_floors: [("A12", 60.0)], tech_prereqs: [],
+         trl_steps: [ (trl: 6, cost: 600.0, min_duration_days: 540.0, facility: None, scurve_k: 1.2), (trl: 7, cost: 700.0, min_duration_days: 730.0, facility: None, scurve_k: 1.3), (trl: 8, cost: 600.0, min_duration_days: 365.0, facility: None, scurve_k: 1.0), (trl: 9, cost: 500.0, min_duration_days: 365.0, facility: None, scurve_k: 0.8) ],
+         reliability: (ceiling: 0.96, trl6_floor: 0.45, ul_weight: 0.25, heritage_weight: 0.3), derivative_of: None,
+         source: "design/02-TECH-TREE.md F3 high-closure ECLSS (≥98% water/air) for long Mars stays"),
+    ],
+)

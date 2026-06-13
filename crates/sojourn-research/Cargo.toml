@@ -1,0 +1,24 @@
+[package]
+name = "sojourn-research"
+description = "Sojourn research & personnel (FA-05): the two-track modelled-research engine (Understanding Levels + TRL programs), test campaigns, dead ends, breakthroughs, leapfrogging, the science tide, personnel and the astronaut pipeline. SimModule on the sojourn-core kernel (physics-independent)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[dev-dependencies]
+rand_chacha = { workspace = true }
+rand_core = { workspace = true }
+
+[lints]
+workspace = true

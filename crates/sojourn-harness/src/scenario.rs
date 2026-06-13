@@ -29,16 +29,20 @@ pub struct TimedCommand {
     /// A world command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub world: Option<sojourn_world::WorldCommand>,
+    /// A research command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub research: Option<sojourn_research::ResearchCommand>,
 }
 
 impl TimedCommand {
     /// The kernel command this entry submits.
     pub fn to_kernel(&self) -> Result<Command> {
-        match (&self.command, &self.astro, &self.world) {
-            (Some(c), None, None) => Ok(c.clone()),
-            (None, Some(a), None) => Ok(sojourn_astro::astro_payload(a)),
-            (None, None, Some(w)) => Ok(sojourn_world::world_payload(w)),
-            _ => bail!("each scenario command needs exactly one of `command`, `astro` or `world`"),
+        match (&self.command, &self.astro, &self.world, &self.research) {
+            (Some(c), None, None, None) => Ok(c.clone()),
+            (None, Some(a), None, None) => Ok(sojourn_astro::astro_payload(a)),
+            (None, None, Some(w), None) => Ok(sojourn_world::world_payload(w)),
+            (None, None, None, Some(r)) => Ok(sojourn_research::research_payload(r)),
+            _ => bail!("each scenario command needs exactly one of `command`, `astro`, `world` or `research`"),
         }
     }
 }
@@ -67,6 +71,9 @@ pub struct Scenario {
     /// (`data/world`) plus the world module (belief/sites/locations/prospecting).
     #[serde(default)]
     pub world: bool,
+    /// Install the FA-05 research module (loads `data/research` + `data/tech`).
+    #[serde(default)]
+    pub research: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -112,6 +119,11 @@ impl Scenario {
                 .map_err(|e| anyhow::anyhow!("loading world data: {e}"))?;
             mods.push(Box::new(astro));
             mods.push(Box::new(world));
+        }
+        if self.research {
+            let module = sojourn_research::ResearchModule::load(Path::new("data"))
+                .map_err(|e| anyhow::anyhow!("loading research data: {e}"))?;
+            mods.push(Box::new(module));
         }
         Ok(mods)
     }

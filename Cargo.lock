@@ -739,6 +739,7 @@ dependencies = [
  "clap",
  "criterion",
  "postcard",
+ "rand_chacha",
  "rand_core",
  "ron",
  "serde",
@@ -746,7 +747,23 @@ dependencies = [
  "slotmap",
  "sojourn-astro",
  "sojourn-core",
+ "sojourn-research",
  "sojourn-world",
+]
+
+[[package]]
+name = "sojourn-research"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_chacha",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-core",
+ "thiserror",
 ]
 
 [[package]]

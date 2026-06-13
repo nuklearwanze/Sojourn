@@ -1,0 +1,10 @@
+// Personnel trait definitions (design/01-RESEARCH.md §7). Multipliers on program
+// progress / breakthrough / overrun; additive reliability bonus. Sourced as design intent.
+(
+    traits: [
+        (id: "visionary",  low_trl_mult: 1.30, qual_mult: 0.90, breakthrough_mult: 1.40, overrun_mult: 1.10, reliability_bonus: 0.00, source: "design/01-RESEARCH.md §7 Visionary — better at low-TRL/basic science"),
+        (id: "closer",     low_trl_mult: 0.90, qual_mult: 1.30, breakthrough_mult: 0.90, overrun_mult: 0.90, reliability_bonus: 0.02, source: "design/01-RESEARCH.md §7 Closer — better at TRL 6→9 qualification"),
+        (id: "maverick",   low_trl_mult: 1.10, qual_mult: 1.00, breakthrough_mult: 1.50, overrun_mult: 1.40, reliability_bonus: -0.02, source: "design/01-RESEARCH.md §7 Maverick — higher breakthrough chance, higher overrun variance"),
+        (id: "safe-hands", low_trl_mult: 1.00, qual_mult: 1.05, breakthrough_mult: 0.80, overrun_mult: 0.70, reliability_bonus: 0.05, source: "design/01-RESEARCH.md §7 Safe Hands — reliability bonus, low variance"),
+    ],
+)

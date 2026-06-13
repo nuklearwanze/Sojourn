@@ -1,0 +1,22 @@
+// Research tuning parameters (engineering defaults; design/01-RESEARCH.md "data note").
+// Not plausibility-bearing physical constants — they calibrate the modelled process so
+// remote/lab science, TRL maturation, dead ends, breakthroughs and the tide behave as the
+// design describes. SI-agnostic abstract quantities (RP/DE/UL/days).
+(
+    rp_per_scientist_day: 1.0,
+    de_per_engineer_day: 1.0,
+    ul_per_rp: 0.05,
+    overrun_sigma: 0.2,
+    test_fail_base: 0.06,
+    failure_ul_inject: 0.4,
+    insight_per_basic_rp: 0.02,
+    tide_baseline_per_day: 0.0008,
+    tide_aggregate_weight: 0.9,
+    catchup_per_level: 0.02,
+    career_dose_limit: 1000.0,
+    astronaut_train_days: 730.0,
+    tacit_per_head: 12.0,
+    dead_end_rate: 0.35,
+    breakthrough_threshold: 500.0,
+    source: "Engineering defaults calibrated to design/01-RESEARCH.md: diminishing-returns science, S-curve TRL maturation, Augustine-style overruns, rare basic-science-weighted breakthroughs (~order of a decade for a heavily invested domain), and a bounded global tide. Tunable data, not code.",
+)

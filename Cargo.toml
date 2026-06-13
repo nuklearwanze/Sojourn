@@ -5,6 +5,7 @@ members = [
     "crates/sojourn-astro",
     "crates/sojourn-world",
     "crates/sojourn-worldbuild",
+    "crates/sojourn-research",
     "crates/sojourn-harness",
 ]
 

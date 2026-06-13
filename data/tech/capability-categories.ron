@@ -1,0 +1,13 @@
+// Capability categories (design/02-TECH-TREE.md §L1): each "grand capability" has ≥2
+// candidate technology paths so per-game dead-end seeding never bricks a strategy. This
+// is the domain over which the constructive reachability invariant holds (FR-RESP-301).
+(
+    categories: [
+        (id: "reusable-launch",     paths: ["H2", "H3"],     source: "design/02-TECH-TREE.md §L1 cheap launch — ≥2 paths"),
+        (id: "methalox-propulsion", paths: ["B1.5", "B1.6"], source: "design/02-TECH-TREE.md B1 chemical — reusable methalox family"),
+        (id: "nuclear-thermal",     paths: ["B3.1", "B3.2"], source: "design/02-TECH-TREE.md B3 NTP — solid-core vs CERMET paths"),
+        (id: "nuclear-electric",    paths: ["B4.1", "B4.2"], source: "design/02-TECH-TREE.md B4 NEP — reactor scale-up paths"),
+        (id: "lunar-propellant",    paths: ["G2", "G3"],     source: "design/02-TECH-TREE.md §L1 lunar propellant — water-ice vs regolith O2"),
+        (id: "closed-life-support", paths: ["F2", "F3"],     source: "design/02-TECH-TREE.md §L1 closed life support — physico-chemical vs high-closure"),
+    ],
+)

@@ -1,0 +1,24 @@
+// Knowledge domains (Track A), the full A1–A17 set from design/02-TECH-TREE.md §A.
+// Each is a continuous Understanding Level (0–100) with synergy links, diminishing
+// returns (knee + steepness) and basic-vs-applied + mission-injectable flags. Sourced.
+(
+    domains: [
+        (id: "A1", name_id: "dom.materials", synergy: [("A7", 0.2), ("A4", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A1 Materials Science (alloys/composites/refractories)"),
+        (id: "A2", name_id: "dom.chem-propulsion", synergy: [("A1", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A2 Combustion & Chemical Propulsion Science"),
+        (id: "A3", name_id: "dom.plasma-em", synergy: [("A6", 0.2), ("A4", 0.2)], dr_knee: 65.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A3 Plasma & Electromagnetics"),
+        (id: "A4", name_id: "dom.nuclear", synergy: [("A1", 0.2), ("A6", 0.2), ("A3", 0.2)], dr_knee: 60.0, dr_steepness: 3.5, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A4 Nuclear Physics (fission, later fusion)"),
+        (id: "A5", name_id: "dom.thermal", synergy: [("A1", 0.2), ("A6", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A5 Thermal Physics (heat transfer, radiators, cryo)"),
+        (id: "A6", name_id: "dom.power", synergy: [("A5", 0.2), ("A4", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A6 Power-Systems Science (PV, conversion, storage)"),
+        (id: "A7", name_id: "dom.cryogenics", synergy: [("A5", 0.2), ("A1", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A7 Cryogenics & Propellant Science (boil-off, densification)"),
+        (id: "A8", name_id: "dom.astrodynamics", synergy: [("A9", 0.2)], dr_knee: 75.0, dr_steepness: 2.5, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A8 Astrodynamics & Trajectory Theory"),
+        (id: "A9", name_id: "dom.gnc", synergy: [("A8", 0.2)], dr_knee: 75.0, dr_steepness: 2.5, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A9 GNC & Autonomy (nav, control, AI ops)"),
+        (id: "A10", name_id: "dom.aerothermo-edl", synergy: [("A1", 0.2), ("A5", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A10 Aerothermodynamics & EDL Science"),
+        (id: "A11", name_id: "dom.radiation-bio", synergy: [("A1", 0.2), ("A13", 0.2)], dr_knee: 65.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A11 Radiation Physics & Biology"),
+        (id: "A12", name_id: "dom.closed-ecology", synergy: [("A13", 0.2)], dr_knee: 65.0, dr_steepness: 3.5, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A12 Closed-Ecology / Bioregenerative Science"),
+        (id: "A13", name_id: "dom.human-factors", synergy: [("A11", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A13 Human Factors & Space Medicine"),
+        (id: "A14", name_id: "dom.isru-chem", synergy: [("A1", 0.2), ("A15", 0.2)], dr_knee: 65.0, dr_steepness: 3.0, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A14 In-Situ Resource Chemistry"),
+        (id: "A15", name_id: "dom.geosciences", synergy: [("A14", 0.2), ("A16", 0.2)], dr_knee: 80.0, dr_steepness: 2.0, basic_science: false, mission_injectable: true, source: "design/02-TECH-TREE.md A15 Geosciences (per-body; mission-advanced)"),
+        (id: "A16", name_id: "dom.astrobiology", synergy: [("A15", 0.2), ("A14", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: true, source: "design/02-TECH-TREE.md A16 Astrobiology (biosignatures, habitability)"),
+        (id: "A17", name_id: "dom.manufacturing", synergy: [("A1", 0.2), ("A14", 0.2)], dr_knee: 70.0, dr_steepness: 3.0, basic_science: true, mission_injectable: false, source: "design/02-TECH-TREE.md A17 Manufacturing & Construction Science (additive, regolith, ISAM)"),
+    ],
+)

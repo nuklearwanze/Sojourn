@@ -1,0 +1,29 @@
+// FA-05 research scenario: fund a domain, then mature a technology through TRL under
+// the research module. Drives hire/allocate/start-program commands, then checks
+// double-run determinism (verify) and save/load round-trip.
+(
+    name: "research-program",
+    seed: 5,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    research: true,
+    commands: [
+        (tick: 0, research: Some(Hire(faction: 0, role: Scientist, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Scientist, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Scientist, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Scientist, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: ["closer"]))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(Hire(faction: 0, role: Engineer, discipline: "A2", skill: 6.0, traits: []))),
+        (tick: 0, research: Some(SetAllocation(faction: 0, domain_splits: [("A2", 1.0)], program_splits: [], facilities: ["test-stand"]))),
+        (tick: 43200000, research: Some(StartProgram(faction: 0, tech: "B1.5", lead: None))),
+        (tick: 43200000, research: Some(SetAllocation(faction: 0, domain_splits: [("A2", 0.2)], program_splits: [(0, 1.0)], facilities: ["test-stand"]))),
+        (tick: 216000000, research: Some(RegisterHeritage(faction: 0, tech: "B1.5", units: 4))),
+    ],
+    checkpoints: [43200000, 216000000, 300000000],
+    until_tick: 300000000,
+)

@@ -25,5 +25,12 @@
         // FA-03 world-data classes (specs/004-world-data contracts/observation-commands.md)
         (id: "body-catalogued",  default_pause: LogOnly, source: "specs/004-world-data FR-WORLD-502/703"),
         (id: "survey-milestone", default_pause: LogOnly, source: "specs/004-world-data FR-WORLD-305/703"),
+        // FA-05 research classes (specs/005-research-personnel contracts/research-commands.md)
+        (id: "breakthrough",      default_pause: Interrupt, source: "specs/005-research-personnel FR-RESP-302 (announced discovery)"),
+        (id: "dead-end-confirmed", default_pause: LogOnly,  source: "specs/005-research-personnel FR-RESP-301"),
+        (id: "test-failure",      default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-204 (spectacular flight failures carry a PR payload)"),
+        (id: "program-milestone", default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-802"),
+        (id: "trl-advance",       default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-201"),
+        (id: "publish",           default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-402"),
     ],
 )

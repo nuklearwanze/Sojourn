@@ -287,6 +287,34 @@ fn main() -> Result<()> {
                     m.sojournal.entries().len(),
                     m.world_hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
                 );
+            } else if dir.join("domains.ron").exists() {
+                // FA-05 research data (FR-RESP-901): `dir` is data/research; the tech
+                // tree is the sibling data/tech. Validate + run the reachability sweep.
+                let parent = dir.parent().unwrap_or(std::path::Path::new("."));
+                let module = sojourn_research::ResearchModule::load(parent)
+                    .map_err(|e| anyhow::anyhow!("research data invalid: {e}"))?;
+                use rand_chacha::ChaCha12Rng;
+                use rand_core::SeedableRng;
+                let mut bricked = 0u32;
+                for seed in 0..200u64 {
+                    let mut rng = ChaCha12Rng::seed_from_u64(seed);
+                    let (dead_ends, _) = sojourn_research::seeding::seed(&module.data, &mut rng);
+                    if !sojourn_research::seeding::every_category_reachable(&module.data, &dead_ends) {
+                        bricked += 1;
+                    }
+                }
+                if bricked > 0 {
+                    bail!("reachability sweep FAILED: {bricked}/200 seeds bricked a capability category");
+                }
+                println!(
+                    "DATA VALID (research): {} domains, {} tech nodes, {} categories, {} traits; \
+                     reachability sweep PASS (200 seeds); research hash {}",
+                    module.data.domains.len(),
+                    module.data.nodes.len(),
+                    module.data.categories.len(),
+                    module.data.traits.len(),
+                    module.data.content_hash.iter().map(|b| format!("{b:02x}")).collect::<String>()
+                );
             } else if dir.join("test-catalog.ron").exists() {
                 let module = sojourn_astro::AstroModule::load(&dir)
                     .map_err(|e| anyhow::anyhow!("astro data invalid: {e}"))?;
@@ -325,9 +353,15 @@ fn main() -> Result<()> {
                             .expect("world data loads"),
                     )
                 }),
-                other => {
-                    bail!("unknown module '{other}' (use 'toy', 'synthetic', 'astro' or 'world')")
-                }
+                "research" => Box::new(|| {
+                    Box::new(
+                        sojourn_research::ResearchModule::load(std::path::Path::new("data"))
+                            .expect("research data loads"),
+                    )
+                }),
+                other => bail!(
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world' or 'research')"
+                ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
             for p in &report.passed {

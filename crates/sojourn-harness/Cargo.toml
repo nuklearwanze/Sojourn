@@ -10,6 +10,7 @@ rust-version.workspace = true
 sojourn-core = { path = "../sojourn-core" }
 sojourn-astro = { path = "../sojourn-astro" }
 sojourn-world = { path = "../sojourn-world" }
+sojourn-research = { path = "../sojourn-research" }
 serde = { workspace = true }
 postcard = { workspace = true }
 ron = { workspace = true }
@@ -17,6 +18,7 @@ serde_json = { workspace = true }
 anyhow = { workspace = true }
 clap = { workspace = true }
 rand_core = { workspace = true }
+rand_chacha = { workspace = true }
 slotmap = { workspace = true }
 
 [dev-dependencies]
