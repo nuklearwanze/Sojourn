@@ -10,7 +10,9 @@ rust-version = "1.96"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
-postcard = { version = "1", features = ["use-std"] }
+# default-features off: drops the no_std `heapless` path (and its unmaintained
+# `atomic-polyfill` transitive) — we only need the std codec.
+postcard = { version = "1", default-features = false, features = ["use-std"] }
 rand_core = "0.6"
 rand_chacha = { version = "0.3", features = ["serde1"] }
 blake3 = "1"
