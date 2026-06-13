@@ -61,17 +61,24 @@ jobs:
         run: |
           cargo run -q -p sojourn-harness --release -- validate-data data/kernel
           cargo run -q -p sojourn-harness --release -- validate-data data/astro
-      - name: double-run determinism (smoke + interrupts + astro)
+          cargo run -q -p sojourn-harness --release -- validate-data data/world
+          cargo run -q -p sojourn-harness --release -- validate-data data/research
+      - name: double-run determinism (smoke + interrupts + astro + world + research)
         run: |
           cargo run -q -p sojourn-harness --release -- verify scenarios/smoke_decade.ron
           cargo run -q -p sojourn-harness --release -- verify scenarios/interrupts.ron
           cargo run -q -p sojourn-harness --release -- verify scenarios/astro_coast.ron
           cargo run -q -p sojourn-harness --release -- verify scenarios/astro_transfer.ron
           cargo run -q -p sojourn-harness --release -- verify scenarios/astro_lowthrust.ron
+          cargo run -q -p sojourn-harness --release -- verify scenarios/survey_refine.ron
+          cargo run -q -p sojourn-harness --release -- verify scenarios/research_program.ron
       - name: astro round-trip (mid-burn save)
         run: cargo run -q -p sojourn-harness --release -- roundtrip scenarios/astro_transfer.ron --save-at-ticks 610,19600
-      - name: save/load round-trip
-        run: cargo run -q -p sojourn-harness --release -- roundtrip scenarios/smoke_decade.ron --save-at-ticks 2592000,15000000,94608000
+      - name: save/load round-trip (kernel + world + research)
+        run: |
+          cargo run -q -p sojourn-harness --release -- roundtrip scenarios/smoke_decade.ron --save-at-ticks 2592000,15000000,94608000
+          cargo run -q -p sojourn-harness --release -- roundtrip scenarios/survey_refine.ron --save-at-ticks 350,600
+          cargo run -q -p sojourn-harness --release -- roundtrip scenarios/research_program.ron --save-at-ticks 43200000,216000000
       - name: mutation gate has teeth
         run: cargo run -q -p sojourn-harness --release -- mutate --all
       - name: crash recovery
@@ -81,6 +88,8 @@ jobs:
           cargo run -q -p sojourn-harness --release -- conformance --module toy
           cargo run -q -p sojourn-harness --release -- conformance --module synthetic
           cargo run -q -p sojourn-harness --release -- conformance --module astro
+          cargo run -q -p sojourn-harness --release -- conformance --module world
+          cargo run -q -p sojourn-harness --release -- conformance --module research
 
   # Architecture audit: the core must carry no presentation-layer dependency.
   audit:
