@@ -378,7 +378,10 @@ fn compute_fine_needed(m: &AstroModule, s: &AstroSlice, now: u64) -> bool {
         }
         // High-accel guidance arcs need fine stepping too.
         if c.guidance.is_some()
-            && let Some(def) = m.engines.get(&c.engine)
+            && let Some(def) = c
+                .inline_engine
+                .as_ref()
+                .or_else(|| m.engines.get(&c.engine))
         {
             let accel = def.max_thrust_n / c.mass.total().max(1.0);
             if accel >= m.config.lowthrust_accel_threshold {
@@ -521,6 +524,7 @@ fn integrate_craft(
     }
     let dominant = c0.dominant;
     let engine = c0.engine.clone();
+    let inline_engine = c0.inline_engine.clone();
     let throttle = c0.throttle;
     let guidance = c0.guidance.clone();
     let burn = s.burns.get(&id).cloned();
@@ -530,7 +534,9 @@ fn integrate_craft(
         let mut states = BodyStates::new(&m.catalog, &s.motions, t_mid_ns);
         forces::freeze(&m.catalog, &mut states, &m.config, dominant)
     };
-    let def = m.engines.get(&engine);
+    // Resolve the engine: inline (designer-built) in preference to the catalogue.
+    let def_owned = inline_engine.or_else(|| m.engines.get(&engine).cloned());
+    let def = def_owned.as_ref();
 
     // Tier (research R2; state-driven only).
     let c = s.craft.get(&id).expect("craft");
@@ -919,7 +925,12 @@ fn apply_station_keeping(m: &AstroModule, s: &mut AstroSlice, craft_id: u64, t_n
     }
     // Apply impulsively; debit propellant by the rocket equation.
     let craft = s.craft.get_mut(&craft_id).expect("craft");
-    if let Some(def) = m.engines.get(&craft.engine) {
+    if let Some(def) = craft
+        .inline_engine
+        .clone()
+        .or_else(|| m.engines.get(&craft.engine).cloned())
+        .as_ref()
+    {
         let ve = def.exhaust_velocity();
         let m0 = craft.mass.total();
         let m1 = m0 * libm::exp(-dv.norm() / ve);
@@ -1021,6 +1032,7 @@ fn apply_command(
             dry_mass,
             propellant,
             engine,
+            inline_engine,
             available_power_w,
             drag_area_m2,
             srp_area_m2,
@@ -1034,8 +1046,18 @@ fn apply_command(
             if m.catalog.body(BodyId(dominant)).is_none() {
                 return reject(format!("unknown dominant body {dominant}"));
             }
-            if m.engines.get(&engine).is_none() {
-                return reject(format!("unknown engine '{engine}'"));
+            // Designer-built engines are carried inline (FA-04); otherwise the
+            // engine id must resolve against the fixture catalogue.
+            match &inline_engine {
+                Some(ie) if ie.isp_s <= 0.0 || ie.max_thrust_n <= 0.0 => {
+                    return reject("inline engine: Isp and thrust must be positive".into());
+                }
+                Some(_) => {}
+                None => {
+                    if m.engines.get(&engine).is_none() {
+                        return reject(format!("unknown engine '{engine}'"));
+                    }
+                }
             }
             let id = s.next_craft;
             s.next_craft += 1;
@@ -1051,6 +1073,7 @@ fn apply_command(
                         propellant,
                     },
                     engine,
+                    inline_engine,
                     throttle: 1.0,
                     available_power_w,
                     drag_area_m2,

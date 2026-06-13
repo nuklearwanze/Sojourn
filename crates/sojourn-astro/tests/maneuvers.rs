@@ -262,6 +262,7 @@ fn power_limited_thrust_scales_with_available_power() {
             dry_mass: 50.0,
             propellant: 10.0,
             engine: "ep-ion".into(),
+            inline_engine: None,
             available_power_w: 1150.0, // half the 2300 W rating
             drag_area_m2: 0.0,
             srp_area_m2: 0.0,

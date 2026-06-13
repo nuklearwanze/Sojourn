@@ -1,0 +1,10 @@
+// Vehicle tuning parameters (engineering defaults; not plausibility-bearing physical
+// constants). Abstract cost units; FA-06 maps them to the six-currency economy.
+(
+    solar_ref_m: 1.495978707e11,
+    cost_per_kg: 1000.0,
+    immaturity_cost_mult: 2.0,
+    learning_exponent: 0.15,
+    build_days_per_kg: 0.05,
+    source: "Cost ~mass-driven with a maturity premium and a Wright-style learning curve (b~0.15, ~10% cost reduction per doubling); engineering defaults, design/03-ECONOMY.md §FR-ECO-015",
+)

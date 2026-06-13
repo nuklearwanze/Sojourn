@@ -1,0 +1,24 @@
+// FA-04 vehicle scenario: compose a design, create a derivative, register production.
+// Checks double-run determinism (verify) and save/load round-trip with the vehicle module.
+(
+    name: "vehicle-design",
+    seed: 7,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    vehicle: true,
+    commands: [
+        (tick: 0, vehicle: Some(ComposeDesign(
+            faction: 0,
+            class: "tug",
+            stages: [ (components: ["struct-allium", "tank-cryo", "eng-hydrolox"], propellant_kg: 18000.0, engine: Some("eng-hydrolox")) ],
+            redundancy: [],
+            mission: (),
+        ))),
+        (tick: 100, vehicle: Some(RegisterProduction(faction: 0, design: 0, units: 5))),
+        (tick: 200, vehicle: Some(DeriveDesign(faction: 0, parent: 0))),
+        (tick: 300, vehicle: Some(RegisterProduction(faction: 0, design: 1, units: 3))),
+    ],
+    checkpoints: [100, 300, 1000],
+    until_tick: 1000,
+)

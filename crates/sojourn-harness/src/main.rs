@@ -333,6 +333,21 @@ fn main() -> Result<()> {
                         .map(|b| format!("{b:02x}"))
                         .collect::<String>()
                 );
+            } else if dir.join("components.ron").exists() {
+                // FA-04 vehicle component data (FR-VD-803).
+                let module = sojourn_vehicle::VehicleModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("vehicle data invalid: {e}"))?;
+                println!(
+                    "DATA VALID (vehicle): {} components, {} classes, vehicle hash {}",
+                    module.catalogue.components.len(),
+                    module.catalogue.classes.len(),
+                    module
+                        .catalogue
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
             } else if dir.join("test-catalog.ron").exists() {
                 let module = sojourn_astro::AstroModule::load(&dir)
                     .map_err(|e| anyhow::anyhow!("astro data invalid: {e}"))?;
@@ -377,8 +392,14 @@ fn main() -> Result<()> {
                             .expect("research data loads"),
                     )
                 }),
+                "vehicle" => Box::new(|| {
+                    Box::new(
+                        sojourn_vehicle::VehicleModule::load(std::path::Path::new("data/vehicle"))
+                            .expect("vehicle data loads"),
+                    )
+                }),
                 other => bail!(
-                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world' or 'research')"
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research' or 'vehicle')"
                 ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;

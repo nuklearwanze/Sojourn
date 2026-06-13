@@ -32,5 +32,7 @@
         (id: "program-milestone", default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-802"),
         (id: "trl-advance",       default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-201"),
         (id: "publish",           default_pause: LogOnly,   source: "specs/005-research-personnel FR-RESP-402"),
+        // FA-04 vehicle-designer classes (specs/006-vehicle-designer contracts/vehicle-commands.md)
+        (id: "vehicle-produced",  default_pause: LogOnly,   source: "specs/006-vehicle-designer FR-VD-502 (host bridges to FA-05 heritage)"),
     ],
 )

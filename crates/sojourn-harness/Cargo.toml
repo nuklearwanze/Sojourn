@@ -11,6 +11,7 @@ sojourn-core = { path = "../sojourn-core" }
 sojourn-astro = { path = "../sojourn-astro" }
 sojourn-world = { path = "../sojourn-world" }
 sojourn-research = { path = "../sojourn-research" }
+sojourn-vehicle = { path = "../sojourn-vehicle" }
 serde = { workspace = true }
 postcard = { workspace = true }
 ron = { workspace = true }

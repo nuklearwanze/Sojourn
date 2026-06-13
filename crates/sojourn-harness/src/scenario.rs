@@ -32,18 +32,28 @@ pub struct TimedCommand {
     /// A research command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub research: Option<sojourn_research::ResearchCommand>,
+    /// A vehicle command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub vehicle: Option<sojourn_vehicle::VehicleCommand>,
 }
 
 impl TimedCommand {
     /// The kernel command this entry submits.
     pub fn to_kernel(&self) -> Result<Command> {
-        match (&self.command, &self.astro, &self.world, &self.research) {
-            (Some(c), None, None, None) => Ok(c.clone()),
-            (None, Some(a), None, None) => Ok(sojourn_astro::astro_payload(a)),
-            (None, None, Some(w), None) => Ok(sojourn_world::world_payload(w)),
-            (None, None, None, Some(r)) => Ok(sojourn_research::research_payload(r)),
+        match (
+            &self.command,
+            &self.astro,
+            &self.world,
+            &self.research,
+            &self.vehicle,
+        ) {
+            (Some(c), None, None, None, None) => Ok(c.clone()),
+            (None, Some(a), None, None, None) => Ok(sojourn_astro::astro_payload(a)),
+            (None, None, Some(w), None, None) => Ok(sojourn_world::world_payload(w)),
+            (None, None, None, Some(r), None) => Ok(sojourn_research::research_payload(r)),
+            (None, None, None, None, Some(v)) => Ok(sojourn_vehicle::vehicle_payload(v)),
             _ => bail!(
-                "each scenario command needs exactly one of `command`, `astro`, `world` or `research`"
+                "each scenario command needs exactly one of `command`, `astro`, `world`, `research` or `vehicle`"
             ),
         }
     }
@@ -76,6 +86,9 @@ pub struct Scenario {
     /// Install the FA-05 research module (loads `data/research` + `data/tech`).
     #[serde(default)]
     pub research: bool,
+    /// Install the FA-04 vehicle module (loads `data/vehicle`).
+    #[serde(default)]
+    pub vehicle: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -125,6 +138,11 @@ impl Scenario {
         if self.research {
             let module = sojourn_research::ResearchModule::load(Path::new("data"))
                 .map_err(|e| anyhow::anyhow!("loading research data: {e}"))?;
+            mods.push(Box::new(module));
+        }
+        if self.vehicle {
+            let module = sojourn_vehicle::VehicleModule::load(Path::new("data/vehicle"))
+                .map_err(|e| anyhow::anyhow!("loading vehicle data: {e}"))?;
             mods.push(Box::new(module));
         }
         Ok(mods)

@@ -1,0 +1,68 @@
+// Component catalogue (FR-VD-101): researched parts with class-specific physical
+// parameters. Each references the FA-05 technology that researches it. Sourced
+// real-hardware-class values; no per-design magic numbers (Principle II).
+(
+    components: [
+        // --- structures & tanks ---
+        (id: "struct-allium", tech: "D1", dry_mass_kg: 500.0,
+         params: Structure(thrust_limit_n: 2500000.0),
+         source: "Al-Li isogrid primary structure mass fraction (Atlas/Centaur-class); D1"),
+        (id: "tank-cryo", tech: "D2", dry_mass_kg: 200.0,
+         params: Tank(capacity_kg: 20000.0, boiloff_frac_per_day: 0.001),
+         source: "Composite cryotank ~1% dry/propellant (D2); low-boil-off MLI ~0.1%/day"),
+
+        // --- propulsion families ---
+        (id: "eng-hydrolox", tech: "B1.4", dry_mass_kg: 300.0,
+         params: Engine(family: Chemical, isp_s: 450.0, max_thrust_n: 110000.0, throttle: (0.6, 1.0), power_limited: false, rated_power_w: 0.0, reactor_mass_kg: 0.0, waste_heat_w: 2000.0, boiloff_frac_per_day: 0.0),
+         source: "RL10C-class hydrolox upper stage: Isp ~450 s, ~110 kN (Aerojet Rocketdyne); B1.4"),
+        (id: "eng-methalox", tech: "B1.5", dry_mass_kg: 1600.0,
+         params: Engine(family: Chemical, isp_s: 380.0, max_thrust_n: 2300000.0, throttle: (0.4, 1.0), power_limited: false, rated_power_w: 0.0, reactor_mass_kg: 0.0, waste_heat_w: 5000.0, boiloff_frac_per_day: 0.0),
+         source: "Full-flow staged-combustion methalox: Isp ~380 s, ~2.3 MN (flying-class FFSC); B1.5"),
+        (id: "eng-ion", tech: "B2.1", dry_mass_kg: 8.0,
+         params: Engine(family: Electric, isp_s: 3100.0, max_thrust_n: 0.092, throttle: (0.0, 1.0), power_limited: true, rated_power_w: 2300.0, reactor_mass_kg: 0.0, waste_heat_w: 500.0, boiloff_frac_per_day: 0.0),
+         source: "NSTAR-class gridded ion: Isp ~3100 s, 92 mN at 2.3 kW (Deep Space 1/Dawn); B2.1"),
+        (id: "eng-nep", tech: "B4.1", dry_mass_kg: 400.0,
+         params: Engine(family: NuclearElectric, isp_s: 5000.0, max_thrust_n: 2.0, throttle: (0.0, 1.0), power_limited: true, rated_power_w: 100000.0, reactor_mass_kg: 2000.0, waste_heat_w: 80000.0, boiloff_frac_per_day: 0.0),
+         source: "NEP thruster (high-power Hall/ion) on a ~100 kWe fission reactor; reactor+shield ~2 t; B4.1/B2.3"),
+
+        // --- power ---
+        (id: "pwr-pv", tech: "C1", dry_mass_kg: 100.0,
+         params: Power(gen_w: 30000.0, solar: true),
+         source: "Roll-out solar array ~30 kW at 1 AU (ROSA-class); C1; scales with 1/r^2"),
+        (id: "pwr-rtg", tech: "C2", dry_mass_kg: 60.0,
+         params: Power(gen_w: 300.0, solar: false),
+         source: "MMRTG ~300 We BOL, distance-independent (Pu-238); C2"),
+        (id: "pwr-reactor", tech: "B4.1", dry_mass_kg: 1500.0,
+         params: Power(gen_w: 100000.0, solar: false),
+         source: "Space fission reactor ~100 kWe (Kilopower-derived); B4.1"),
+
+        // --- thermal ---
+        (id: "rad-panel", tech: "C6", dry_mass_kg: 200.0,
+         params: Thermal(reject_w_per_kg: 500.0),
+         source: "Deployable heat-pipe radiator ~500 W/kg rejection (NEP-class); C6/B4.4"),
+
+        // --- avionics / comms / payload ---
+        (id: "avionics", tech: "E1", dry_mass_kg: 50.0,
+         params: Avionics(power_demand_w: 500.0),
+         source: "Integrated avionics/GNC suite ~500 W; E1"),
+        (id: "comms-ka", tech: "E6", dry_mass_kg: 80.0,
+         params: Comms(power_demand_w: 1000.0),
+         source: "Ka-band high-gain comms ~1 kW; E6"),
+        (id: "payload-sci", tech: "J1", dry_mass_kg: 300.0,
+         params: Payload(power_demand_w: 800.0, waste_heat_w: 800.0),
+         source: "Remote-sensing instrument suite ~800 W; J1"),
+
+        // --- life support / accommodation ---
+        (id: "ls-eclss", tech: "F2", dry_mass_kg: 1000.0,
+         params: LifeSupport(closure_fraction: 0.9, per_crew_day_kg: 5.0, crew: 4, shield_kg: 800.0, power_demand_w: 2000.0),
+         source: "Physico-chemical ECLSS ~90% water/air closure, ISS-derived; ~5 kg/crew-day open-loop; F2"),
+
+        // --- EDL / landing ---
+        (id: "edl-shield", tech: "A10", dry_mass_kg: 400.0,
+         params: EdlKit(heat_shield_w_m2: 5000000.0, area_m2: 20.0),
+         source: "PICA-class ablative heat shield (~5 MW/m^2 peak); A10"),
+        (id: "gear-landing", tech: "I5", dry_mass_kg: 300.0,
+         params: Landing,
+         source: "Crewed-lander landing gear mass fraction; I5"),
+    ],
+)

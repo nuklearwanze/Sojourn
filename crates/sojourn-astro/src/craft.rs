@@ -101,8 +101,13 @@ pub struct Craft {
     pub state: StateVec,
     /// Mass accounting.
     pub mass: MassState,
-    /// Fixture engine id (FA-04 endpoint binding later).
+    /// Fixture engine id (resolved against the catalogue when `inline_engine` is None).
     pub engine: String,
+    /// Inline engine parameters carried with the craft (FA-04 designer-built
+    /// engines, contracts/propulsion-binding.md). When `Some`, this is used in
+    /// preference to the catalogue `engine` id.
+    #[serde(default)]
+    pub inline_engine: Option<crate::propulsion::EngineDef>,
     /// Commanded throttle [0, 1].
     pub throttle: f64,
     /// Available electrical power (W) for power-limited engines.

@@ -24,8 +24,12 @@ pub enum AstroCommand {
         dry_mass: f64,
         /// Propellant (kg).
         propellant: f64,
-        /// Fixture engine id.
+        /// Fixture engine id (used when `inline_engine` is None).
         engine: String,
+        /// Inline engine parameters (FA-04 designer-built engines). When set, the
+        /// craft carries these instead of resolving `engine` against the catalogue.
+        #[serde(default)]
+        inline_engine: Option<crate::propulsion::EngineDef>,
         /// Available power (W).
         available_power_w: f64,
         /// Drag area (m²).

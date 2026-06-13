@@ -1,0 +1,20 @@
+[package]
+name = "sojourn-vehicle"
+description = "Sojourn vehicle designer & propulsion (FA-04): component-composition designer with physics-derived, fully-traceable performance (mass, delta-v, thrust, power, thermal, reliability, cost) and propulsion families producing the FA-02 endpoint. SimModule on the sojourn-core kernel."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+sojourn-astro = { path = "../sojourn-astro" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

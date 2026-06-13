@@ -748,6 +748,7 @@ dependencies = [
  "sojourn-astro",
  "sojourn-core",
  "sojourn-research",
+ "sojourn-vehicle",
  "sojourn-world",
 ]
 
@@ -762,6 +763,20 @@ dependencies = [
  "rand_core",
  "ron",
  "serde",
+ "sojourn-core",
+ "thiserror",
+]
+
+[[package]]
+name = "sojourn-vehicle"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "ron",
+ "serde",
+ "sojourn-astro",
  "sojourn-core",
  "thiserror",
 ]

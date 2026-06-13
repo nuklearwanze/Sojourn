@@ -1,0 +1,14 @@
+// Vehicle-class templates (FR-VD-701): all archetypes are built from the same
+// component system; the template flags which design-time checks apply.
+(
+    classes: [
+        (id: "launch-vehicle", lander: false, crewed: false, source: "design/04-SPACEFLIGHT.md §4.3 launch vehicles (H)"),
+        (id: "tug", lander: false, crewed: false, source: "design/04-SPACEFLIGHT.md §4.3 in-space tug (chem/EP/nuclear)"),
+        (id: "crew-transit", lander: false, crewed: true, source: "design/04-SPACEFLIGHT.md §4.3 transit habitat / crewed vehicle"),
+        (id: "lander", lander: true, crewed: false, source: "design/04-SPACEFLIGHT.md §4.3 lander (lunar/Mars/cargo)"),
+        (id: "crew-lander", lander: true, crewed: true, source: "design/04-SPACEFLIGHT.md §4.3 crewed lander"),
+        (id: "rover", lander: false, crewed: false, source: "design/04-SPACEFLIGHT.md §4.3 rover (teleop/crewed)"),
+        (id: "station-module", lander: false, crewed: true, source: "design/04-SPACEFLIGHT.md §4.3 station/base module"),
+        (id: "probe", lander: false, crewed: false, source: "design/04-SPACEFLIGHT.md §4.3 science probe"),
+    ],
+)

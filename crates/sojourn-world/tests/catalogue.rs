@@ -118,6 +118,7 @@ fn catalogue_loads_under_the_propagator_unchanged() {
         dry_mass: 1000.0,
         propellant: 0.0,
         engine: "chem-hydrolox".into(),
+        inline_engine: None,
         available_power_w: 0.0,
         drag_area_m2: 0.0,
         srp_area_m2: 0.0,

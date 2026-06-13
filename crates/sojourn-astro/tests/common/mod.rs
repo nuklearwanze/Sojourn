@@ -146,6 +146,7 @@ pub fn spawn_state(
             dry_mass: dry,
             propellant,
             engine: engine.into(),
+            inline_engine: None,
             available_power_w: 2300.0,
             drag_area_m2: 0.0,
             srp_area_m2: 0.0,
