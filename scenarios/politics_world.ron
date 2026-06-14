@@ -1,0 +1,57 @@
+// FA-09 polity scenario: a mini-game. Initialise the world (two factions, one AI;
+// two candidate worlds with FA-03 priors; default COSPAR protection), select a Grand
+// Goal, race for a first, swing the mood (incl. a loss-of-crew), set/lobby policy,
+// run a staged astrobiology evidence chain, and crash a non-sterile lander into a
+// Special Region — while the AI world and the seeded event scheduler run underneath.
+// Exercises every sub-system for the double-run determinism + save/load gates.
+(
+    name: "politics-world",
+    seed: 7,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    polity: true,
+    commands: [
+        (tick: 0, polity: Some(InitWorld(
+            factions: [
+                (id: 0, funding_model: Agency, baseline_mood: 0.0, ai: false),
+                (id: 1, funding_model: Agency, baseline_mood: 0.0, ai: true),
+            ],
+            candidates: [
+                (candidate: 4, presence_prob: 0.10, tier: Subsurface),
+                (candidate: 121, presence_prob: 0.50, tier: Ocean),
+            ],
+            protections: [],
+            difficulty: (ai_funding_mult: 1.0, ai_competence_mult: 1.0, event_rate_mult: 1.0),
+        ))),
+        (tick: 0, polity: Some(SelectGrandGoal(faction: 0, kind: Seeker))),
+        // Day 1: claim the first fully-reusable orbital flight (a world-first).
+        (tick: 86400, polity: Some(RecordAchievement((
+            faction: 0, milestone: 1,
+            facts: (body: None, crewed: false, reusable: true, propellant_sold_kg: 0.0, isru_origin: false, tags: ["orbital"]),
+        )))),
+        (tick: 172800, polity: Some(RecordOutcome(
+            crew: (faction: 0, loss_of_crew: false, routine_failure: false, success: true, world_first: true),
+            economy: (faction: 0, base_appropriation: 25000000000.0, base_valuation: 0.0, off_earth_tonnage_profit: 0.0),
+        ))),
+        // Day 30: raise nuclear-launch approval; lobby PP stringency up.
+        (tick: 2592000, polity: Some(SetPolicy(id: "nuclear-launch", level: 0.6))),
+        (tick: 2592000, polity: Some(Lobby(faction: 0, id: "pp-stringency", direction: 1.0))),
+        // Days 60-90: a staged astrobiology evidence chain on Enceladus (body 121).
+        (tick: 5184000, polity: Some(CollectEvidence((faction: 0, candidate: 121, stage: OrbitalHint, quality: 0.8)))),
+        (tick: 5184000, polity: Some(CollectEvidence((faction: 0, candidate: 121, stage: InSitu, quality: 0.8)))),
+        (tick: 7776000, polity: Some(CollectEvidence((faction: 0, candidate: 121, stage: Microscopy, quality: 0.9)))),
+        (tick: 7776000, polity: Some(CollectEvidence((faction: 0, candidate: 121, stage: SampleReturn, quality: 1.0)))),
+        // Day 120: crash a non-sterile lander into the Martian Special Region.
+        (tick: 10368000, polity: Some(EvaluateContamination((
+            body: 4, special_region: true, lander_bioburden: 120.0, crash: true, sample_return: false, containment_chain: false,
+        )))),
+        // Day 150: a loss-of-crew — severe, long-lasting, freezes crewed approval.
+        (tick: 12960000, polity: Some(RecordOutcome(
+            crew: (faction: 0, loss_of_crew: true, routine_failure: false, success: false, world_first: false),
+            economy: (faction: 0, base_appropriation: 25000000000.0, base_valuation: 0.0, off_earth_tonnage_profit: 0.0),
+        ))),
+    ],
+    checkpoints: [86400, 7776000, 17280000],
+    until_tick: 17280000,
+)

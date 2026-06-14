@@ -1,0 +1,15 @@
+// FA-09 Grand-Goal thresholds + composite-score weights (FR-PEA-801…803). Each goal
+// computes a deterministic pass/fail from composed inputs; the horizon resolves to
+// the selected goal's pass/fail (primary) + a secondary composite score. Sourced
+// from design/00-OVERVIEW.md §9.
+(
+    pathfinder_firsts: 10,
+    homestead_index: 0.8,
+    prospector_tonnage: 100.0,
+    seeker_worlds: 3,
+    change_penalty: 0.2,
+    prestige_weight: 1.0,
+    milestone_weight: 1.0,
+    goal_weight: 2.0,
+    source: "design/00-OVERVIEW.md §9 (Grand Goals: Pathfinder/Homestead/Prospector/Seeker; scoring at the horizon)",
+)

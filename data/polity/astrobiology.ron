@@ -1,0 +1,23 @@
+// FA-09 astrobiology evidence/consensus params (FR-PEA-301…308, Q-clarify). Staged
+// evidence updates each faction's log-odds posterior; the community consensus is a
+// PRESTIGE-WEIGHTED aggregate; a candidate is conclusive only when the consensus
+// crosses the band (>=0.9 / <=0.1) AND a SampleReturn item exists. A negative-truth
+// world's consensus is capped below the positive band (false_hint_cap) — the
+// honesty invariant (never a false "life confirmed"). The PRIORS live in FA-03's
+// data/world/astrobiology.ron and are bridged in as composed values.
+(
+    stage_lr: (
+        orbital_hint: 0.4,
+        in_situ: 0.9,
+        microscopy: 1.4,
+        sample_return: 3.0,
+    ),
+    abiotic_competitor_strength: 0.55,
+    consensus_weight: PrestigeWeighted,
+    band_positive: 0.9,
+    band_negative: 0.1,
+    sample_return_required: true,
+    false_hint_cap: 0.7,
+    disagreement_width: 0.25,
+    source: "biosignature-ambiguity + sample-return-confirmation literature; staged Bayesian evidence with abiotic competitors (design/05-WORLD.md §4)",
+)

@@ -1,0 +1,7 @@
+// FA-09 cross-cutting polity config (FR-PEA-803). Scoring horizon + composite-score
+// normalisation. Sourced from design/00-OVERVIEW.md §9 (25/50/100-yr runs).
+(
+    horizon_years: 100,
+    score_normalisation: 1000.0,
+    source: "design/00-OVERVIEW.md §9 (configurable 25/50/100-yr scoring horizon)",
+)

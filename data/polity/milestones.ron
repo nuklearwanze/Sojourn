@@ -1,0 +1,28 @@
+// FA-09 historic-firsts catalogue (FR-PEA-101). A REPRESENTATIVE SOURCED SUBSET of
+// the ~120 firsts spanning all eras (foothold/cislunar/frontier/endgame), with the
+// full structure — completable in data without code change (the FA-05 tech-node
+// precedent). Conditions are machine-checkable predicates over composed
+// AchievementFacts; ALL must hold. Endgame firsts are Breakthrough-gated (FA-05).
+(
+    milestones: [
+        (id: 1, era: "foothold", description: "First fully-reusable orbital flight", weight: 80.0, faction_first_fraction: 0.3, conditions: [Reusable, Tag("orbital")], source: "design/05-WORLD.md §6 (Foothold era firsts)"),
+        (id: 2, era: "foothold", description: "First commercial LEO station", weight: 70.0, faction_first_fraction: 0.3, conditions: [Tag("commercial-leo-station")], source: "design/05-WORLD.md §6"),
+        (id: 3, era: "foothold", description: "First crewed lunar return of the new era", weight: 120.0, faction_first_fraction: 0.35, conditions: [Crewed, Tag("lunar-return")], source: "design/05-WORLD.md §6"),
+        (id: 4, era: "foothold", description: "First lunar-polar ice ground-truth", weight: 90.0, faction_first_fraction: 0.3, conditions: [Tag("lunar-polar-ice")], source: "design/05-WORLD.md §6"),
+        (id: 5, era: "foothold", description: "First on-orbit cryogenic propellant transfer", weight: 100.0, faction_first_fraction: 0.3, conditions: [Tag("cryo-prop-transfer")], source: "design/05-WORLD.md §6"),
+        (id: 6, era: "foothold", description: "First surface fission reactor operated through a lunar night", weight: 110.0, faction_first_fraction: 0.3, conditions: [Tag("lunar-night-fission")], source: "design/05-WORLD.md §6"),
+        (id: 7, era: "cislunar", description: "First kilogram of lunar-derived propellant sold", weight: 200.0, faction_first_fraction: 0.3, conditions: [PropellantSold(1.0), IsruOrigin, Tag("lunar")], source: "design/05-WORLD.md §6 (Cislunar/Mars era)"),
+        (id: 8, era: "cislunar", description: "First crewed Mars landing", weight: 500.0, faction_first_fraction: 0.35, conditions: [Crewed, Body(4), Tag("landing")], source: "design/05-WORLD.md §6"),
+        (id: 9, era: "cislunar", description: "First Mars ascent on locally-made propellant", weight: 320.0, faction_first_fraction: 0.3, conditions: [Body(4), IsruOrigin, Tag("ascent")], source: "design/05-WORLD.md §6"),
+        (id: 10, era: "cislunar", description: "First MW-class NEP transit", weight: 260.0, faction_first_fraction: 0.3, conditions: [Tag("nep-mw")], source: "design/05-WORLD.md §6"),
+        (id: 11, era: "cislunar", description: "First Phobos/Deimos staging base", weight: 220.0, faction_first_fraction: 0.3, conditions: [Tag("phobos-deimos-base")], source: "design/05-WORLD.md §6"),
+        (id: 12, era: "cislunar", description: "First closed-loop ECLSS to run a full Mars synodic cycle", weight: 240.0, faction_first_fraction: 0.3, conditions: [Tag("eclss-synodic")], source: "design/05-WORLD.md §6"),
+        (id: 13, era: "frontier", description: "First sample returned from an ocean-world plume (Enceladus)", weight: 480.0, faction_first_fraction: 0.35, conditions: [Body(121), Tag("plume-sample")], source: "design/05-WORLD.md §6 (Frontier era)"),
+        (id: 14, era: "frontier", description: "First cryobot through Europan ice", weight: 520.0, faction_first_fraction: 0.35, conditions: [Body(111), Tag("cryobot")], source: "design/05-WORLD.md §6"),
+        (id: 15, era: "frontier", description: "First conclusive astrobiology result for a candidate world", weight: 700.0, faction_first_fraction: 0.4, conditions: [Tag("astrobiology-conclusive")], source: "design/05-WORLD.md §6 (top-tier; positive OR conclusive negative)"),
+        (id: 16, era: "frontier", description: "First settlement to survive a 5-year resupply embargo", weight: 600.0, faction_first_fraction: 0.4, conditions: [Tag("embargo-survival")], source: "design/05-WORLD.md §6 (Homestead)"),
+        (id: 17, era: "endgame", description: "First fission-fragment/fusion-driven transit", weight: 850.0, faction_first_fraction: 0.4, conditions: [Tag("advanced-propulsion")], source: "design/05-WORLD.md §6 (Breakthrough-gated endgame, FA-05)"),
+        (id: 18, era: "endgame", description: "First off-Earth-built large structure", weight: 800.0, faction_first_fraction: 0.4, conditions: [Tag("large-structure-offearth")], source: "design/05-WORLD.md §6 (Breakthrough-gated endgame, FA-05)"),
+    ],
+    source: "design/05-WORLD.md §6 milestones/firsts scoring spine; representative sourced subset of ~120 firsts across all eras",
+)

@@ -15,6 +15,7 @@ sojourn-vehicle = { path = "../sojourn-vehicle" }
 sojourn-economy = { path = "../sojourn-economy" }
 sojourn-base = { path = "../sojourn-base" }
 sojourn-crew = { path = "../sojourn-crew" }
+sojourn-polity = { path = "../sojourn-polity" }
 serde = { workspace = true }
 postcard = { workspace = true }
 ron = { workspace = true }

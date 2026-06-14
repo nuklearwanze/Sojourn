@@ -365,6 +365,27 @@ fn main() -> Result<()> {
                         .map(|b| format!("{b:02x}"))
                         .collect::<String>()
                 );
+            } else if dir.join("milestones.ron").exists() {
+                // FA-09 politics/events/milestones/astrobiology data (FR-PEA-903):
+                // schema + sources + semantic checks (in load) plus the analytic gates
+                // (prior fidelity, consensus band incl. the honesty invariant,
+                // contamination/hazard monotonicity, tiebreak/score determinism).
+                let m = sojourn_polity::PolityModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("polity data invalid: {e}"))?;
+                polity_analytic_gates(&m)?;
+                println!(
+                    "DATA VALID (polity): {} firsts, {} event classes, {} policy levers, \
+                     {} PP bodies; analytic gates PASS; polity hash {}",
+                    m.params.milestones.milestones.len(),
+                    m.params.events.classes.len(),
+                    m.params.policy.levers.len(),
+                    m.params.protection.bodies.len(),
+                    m.params
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
             } else if dir.join("modules.ron").exists() {
                 // FA-07 base data (FR-BC-701): schema + sources + ref resolution (in
                 // load) plus the analytic gates (shielding exp-attenuation).
@@ -470,8 +491,14 @@ fn main() -> Result<()> {
                             .expect("crew data loads"),
                     )
                 }),
+                "polity" => Box::new(|| {
+                    Box::new(
+                        sojourn_polity::PolityModule::load(std::path::Path::new("data/polity"))
+                            .expect("polity data loads"),
+                    )
+                }),
                 other => bail!(
-                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle', 'economy', 'base' or 'crew')"
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle', 'economy', 'base', 'crew' or 'polity')"
                 ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
@@ -614,6 +641,70 @@ fn crew_analytic_gates(m: &sojourn_crew::CrewModule) -> Result<()> {
     let cap = hazard::capability(&[0.5, 0.5]);
     if (cap - 0.25).abs() > 1e-9 {
         bail!("capability gate failed: product of [0.5,0.5] ≠ 0.25 ({cap})");
+    }
+    Ok(())
+}
+
+/// FA-09 analytic validation gates (FR-PEA-903, contracts/polity-data.md): the
+/// consensus band + the honesty invariant (never conclusive-positive for negative
+/// ground truth), forward-contamination monotonicity, and event-hazard monotonicity.
+fn polity_analytic_gates(m: &sojourn_polity::PolityModule) -> Result<()> {
+    use sojourn_polity::EvidenceStage;
+    use sojourn_polity::{astrobiology, events, protection};
+    let p = &m.params;
+
+    // 1. Consensus band + honesty invariant.
+    let d_pos = astrobiology::evidence_delta(EvidenceStage::SampleReturn, 1.0, true, &p.astro);
+    let prob_pos = astrobiology::faction_prob(d_pos, true, true, &p.astro);
+    if prob_pos < p.astro.band_positive {
+        bail!(
+            "consensus gate: a clean positive SampleReturn must reach the positive band ({prob_pos} < {})",
+            p.astro.band_positive
+        );
+    }
+    let d_hint = astrobiology::evidence_delta(EvidenceStage::Microscopy, 1.0, false, &p.astro);
+    let prob_neg = astrobiology::faction_prob(d_hint * 5.0, false, false, &p.astro);
+    if prob_neg >= p.astro.band_positive {
+        bail!("honesty gate: a negative-truth world reached the positive band ({prob_neg})");
+    }
+    let d_neg_sr = astrobiology::evidence_delta(EvidenceStage::SampleReturn, 1.0, false, &p.astro);
+    if d_neg_sr >= 0.0 {
+        bail!(
+            "honesty gate: a negative-truth SampleReturn must push the posterior DOWN ({d_neg_sr})"
+        );
+    }
+
+    // 2. Forward contamination monotone in overage; compliant degrades nothing; crash ≥ soft.
+    let cp = &p.protection.contamination;
+    if protection::forward_severity(5.0, 10.0, false, cp) != 0.0 {
+        bail!("contamination gate: a compliant lander must degrade nothing");
+    }
+    let s1 = protection::forward_severity(20.0, 10.0, false, cp);
+    let s2 = protection::forward_severity(40.0, 10.0, false, cp);
+    if s2 <= s1 {
+        bail!("contamination gate: severity must increase with bioburden overage ({s2} !> {s1})");
+    }
+    let crash = protection::forward_severity(20.0, 10.0, true, cp);
+    if crash < s1 {
+        bail!("contamination gate: a crash must be at least as severe as a soft landing");
+    }
+
+    // 3. Event hazard monotone in risk + clamped to [0,1].
+    let def = p
+        .events
+        .classes
+        .iter()
+        .find(|c| c.class == "anomaly")
+        .ok_or_else(|| anyhow::anyhow!("no 'anomaly' event class to validate"))?;
+    let mature = events::event_prob(def, events::risk_factor(1.0), 1.0);
+    let immature = events::event_prob(def, events::risk_factor(0.0), 1.0);
+    if immature <= mature {
+        bail!(
+            "event gate: a lower-maturity (riskier) faction must earn a higher probability ({immature} !> {mature})"
+        );
+    }
+    if events::event_prob(def, 1000.0, 1000.0) > 1.0 {
+        bail!("event gate: probability must clamp to ≤ 1");
     }
     Ok(())
 }

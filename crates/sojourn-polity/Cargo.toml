@@ -1,0 +1,20 @@
+[package]
+name = "sojourn-polity"
+description = "Sojourn politics, events, milestones & astrobiology (FA-09): the non-combat competitive and narrative layer — historic firsts + prestige, public/political mood, seeded astrobiology ground truth + staged evidence, a daily seeded event scheduler, policy/treaties, COSPAR planetary protection, an abstracted AI world, and Grand-Goal scoring. SimModule on the sojourn-core kernel; cross-slice facts flow in as composed values (dep core only)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[lints]
+workspace = true

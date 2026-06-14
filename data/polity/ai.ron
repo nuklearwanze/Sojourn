@@ -1,0 +1,12 @@
+// FA-09 AI-world behaviour params (FR-PEA-701…704). The AI factions run an
+// ABSTRACTED, heuristic, seeded model over composed capability estimates (not a
+// mirror of FA-04..08). Capability is clamped to the plausibility envelope (no
+// cheating into impossible tech); difficulty tunes funding/competence only.
+// Sourced from design/05-WORLD.md §7.
+(
+    base_competence: 0.45,
+    envelope_cap: 1.0,
+    tide_advance_per_day: 0.00002,
+    claim_threshold: 0.6,
+    source: "design/05-WORLD.md §7 (AI world: simplified same systems; same physics/plausibility; difficulty tunes funding/competence)",
+)

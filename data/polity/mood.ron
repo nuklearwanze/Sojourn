@@ -1,0 +1,20 @@
+// FA-09 public/political mood params (FR-PEA-201…205). Bounded mood with
+// exponential decay toward a faction baseline; loss-of-crew is severe and
+// long-lasting (deeper than a routine failure + a multi-year crewed-flight freeze).
+// Sourced from agency appropriation volatility and NASA's 2-4 yr post-accident
+// crewed-flight pauses (design/00-OVERVIEW.md §3, 05-WORLD.md §5).
+(
+    world_first_delta: 0.30,
+    success_delta: 0.03,
+    routine_failure_delta: -0.10,
+    loss_of_crew_delta: -0.60,
+    decay_per_day: 0.004,
+    mood_min: -1.0,
+    mood_max: 1.0,
+    loc_recovery_days: 1095.0,
+    appropriation_slope: 0.30,
+    valuation_slope: 0.50,
+    approval_base_days: 180.0,
+    approval_mood_days: 150.0,
+    source: "design/00-OVERVIEW.md §3 (appropriation volatility, fatal-accident 2-4 yr crewed freeze), 05-WORLD.md §5 (public/political mood)",
+)

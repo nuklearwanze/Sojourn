@@ -1,0 +1,11 @@
+// FA-09 analytic validation cases + tolerances (FR-PEA-903). The gates themselves
+// run in the harness (validate-data polity): ground-truth prior fidelity across
+// seeds, consensus band incl. the never-conclusive-positive-for-negative honesty
+// invariant, contamination monotonicity, event-hazard monotonicity, tiebreak/score
+// determinism, mood bounds. Sourced from the constitution's analytic-validation
+// mandate.
+(
+    prior_fidelity_seeds: 3000,
+    prior_fidelity_tol: 0.06,
+    source: "Constitution v1.0.0 testing mandate (analytic validation against known cases); design/05-WORLD.md §4/§9",
+)

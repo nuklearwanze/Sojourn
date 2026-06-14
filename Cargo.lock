@@ -793,9 +793,24 @@ dependencies = [
  "sojourn-core",
  "sojourn-crew",
  "sojourn-economy",
+ "sojourn-polity",
  "sojourn-research",
  "sojourn-vehicle",
  "sojourn-world",
+]
+
+[[package]]
+name = "sojourn-polity"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-core",
+ "thiserror",
 ]
 
 [[package]]

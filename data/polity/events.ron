@@ -1,0 +1,19 @@
+// FA-09 event-class catalogue (FR-PEA-401…405). Each source is evaluated daily as a
+// Bernoulli draw with a multiplicative-hazard probability (base_rate x state factors
+// in events.rs) — a riskier configuration earns a strictly higher probability.
+// Per-day base rates are small (century horizons). interrupt vs log feeds the FA-01
+// loop. Sourced from design/05-WORLD.md §5 (seeded + state-driven events).
+(
+    classes: [
+        (class: "anomaly", base_rate: 0.0006, interrupt: true, source: "05-WORLD.md §5 (stuck valve/comms loss/software bug; state-driven)"),
+        (class: "launch-failure", base_rate: 0.0003, interrupt: true, source: "05-WORLD.md §5 (launch failure)"),
+        (class: "solar-storm", base_rate: 0.0002, interrupt: true, source: "05-WORLD.md §5 (radiation events)"),
+        (class: "funding-crisis", base_rate: 0.00006, interrupt: true, source: "05-WORLD.md §5 (funding crises)"),
+        (class: "funding-boom", base_rate: 0.00006, interrupt: true, source: "05-WORLD.md §5 (funding booms)"),
+        (class: "political-shakeup", base_rate: 0.00008, interrupt: true, source: "05-WORLD.md §5 (political shake-ups)"),
+        (class: "supply-shock", base_rate: 0.00004, interrupt: true, source: "05-WORLD.md §5 (Pu-238 shortage / supply shocks)"),
+        (class: "personnel-event", base_rate: 0.0001, interrupt: false, source: "05-WORLD.md §5 (key hire/loss)"),
+        (class: "discovery", base_rate: 0.0001, interrupt: true, source: "05-WORLD.md §5 (discoveries)"),
+    ],
+    source: "design/05-WORLD.md §5 event system (seeded + state-driven, interrupt-and-pause hooks)",
+)

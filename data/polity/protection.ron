@@ -1,0 +1,24 @@
+// FA-09 COSPAR planetary-protection params (FR-PEA-601…605). Per-body categories
+// I-V + Special Regions + bioburden limits (default catalogue; the host may bridge
+// FA-03 site data over these at InitWorld). Forward contamination is GRADED by
+// bioburden overage x crash/soft factor (the clarified model). Sourced from COSPAR
+// planetary-protection policy (design/05-WORLD.md §3).
+(
+    bodies: [
+        (body: 4, category: 4, special_region: true, bioburden_limit: 30.0, source: "COSPAR Mars Special Regions (Cat IV/IVc; recurring-slope-lineae, ground ice)"),
+        (body: 111, category: 4, special_region: true, bioburden_limit: 25.0, source: "COSPAR Europa (Cat IV; subglacial ocean, ~1e-4 contamination probability)"),
+        (body: 121, category: 4, special_region: true, bioburden_limit: 25.0, source: "COSPAR Enceladus (Cat IV; plume/ocean)"),
+        (body: 120, category: 2, special_region: false, bioburden_limit: 300.0, source: "COSPAR Titan (Cat II; exotic chemistry, low water activity)"),
+        (body: 10, category: 2, special_region: false, bioburden_limit: 300.0, source: "COSPAR Ceres (Cat II; briny subsurface)"),
+        (body: 2, category: 2, special_region: false, bioburden_limit: 300.0, source: "COSPAR Venus (Cat II)"),
+        (body: 3, category: 1, special_region: false, bioburden_limit: 1000000000.0, source: "COSPAR Earth/Moon (Cat I; no protection required)"),
+    ],
+    contamination: (
+        overage_exponent: 1.0,
+        overage_scale: 0.25,
+        crash_factor: 2.5,
+        soft_factor: 1.0,
+        backcontam_penalty: 0.5,
+    ),
+    source: "COSPAR planetary-protection policy categories I-V + Special Regions (design/05-WORLD.md §3)",
+)

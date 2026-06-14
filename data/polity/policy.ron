@@ -1,0 +1,14 @@
+// FA-09 policy/treaty levers (FR-PEA-501…505). Bounded levels with seeded drift and
+// lobbying; a mission/partnership lacking a required level (≥ grant_threshold) is
+// gated/penalised. The 'pp-stringency' lever is the single source the planetary-
+// protection regime (US6) consumes. Sourced from design/05-WORLD.md §5.
+(
+    levers: [
+        (id: "launch-licensing", min: 0.0, max: 1.0, default: 0.5, drift_per_period: 0.0005, lobby_step: 0.10, grant_threshold: 0.4, source: "05-WORLD.md §5 (launch licensing & range access)"),
+        (id: "nuclear-launch", min: 0.0, max: 1.0, default: 0.3, drift_per_period: 0.0004, lobby_step: 0.10, grant_threshold: 0.5, source: "05-WORLD.md §5 (nuclear-launch approval, NTP/RTG politics)"),
+        (id: "pp-stringency", min: 0.0, max: 1.0, default: 0.6, drift_per_period: 0.0003, lobby_step: 0.08, grant_threshold: 0.0, source: "05-WORLD.md §3/§5 (planetary-protection stringency)"),
+        (id: "export-control", min: 0.0, max: 1.0, default: 0.4, drift_per_period: 0.0004, lobby_step: 0.08, grant_threshold: 0.5, source: "05-WORLD.md §5 (export controls, ITAR-like effects)"),
+        (id: "debris-mitigation", min: 0.0, max: 1.0, default: 0.5, drift_per_period: 0.0003, lobby_step: 0.08, grant_threshold: 0.3, source: "05-WORLD.md §5 (debris/sustainability regulation)"),
+    ],
+    source: "design/05-WORLD.md §5 policy & treaties",
+)
