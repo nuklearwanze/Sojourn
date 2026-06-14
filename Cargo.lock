@@ -745,6 +745,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "sojourn-crew"
+version = "0.1.0"
+dependencies = [
+ "blake3",
+ "libm",
+ "postcard",
+ "rand_core",
+ "ron",
+ "serde",
+ "sojourn-core",
+ "thiserror",
+]
+
+[[package]]
 name = "sojourn-economy"
 version = "0.1.0"
 dependencies = [
@@ -777,6 +791,7 @@ dependencies = [
  "sojourn-astro",
  "sojourn-base",
  "sojourn-core",
+ "sojourn-crew",
  "sojourn-economy",
  "sojourn-research",
  "sojourn-vehicle",

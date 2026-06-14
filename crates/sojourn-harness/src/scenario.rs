@@ -41,6 +41,9 @@ pub struct TimedCommand {
     /// A base command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub base: Option<sojourn_base::BaseCommand>,
+    /// A crew command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub crew: Option<sojourn_crew::CrewCommand>,
 }
 
 impl TimedCommand {
@@ -54,22 +57,32 @@ impl TimedCommand {
             &self.vehicle,
             &self.economy,
             &self.base,
+            &self.crew,
         ) {
-            (Some(c), None, None, None, None, None, None) => Ok(c.clone()),
-            (None, Some(a), None, None, None, None, None) => Ok(sojourn_astro::astro_payload(a)),
-            (None, None, Some(w), None, None, None, None) => Ok(sojourn_world::world_payload(w)),
-            (None, None, None, Some(r), None, None, None) => {
+            (Some(c), None, None, None, None, None, None, None) => Ok(c.clone()),
+            (None, Some(a), None, None, None, None, None, None) => {
+                Ok(sojourn_astro::astro_payload(a))
+            }
+            (None, None, Some(w), None, None, None, None, None) => {
+                Ok(sojourn_world::world_payload(w))
+            }
+            (None, None, None, Some(r), None, None, None, None) => {
                 Ok(sojourn_research::research_payload(r))
             }
-            (None, None, None, None, Some(v), None, None) => {
+            (None, None, None, None, Some(v), None, None, None) => {
                 Ok(sojourn_vehicle::vehicle_payload(v))
             }
-            (None, None, None, None, None, Some(e), None) => {
+            (None, None, None, None, None, Some(e), None, None) => {
                 Ok(sojourn_economy::economy_payload(e))
             }
-            (None, None, None, None, None, None, Some(b)) => Ok(sojourn_base::base_payload(b)),
+            (None, None, None, None, None, None, Some(b), None) => {
+                Ok(sojourn_base::base_payload(b))
+            }
+            (None, None, None, None, None, None, None, Some(cr)) => {
+                Ok(sojourn_crew::crew_payload(cr))
+            }
             _ => bail!(
-                "each scenario command needs exactly one of `command`, `astro`, `world`, `research`, `vehicle`, `economy` or `base`"
+                "each scenario command needs exactly one of `command`, `astro`, `world`, `research`, `vehicle`, `economy`, `base` or `crew`"
             ),
         }
     }
@@ -111,6 +124,9 @@ pub struct Scenario {
     /// Install the FA-07 base module (loads `data/base`).
     #[serde(default)]
     pub base: bool,
+    /// Install the FA-08 crew module (loads `data/crew`).
+    #[serde(default)]
+    pub crew: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -175,6 +191,11 @@ impl Scenario {
         if self.base {
             let module = sojourn_base::BaseModule::load(Path::new("data/base"))
                 .map_err(|e| anyhow::anyhow!("loading base data: {e}"))?;
+            mods.push(Box::new(module));
+        }
+        if self.crew {
+            let module = sojourn_crew::CrewModule::load(Path::new("data/crew"))
+                .map_err(|e| anyhow::anyhow!("loading crew data: {e}"))?;
             mods.push(Box::new(module));
         }
         Ok(mods)

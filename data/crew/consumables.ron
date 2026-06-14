@@ -1,0 +1,9 @@
+// FA-08 consumables rates (FR-LSC-101, A1). Air/water (O2/water/N2) is recycled by
+// ECLSS closure; food is open-loop (bioregenerative is FA-07's greenhouse loop).
+(
+    o2_kg_per_crew_day: 0.84,
+    water_kg_per_crew_day: 3.5,
+    n2_kg_per_crew_day: 0.1,
+    food_kg_per_crew_day: 1.8,
+    source: "ISS ECLSS consumables budget (~0.84 kg O2, ~3.5 kg water, ~1.8 kg food per crew-day); design/04-SPACEFLIGHT.md §6",
+)

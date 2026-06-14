@@ -1,0 +1,8 @@
+// Analytic validation cases for `validate-data crew` (contracts/crew-data.md). The
+// harness checks the make-up identity, REID monotonicity, multiplicative-hazard
+// factor monotonicity, the Mars EDL gap, and the capability product from the
+// loaded params + the pure functions.
+(
+    edl_gap: (harder: "mars", easier: "moon"),
+    source: "FA-08 analytic validation cases (specs/009-life-support-crew/contracts/crew-data.md)",
+)

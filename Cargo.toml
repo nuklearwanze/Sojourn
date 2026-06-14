@@ -9,6 +9,7 @@ members = [
     "crates/sojourn-vehicle",
     "crates/sojourn-economy",
     "crates/sojourn-base",
+    "crates/sojourn-crew",
     "crates/sojourn-harness",
 ]
 

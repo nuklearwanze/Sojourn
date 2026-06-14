@@ -1,0 +1,11 @@
+// FA-08 psychology params (FR-LSC-401…403). Psych-load accrual + confinement/
+// comms-lag sensitivities + the anomaly hazard.
+(
+    base_rate: 0.0005,
+    duration_sens: 0.001,
+    confinement_ref_m3: 20.0,
+    comms_lag_sens: 0.00001,
+    anomaly_base: 0.001,
+    anomaly_ops_mult: 0.5,
+    source: "isolation/confinement/comms-lag psychology (analog & long-duration mission studies); design/04-SPACEFLIGHT.md §6",
+)

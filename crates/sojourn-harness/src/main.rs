@@ -348,6 +348,23 @@ fn main() -> Result<()> {
                         .map(|b| format!("{b:02x}"))
                         .collect::<String>()
                 );
+            } else if dir.join("eclss.ron").exists() {
+                // FA-08 life support & crew data (FR-LSC-801): schema + sources +
+                // REID threshold + Mars EDL gap (in load) plus the analytic gates.
+                let m = sojourn_crew::CrewModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("crew data invalid: {e}"))?;
+                crew_analytic_gates(&m)?;
+                println!(
+                    "DATA VALID (crew): {} GCR environments, {} EDL bodies; REID 3% + Mars gap + \
+                     analytic gates PASS; crew hash {}",
+                    m.params.radiation.gcr_by_env.len(),
+                    m.params.edl.body_difficulty.len(),
+                    m.params
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
             } else if dir.join("modules.ron").exists() {
                 // FA-07 base data (FR-BC-701): schema + sources + ref resolution (in
                 // load) plus the analytic gates (shielding exp-attenuation).
@@ -447,8 +464,14 @@ fn main() -> Result<()> {
                             .expect("base data loads"),
                     )
                 }),
+                "crew" => Box::new(|| {
+                    Box::new(
+                        sojourn_crew::CrewModule::load(std::path::Path::new("data/crew"))
+                            .expect("crew data loads"),
+                    )
+                }),
                 other => bail!(
-                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle', 'economy' or 'base')"
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle', 'economy', 'base' or 'crew')"
                 ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
@@ -547,6 +570,50 @@ fn base_analytic_gates(m: &sojourn_base::BaseModule) -> Result<()> {
                 mat.id
             );
         }
+    }
+    Ok(())
+}
+
+/// FA-08 analytic validation gates (FR-LSC-801, contracts/crew-data.md): REID
+/// monotonicity, multiplicative-hazard factor monotonicity, the Mars EDL gap, and
+/// the capability product.
+fn crew_analytic_gates(m: &sojourn_crew::CrewModule) -> Result<()> {
+    use sojourn_crew::hazard;
+    use sojourn_crew::inputs::{AstronautFacts, Sex};
+    use sojourn_crew::radiation;
+    let p = &m.params;
+
+    // 1. REID monotone in dose.
+    let facts = AstronautFacts {
+        age_years: 40.0,
+        sex: Sex::Male,
+        traits: vec![],
+        training: 1.0,
+    };
+    let r1 = radiation::reid_pct(0.5, &facts, &p.radiation);
+    let r2 = radiation::reid_pct(1.0, &facts, &p.radiation);
+    if r2 <= r1 {
+        bail!("REID gate failed: not monotone in dose ({r2} !> {r1})");
+    }
+
+    // 2. Multiplicative-hazard factor monotonicity + clamp to [0,1].
+    let h1 = hazard::hazard(0.1, &[1.0, 1.0]);
+    let h2 = hazard::hazard(0.1, &[2.0, 1.0]);
+    if h2 <= h1 || h2 > 1.0 {
+        bail!("hazard gate failed: not monotone/clamped ({h2} vs {h1})");
+    }
+
+    // 3. Mars EDL gap (also enforced in load).
+    let mars = p.edl.body_difficulty.get("mars").copied().unwrap_or(0.0);
+    let moon = p.edl.body_difficulty.get("moon").copied().unwrap_or(0.0);
+    if mars <= moon {
+        bail!("EDL gate failed: Mars ({mars}) not harder than moon ({moon})");
+    }
+
+    // 4. Capability product.
+    let cap = hazard::capability(&[0.5, 0.5]);
+    if (cap - 0.25).abs() > 1e-9 {
+        bail!("capability gate failed: product of [0.5,0.5] ≠ 0.25 ({cap})");
     }
     Ok(())
 }

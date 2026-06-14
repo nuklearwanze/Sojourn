@@ -49,5 +49,11 @@
         (id: "pp-violation",         default_pause: Interrupt, source: "specs/008-bases-construction FR-BC-301 (planetary-protection violation)"),
         (id: "embargo-result",       default_pause: LogOnly,   source: "specs/008-bases-construction FR-BC-502 (embargo stress test)"),
         (id: "settlement-milestone", default_pause: Interrupt, source: "specs/008-bases-construction FR-BC-601 (settlement milestone, e.g. embargo-survivor)"),
+        // FA-08 life support & crew classes (specs/009-life-support-crew contracts/crew-commands.md)
+        (id: "spe-storm",            default_pause: Interrupt, source: "specs/009-life-support-crew FR-LSC-202 (solar-particle-event storm)"),
+        (id: "eclss-failure",        default_pause: Interrupt, source: "specs/009-life-support-crew FR-LSC-503 (ECLSS failure; critical beyond abort)"),
+        (id: "crew-anomaly",         default_pause: LogOnly,   source: "specs/009-life-support-crew FR-LSC-403 (psych/ops-driven crew anomaly)"),
+        (id: "astronaut-grounded",   default_pause: Interrupt, source: "specs/009-life-support-crew FR-LSC-203 (3% REID dose limit)"),
+        (id: "loss-of-crew",         default_pause: Interrupt, source: "specs/009-life-support-crew FR-LSC-702 (loss-of-crew; consumed by FA-09)"),
     ],
 )

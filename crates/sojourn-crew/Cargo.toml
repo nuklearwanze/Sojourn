@@ -1,0 +1,20 @@
+[package]
+name = "sojourn-crew"
+description = "Sojourn life support & crew (FA-08): the dynamic, seeded model that makes crewed missions materially harder than robotic ones — consumables vs ECLSS closure, radiation dose + REID, deconditioning, psychology, ECLSS failure, EDL crew-risk, loss-of-crew. SimModule on the sojourn-core kernel; cross-slice physics flows in as composed values (dep core only)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+rand_core = { workspace = true }
+
+[lints]
+workspace = true

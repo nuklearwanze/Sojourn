@@ -1,0 +1,15 @@
+// FA-08 EDL crew-risk params (FR-LSC-601…603, Q1). Per-body difficulty (the Mars
+// gap: Mars >> airless) + vehicle-suitability multipliers.
+(
+    body_difficulty: {
+        "moon": 1.0,
+        "mars": 5.0,
+        "earth": 1.5,
+        "titan": 2.0,
+        "default": 1.0,
+    },
+    base_rate: 0.02,
+    no_heatshield_mult: 3.0,
+    cant_land_mult: 5.0,
+    source: "the Mars EDL gap (landing >1-2 t is a multi-tech grand challenge) vs airless propulsive landing (design/04-SPACEFLIGHT.md §5, 02-TECH-TREE.md I6)",
+)

@@ -1,0 +1,13 @@
+// FA-08 physiology / deconditioning params (FR-LSC-301…303). Micro-g accrual rates
+// + countermeasure effectiveness (artificial gravity strongest) + recovery.
+(
+    bone_rate: 0.0005,
+    muscle_rate: 0.0007,
+    cardio_rate: 0.0004,
+    vision_rate: 0.0003,
+    exercise_eff: 0.5,
+    pharma_eff: 0.3,
+    artificial_g_eff: 0.95,
+    recovery_rate: 0.002,
+    source: "ISS long-duration bone/muscle loss (~1-1.5%/month) + exercise/artificial-gravity countermeasure studies (design/02-TECH-TREE.md F6, 04-SPACEFLIGHT.md §6)",
+)

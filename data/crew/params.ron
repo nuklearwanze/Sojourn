@@ -1,0 +1,8 @@
+// FA-08 hazard thresholds (viability). The 3% REID grounding threshold lives in
+// radiation.ron; these are the asset-viability floors.
+(
+    viability_reid_pct: 3.0,
+    viability_capability_min: 0.3,
+    viability_consumables_days: 0.0,
+    source: "crewed mission viability floors (design/04-SPACEFLIGHT.md §6: dose limit, crew capability, consumables coverage)",
+)

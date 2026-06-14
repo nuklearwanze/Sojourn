@@ -1,0 +1,12 @@
+// FA-08 ECLSS reliability/failure params (FR-LSC-501…504, Q1). Failure base rate +
+// maturity/maintenance/degradation multipliers (the multiplicative hazard).
+(
+    failure_base_rate: 0.0002,
+    trl_ref: 8,
+    low_trl_mult: 0.5,
+    maintenance_mult: 1.0,
+    degradation_rate: 0.001,
+    spares_per_day: 0.5,
+    crew_hr_per_day: 1.0,
+    source: "ISS ECLSS failure/maintenance rates + closure-fraction reliability (design/02-TECH-TREE.md F2-F5, 04-SPACEFLIGHT.md §6)",
+)
