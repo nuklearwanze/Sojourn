@@ -1,0 +1,22 @@
+[package]
+name = "sojourn-ui"
+description = "Sojourn UI view-model + host (FA-10): the headless, testable presentation logic that maps the cores' read-only snapshots to display data and submits journalled commands. No GUI dependency (the egui renderer lives in sojourn-ui-desktop); the same core runs headless for tests (Constitution IV)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+sojourn-astro = { path = "../sojourn-astro" }
+sojourn-world = { path = "../sojourn-world" }
+sojourn-research = { path = "../sojourn-research" }
+sojourn-vehicle = { path = "../sojourn-vehicle" }
+sojourn-economy = { path = "../sojourn-economy" }
+sojourn-base = { path = "../sojourn-base" }
+sojourn-crew = { path = "../sojourn-crew" }
+sojourn-polity = { path = "../sojourn-polity" }
+libm = { workspace = true }
+
+[lints]
+workspace = true

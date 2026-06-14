@@ -1,0 +1,30 @@
+// FA-10 UI theme (FR-UI-1402/1403). A colour-blind-safe palette where colour is
+// NEVER the sole carrier of meaning (every state also carries a shape/label/value),
+// plus scalable text and default hotkeys. No plausibility-bearing values — this is
+// presentation config, not game data, so it carries no `source` requirement.
+(
+    // Okabe-Ito colour-blind-safe palette (paired always with a glyph/label in the UI).
+    palette: (
+        ok:       (0, 158, 115),    // bluish green  — paired with "✓"
+        warn:     (230, 159, 0),    // orange        — paired with "⚠"
+        bad:      (213, 94, 0),     // vermillion    — paired with "✗"
+        info:     (86, 180, 233),   // sky blue      — paired with "ℹ"
+        neutral:  (120, 120, 120),
+        accent:   (204, 121, 167),  // reddish purple
+    ),
+    // Text scaling range (pixels_per_point) for 1280x720 -> 4K legibility.
+    text_scale: (min: 1.0, default: 1.25, max: 2.5),
+    // Default hotkeys (every primary action also has a keyboard path, FR-UI-1404).
+    hotkeys: {
+        "pause":         "Space",
+        "warp_up":       "+",
+        "warp_down":     "-",
+        "screen_map":    "F1",
+        "screen_ops":    "F5",
+        "screen_alerts": "F12",
+        "inspect":       "I",
+        "plan":          "P",
+        "commit":        "Enter",
+    },
+    source: "Okabe & Ito (2008) colour-universal design palette; design/06-UI-UX.md §1/§6 (colour-blind-safe, scalable, full keyboard nav)",
+)

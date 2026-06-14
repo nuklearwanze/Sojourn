@@ -1,0 +1,16 @@
+[package]
+name = "sojourn-ui-desktop"
+description = "Sojourn desktop renderer (FA-10): the thin egui/eframe shell that paints the sojourn-ui view-model. No game logic; reads the view-model, submits commands through the host."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-ui = { path = "../sojourn-ui" }
+eframe = { workspace = true }
+egui = { workspace = true }
+egui_extras = { workspace = true }
+
+[lints]
+workspace = true

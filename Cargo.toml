@@ -11,6 +11,8 @@ members = [
     "crates/sojourn-base",
     "crates/sojourn-crew",
     "crates/sojourn-polity",
+    "crates/sojourn-ui",
+    "crates/sojourn-ui-desktop",
     "crates/sojourn-harness",
 ]
 
@@ -36,6 +38,9 @@ serde_json = "1"
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 criterion = "0.5"
+eframe = "0.29"
+egui = "0.29"
+egui_extras = "0.29"
 
 [workspace.lints.clippy]
 disallowed_types = "deny"
