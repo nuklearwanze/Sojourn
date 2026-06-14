@@ -11,6 +11,7 @@ sojourn-ui = { path = "../sojourn-ui" }
 eframe = { workspace = true }
 egui = { workspace = true }
 egui_extras = { workspace = true }
+libm = { workspace = true }
 
 [lints]
 workspace = true

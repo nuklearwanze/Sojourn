@@ -1,0 +1,1073 @@
+<!--
+  SOJOURN — UI/UX DESIGN TEMPLATE (static dummy)
+  ------------------------------------------------------------------
+  Presentation reference for the real UI (design/06-UI-UX.md). No game
+  logic — presentation only (constitution Principle IV).
+
+  Direction: "flight console / instrument bezel". Deep ink surfaces,
+  chamfered bracketed panels carrying equipment codes + status LEDs,
+  a reticle-framed graticule viewport, restrained phosphor glow on live
+  data, sharp edges, mono-forward console typography. Polished + clean.
+
+  System fonts only (no network). All numbers are illustrative early-game
+  (ESA, 2026 start), SI units only.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sojourn — Mission Console (UI Template)</title>
+<style>
+  /* ============================================================
+     DESIGN TOKENS
+     ============================================================ */
+  :root{
+    --void:#070a0f; --void-2:#0a0e15;
+    --panel:#0d1219; --panel-2:#121823; --inset:#070b11;
+    --line:#1d2632; --line-bright:#2e3d50; --grid:#0f1923;
+    --ink:#e1e8f2; --ink-dim:#8593a6; --ink-faint:#566273;
+
+    --signal:#3ee0a0;   /* go / live / selected (phosphor)  */
+    --plot:#5aa8ff;     /* trajectories / data              */
+    --warn:#ffc14d;     /* caution                          */
+    --alert:#ff5e5e;    /* danger / red-flag                */
+    --science:#b98bff;  /* discovery / astrobiology         */
+    --prestige:#ece2c2; /* political capital / firsts       */
+
+    --c-funds:#3ee0a0; --c-prop:#5aa8ff; --c-mass:#aab6c8;
+    --c-crew:#ffc14d; --c-ops:#5fd2e0; --c-pol:#ece2c2;
+
+    --mono:ui-monospace,"SF Mono","JetBrains Mono","Cascadia Code",Menlo,Consolas,monospace;
+    --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+
+    --gap:9px; --nav-w:196px; --insp-w:296px;
+    --top-h:54px; --log-h:112px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--void);color:var(--ink);
+    font-family:var(--sans);font-size:12.5px;line-height:1.4;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  ::selection{background:rgba(62,224,160,.26)}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-track{background:var(--inset)}
+  ::-webkit-scrollbar-thumb{background:#1c2530;border:1px solid #0c1118}
+  ::-webkit-scrollbar-thumb:hover{background:#27323f}
+
+  .num,.mono,td.num,.kv-v{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+  /* console label */
+  .lbl{font-family:var(--mono);font-size:9px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--ink-faint)}
+
+  a:focus-visible,button:focus-visible,[tabindex]:focus-visible{
+    outline:1px solid var(--signal);outline-offset:1px}
+
+  /* status LED */
+  .led{width:7px;height:7px;border-radius:50%;background:var(--ink-faint);
+    color:var(--ink-faint);box-shadow:0 0 6px currentColor;flex:none}
+  .led.go{background:var(--signal);color:var(--signal)}
+  .led.warn{background:var(--warn);color:var(--warn)}
+  .led.alert{background:var(--alert);color:var(--alert);animation:blink 1.3s steps(2) infinite}
+  .led.plot{background:var(--plot);color:var(--plot)}
+  .led.idle{background:#2a3340;color:transparent;box-shadow:none;border:1px solid var(--line-bright)}
+  @keyframes blink{50%{opacity:.25}}
+
+  /* ============================================================
+     APP SHELL
+     ============================================================ */
+  .app{
+    display:grid;height:100vh;
+    grid-template-columns:var(--nav-w) 1fr var(--insp-w);
+    grid-template-rows:var(--top-h) 1fr var(--log-h);
+    grid-template-areas:"top top top" "nav main insp" "log log log";
+    background:var(--void);
+  }
+
+  /* ---- Top bar ---- */
+  .top{
+    grid-area:top;display:flex;align-items:center;gap:16px;padding:0 14px;
+    background:linear-gradient(180deg,#10151e,#0b0f16);
+    border-bottom:1px solid var(--line);position:relative;
+  }
+  .top::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(62,224,160,.5),rgba(90,168,255,.4),transparent)}
+
+  .brand{display:flex;flex-direction:column;min-width:150px;line-height:1.15}
+  .brand b{font-size:15px;letter-spacing:.34em;font-weight:700}
+  .brand span{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;color:var(--ink-faint)}
+
+  .callsign{display:flex;align-items:center;gap:9px;padding:5px 10px;
+    background:var(--inset);border:1px solid var(--line);
+    clip-path:polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)}
+  .callsign .led{box-shadow:0 0 7px currentColor}
+  .callsign .who{line-height:1.2}
+  .callsign .who b{font-size:12px;letter-spacing:.05em}
+  .callsign .who small{display:block;font-family:var(--mono);font-size:8.5px;color:var(--ink-faint);letter-spacing:.08em}
+
+  .clock{display:flex;align-items:center;gap:13px}
+  .clock .stamp{line-height:1.15}
+  .clock .date{font-family:var(--mono);font-size:15px;letter-spacing:.04em}
+  .clock .since{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);letter-spacing:.06em}
+  .runstate{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;
+    letter-spacing:.16em;color:var(--warn);border:1px solid rgba(255,193,77,.35);
+    padding:3px 8px;background:rgba(255,193,77,.06)}
+  .runstate .led{width:6px;height:6px}
+
+  .warp{display:flex;align-items:stretch;border:1px solid var(--line);background:var(--inset)}
+  .warp button{background:transparent;border:0;border-right:1px solid var(--line);
+    color:var(--ink-dim);font-family:var(--mono);font-size:11px;padding:5px 9px;cursor:pointer;min-width:34px}
+  .warp button:last-child{border-right:0}
+  .warp button:hover{background:var(--panel-2);color:var(--ink)}
+  .warp button[aria-pressed="true"]{background:var(--signal);color:#04140d;font-weight:700;
+    box-shadow:inset 0 0 12px rgba(255,255,255,.25)}
+  .warp .pause[aria-pressed="true"]{background:var(--warn);color:#1c1304}
+
+  .currencies{display:flex;margin-left:auto;align-items:stretch;
+    border:1px solid var(--line);background:var(--inset)}
+  .cur{display:flex;flex-direction:column;align-items:flex-end;min-width:78px;
+    padding:5px 11px;border-right:1px solid var(--line)}
+  .cur:last-child{border-right:0}
+  .cur .l{font-family:var(--mono);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)}
+  .cur .v{font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums;margin-top:1px}
+  .cur .v small{color:var(--ink-faint);font-size:9px}
+  .cur.funds .v{color:var(--c-funds)} .cur.prop .v{color:var(--c-prop)}
+  .cur.mass .v{color:var(--ink)} .cur.crew .v{color:var(--c-crew)}
+  .cur.ops .v{color:var(--c-ops)} .cur.pol .v{color:var(--c-pol)}
+
+  .bell{position:relative;margin-left:4px;border:1px solid var(--line);background:var(--inset);
+    color:var(--ink-dim);width:36px;height:36px;cursor:pointer;font-size:15px;
+    clip-path:polygon(7px 0,100% 0,100% 100%,0 100%,0 7px)}
+  .bell:hover{color:var(--ink);border-color:var(--line-bright)}
+  .bell .badge{position:absolute;top:-6px;right:-6px;background:var(--alert);color:#1d0606;
+    font-family:var(--mono);font-size:9px;font-weight:700;padding:1px 5px}
+
+  /* ---- Left nav ---- */
+  .nav{grid-area:nav;background:linear-gradient(180deg,#0c1118,#0a0e14);
+    border-right:1px solid var(--line);padding:10px 9px;overflow-y:auto}
+  .nav .grp{display:flex;align-items:center;gap:7px;padding:10px 6px 5px}
+  .nav .grp::after{content:"";flex:1;height:1px;background:var(--line)}
+  .navitem{display:flex;align-items:center;gap:9px;width:100%;text-align:left;
+    background:transparent;border:0;color:var(--ink-dim);cursor:pointer;
+    padding:6px 8px;font-size:12px;font-family:var(--sans);position:relative}
+  .navitem .sx{font-family:var(--mono);font-size:9.5px;color:var(--ink-faint);width:26px;flex:none;letter-spacing:.04em}
+  .navitem:hover{background:var(--panel-2);color:var(--ink)}
+  .navitem[aria-current="true"]{color:var(--ink);
+    background:linear-gradient(90deg,rgba(62,224,160,.14),transparent 70%)}
+  .navitem[aria-current="true"]::before{content:"";position:absolute;left:0;top:3px;bottom:3px;
+    width:2px;background:var(--signal);box-shadow:0 0 8px var(--signal)}
+  .navitem[aria-current="true"] .sx{color:var(--signal)}
+  .navitem[aria-current="true"]::after{content:"\25B8";position:absolute;right:8px;color:var(--signal);font-size:10px}
+
+  /* ---- Main work area ---- */
+  .main{grid-area:main;overflow:auto;padding:14px;position:relative;
+    background:
+      radial-gradient(1000px 520px at 72% -8%,rgba(90,168,255,.05),transparent),
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+      var(--void);
+    background-size:auto,34px 34px,34px 34px,auto;
+  }
+  .screen{display:none}
+  .screen.active{display:block;animation:fade .16s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+
+  .screen-head{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:13px;gap:16px}
+  .screen-head h1{font-size:15px;font-weight:600;margin:0;letter-spacing:.06em;text-transform:uppercase;
+    display:flex;align-items:center;gap:10px}
+  .screen-head h1 .scode{font-family:var(--mono);font-size:11px;color:var(--signal);
+    border:1px solid rgba(62,224,160,.4);padding:1px 7px;letter-spacing:.08em}
+  .screen-head .sub{color:var(--ink-dim);font-size:11.5px;margin-top:4px;font-family:var(--mono)}
+
+  .seg{display:flex;border:1px solid var(--line);background:var(--inset)}
+  .seg button{background:transparent;border:0;color:var(--ink-dim);padding:6px 12px;cursor:pointer;
+    font-size:11px;font-family:var(--mono);letter-spacing:.06em;text-transform:uppercase;border-right:1px solid var(--line)}
+  .seg button:last-child{border-right:0}
+  .seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--signal)}
+
+  /* ---- Instrument panel (signature: corner brackets + equipment header) ---- */
+  .panel{position:relative;background:var(--panel);border:1px solid var(--line)}
+  .panel::before,.panel::after{content:"";position:absolute;width:9px;height:9px;
+    border:1px solid var(--line-bright);pointer-events:none;z-index:2}
+  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0}
+  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0}
+  .panel>.ph{display:flex;align-items:center;gap:9px;height:27px;padding:0 11px;
+    background:linear-gradient(180deg,#131a25,#0e131b);border-bottom:1px solid var(--line)}
+  .panel>.ph .code{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.12em}
+  .panel>.ph h2{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-dim);margin:0;font-weight:600}
+  .panel>.ph .right{margin-left:auto;display:flex;align-items:center;gap:8px}
+  .panel>.ph .hint{font-family:var(--mono);font-size:9px;color:var(--ink-faint);letter-spacing:.04em}
+  .panel>.pb{padding:12px}
+
+  .grid{display:grid;gap:var(--gap)}
+  .cols-2{grid-template-columns:1fr 1fr}
+
+  /* ---- Tables ---- */
+  table.data{width:100%;border-collapse:collapse;font-size:11.5px}
+  table.data th{text-align:left;font-weight:600;color:var(--ink-faint);font-size:9px;letter-spacing:.1em;
+    text-transform:uppercase;padding:6px 10px;background:var(--panel-2);position:sticky;top:0;
+    border-bottom:1px solid var(--line)}
+  table.data td{padding:6px 10px;border-bottom:1px solid var(--line);color:var(--ink-dim)}
+  table.data td.num{text-align:right;color:var(--ink)}
+  table.data tr:hover td{background:rgba(90,168,255,.05)}
+  table.data tr.sel td{background:rgba(62,224,160,.10)}
+  table.data tr.sel td:first-child{box-shadow:inset 2px 0 0 var(--signal)}
+  table.data .name{color:var(--ink);font-weight:500}
+
+  .tag{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9.5px;
+    padding:1px 7px;border:1px solid var(--line-bright);color:var(--ink-dim);letter-spacing:.04em;
+    clip-path:polygon(4px 0,100% 0,100% calc(100% - 4px),calc(100% - 4px) 100%,0 100%,0 4px)}
+  .tag.go{color:var(--signal);border-color:rgba(62,224,160,.45)}
+  .tag.warn{color:var(--warn);border-color:rgba(255,193,77,.45)}
+  .tag.alert{color:var(--alert);border-color:rgba(255,94,94,.45)}
+  .tag.sci{color:var(--science);border-color:rgba(185,139,255,.45)}
+
+  /* ---- key/value ---- */
+  .kv{display:grid;grid-template-columns:1fr auto;gap:6px 12px}
+  .kv .kv-k{color:var(--ink-faint);font-size:11px;font-family:var(--mono);letter-spacing:.03em}
+  .kv .kv-v{color:var(--ink);font-size:12px;text-align:right}
+  .trace{color:var(--plot);cursor:help;border-bottom:1px dotted var(--plot)}
+
+  /* ---- buttons ---- */
+  .btn{background:var(--panel-2);border:1px solid var(--line-bright);color:var(--ink);padding:6px 13px;
+    cursor:pointer;font-size:10.5px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase;
+    clip-path:polygon(5px 0,100% 0,100% calc(100% - 5px),calc(100% - 5px) 100%,0 100%,0 5px)}
+  .btn:hover{border-color:var(--ink-faint);background:#19212d}
+  .btn.primary{background:var(--signal);color:#04140d;border-color:var(--signal);font-weight:700}
+  .btn.primary:hover{filter:brightness(1.1)}
+  .btn.ghost{background:transparent}
+
+  /* ---- chips ---- */
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:var(--mono);font-size:10px;letter-spacing:.04em;padding:3px 9px;
+    border:1px solid var(--line);color:var(--ink-faint);background:var(--inset);cursor:pointer}
+  .chip[aria-pressed="true"]{color:var(--plot);border-color:rgba(90,168,255,.5);background:rgba(90,168,255,.08)}
+
+  /* ============================================================
+     VIEWPORT (hero map frame: reticle + brackets + graticule)
+     ============================================================ */
+  .viewport{position:relative;background:
+      radial-gradient(820px 460px at 50% 46%,rgba(90,168,255,.06),transparent),
+      linear-gradient(rgba(28,42,58,.25) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(28,42,58,.25) 1px,transparent 1px),
+      var(--inset);
+    background-size:auto,46px 46px,46px 46px,auto;
+    border:1px solid var(--line);overflow:hidden}
+  .viewport .vbracket{position:absolute;width:18px;height:18px;border:1px solid var(--line-bright);z-index:3}
+  .viewport .vbracket.tl{top:8px;left:8px;border-right:0;border-bottom:0}
+  .viewport .vbracket.tr{top:8px;right:8px;border-left:0;border-bottom:0}
+  .viewport .vbracket.bl{bottom:8px;left:8px;border-right:0;border-top:0}
+  .viewport .vbracket.br{bottom:8px;right:8px;border-left:0;border-top:0}
+  .viewport .vtag{position:absolute;font-family:var(--mono);font-size:9px;letter-spacing:.1em;
+    color:var(--ink-faint);z-index:3}
+  .viewport .vtag.tl{top:13px;left:34px} .viewport .vtag.tr{top:13px;right:34px;color:var(--signal)}
+  .viewport .scale{position:absolute;right:34px;bottom:13px;font-family:var(--mono);font-size:9px;
+    color:var(--ink-faint);display:flex;align-items:center;gap:6px;z-index:3}
+  .viewport .scale i{display:block;width:54px;height:1px;background:var(--ink-faint)}
+  .frame-ctl{position:absolute;left:34px;bottom:12px;display:flex;gap:6px;z-index:3}
+
+  .orbit{fill:none;stroke:#1a2632;stroke-width:1}
+  .orbit.hot{stroke:rgba(90,168,255,.32)}
+  .traj{fill:none;stroke:var(--plot);stroke-width:1.5;stroke-dasharray:5 4;
+    filter:drop-shadow(0 0 4px rgba(90,168,255,.7))}
+  .soi{fill:rgba(90,168,255,.05);stroke:rgba(90,168,255,.32);stroke-dasharray:2 3}
+  .lp{fill:var(--warn)} .body{stroke:#070a0f;stroke-width:1}
+  .mlabel{font-family:var(--mono);font-size:9px;fill:var(--ink-dim);letter-spacing:.04em}
+  .craft{fill:var(--signal);filter:drop-shadow(0 0 5px rgba(62,224,160,.9))}
+  .node-edge{stroke:rgba(133,147,166,.22);stroke-width:1;stroke-dasharray:1 4}
+  .reticle{stroke:rgba(62,224,160,.5);stroke-width:1}
+
+  /* ============================================================
+     S1 FULL-BLEED MAP MODE (map = background, HUD floats on top)
+     ============================================================ */
+  .main:has(#map.active){overflow:hidden}        /* map fills, never scrolls */
+  #map.active{position:absolute;inset:0;display:block;animation:fade .16s ease}
+  .mapstage{position:absolute;inset:0;overflow:hidden;background:
+      radial-gradient(960px 540px at 50% 47%,rgba(90,168,255,.08),transparent),
+      linear-gradient(rgba(28,42,58,.20) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(28,42,58,.20) 1px,transparent 1px),
+      var(--inset);
+    background-size:auto,48px 48px,48px 48px,auto}
+  .mapbg{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1}
+
+  /* readability scrims so overlaid text stays legible over the map */
+  .scrim{position:absolute;left:0;right:0;pointer-events:none;z-index:2}
+  .scrim.top{top:0;height:100px;background:linear-gradient(180deg,rgba(7,10,15,.8),transparent)}
+  .scrim.bottom{bottom:0;height:84px;background:linear-gradient(0deg,rgba(7,10,15,.72),transparent)}
+
+  /* big tactical corner brackets framing the whole display */
+  .tbracket{position:absolute;width:26px;height:26px;border:1px solid var(--line-bright);
+    z-index:5;pointer-events:none}
+  .tbracket.tl{top:12px;left:12px;border-right:0;border-bottom:0}
+  .tbracket.tr{top:12px;right:12px;border-left:0;border-bottom:0}
+  .tbracket.bl{bottom:12px;left:12px;border-right:0;border-top:0}
+  .tbracket.br{bottom:12px;right:12px;border-left:0;border-top:0}
+
+  /* top overlay: identifier + focus control */
+  .map-top{position:absolute;top:16px;left:24px;right:24px;display:flex;align-items:flex-start;
+    justify-content:space-between;gap:16px;z-index:6}
+  .map-id{display:flex;align-items:center;gap:11px}
+  .map-id .scode{font-family:var(--mono);font-size:11px;color:var(--signal);
+    border:1px solid rgba(62,224,160,.4);padding:2px 7px;letter-spacing:.08em}
+  .map-id .t{font-size:14px;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+  .map-id .s{font-family:var(--mono);font-size:9.5px;color:var(--ink-dim);letter-spacing:.06em;margin-top:3px}
+  .map-top-right{display:flex;align-items:center;gap:12px}
+  .livetag{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.14em;color:var(--ink-dim)}
+
+  /* right-hand floating HUD stack */
+  .hud-stack{position:absolute;top:66px;right:24px;width:300px;display:flex;flex-direction:column;
+    gap:10px;z-index:6}
+  .hud{background:rgba(10,14,21,.85);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    border:1px solid var(--line-bright);box-shadow:0 12px 38px rgba(0,0,0,.6)}
+  .hud>.ph{background:linear-gradient(180deg,rgba(20,27,38,.94),rgba(14,19,27,.92))}
+  .hud table.data th{background:rgba(18,24,35,.92)}
+  .hud table.data tr:hover td{background:rgba(90,168,255,.10)}
+
+  /* bottom overlay controls */
+  .map-bl{position:absolute;bottom:20px;left:24px;z-index:6}
+  .map-br{position:absolute;bottom:20px;right:24px;z-index:6;font-family:var(--mono);
+    font-size:9.5px;color:var(--ink-dim);display:flex;align-items:center;gap:7px}
+  .map-br i{display:block;width:60px;height:1px;background:var(--ink-dim)}
+
+  /* ============================================================
+     BESPOKE WIDGETS
+     ============================================================ */
+  .dvbar{display:flex;flex-direction:column;gap:4px}
+  .dvbar .seg-row{display:flex;align-items:center;gap:9px;font-size:11px}
+  .dvbar .track{flex:1;height:13px;background:var(--inset);border:1px solid var(--line);display:flex}
+  .dvbar .fill{height:100%}
+  .dvbar .lab{width:120px;color:var(--ink-dim);font-family:var(--mono);font-size:10px}
+  .dvbar .amt{width:62px;text-align:right;font-family:var(--mono);color:var(--ink)}
+
+  .trl{display:flex;gap:3px}
+  .trl .step{flex:1;height:22px;background:var(--inset);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:var(--ink-faint)}
+  .trl .step.done{background:rgba(62,224,160,.16);border-color:rgba(62,224,160,.3);color:var(--signal)}
+  .trl .step.cur{background:var(--signal);color:#04140d;font-weight:700;border-color:var(--signal);
+    box-shadow:0 0 10px rgba(62,224,160,.55)}
+
+  .ul{margin-bottom:11px}
+  .ul .ulhead{display:flex;justify-content:space-between;font-size:11px;margin-bottom:4px}
+  .ul .ulhead b{color:var(--ink);font-weight:500}
+  .ul .ulhead .v{font-family:var(--mono);color:var(--ink-dim)}
+  .ul .track{height:7px;background:var(--inset);border:1px solid var(--line);position:relative}
+  .ul .fill{height:100%;background:linear-gradient(90deg,#1f7a5d,var(--signal))}
+  .ul .tide{position:absolute;top:-3px;width:2px;height:13px;background:var(--prestige);opacity:.85}
+  .ul .tide::after{content:"tide";position:absolute;top:-11px;left:-9px;font-size:8px;
+    font-family:var(--mono);color:var(--prestige);letter-spacing:.04em}
+
+  .evi{margin-bottom:15px}
+  .evi .ehead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}
+  .evi .ehead b{font-weight:500}
+  .evi .ehead .p{font-family:var(--mono);color:var(--science)}
+  .evi .stages{display:flex;gap:4px}
+  .evi .st{flex:1;text-align:center}
+  .evi .st .bar{height:6px;background:var(--inset);border:1px solid var(--line);margin-bottom:5px}
+  .evi .st .bar i{display:block;height:100%;background:var(--science)}
+  .evi .st small{font-size:8.5px;font-family:var(--mono);color:var(--ink-faint);letter-spacing:.03em}
+  .evi .st.active small{color:var(--science)}
+
+  .gauges{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .gauge{background:var(--inset);border:1px solid var(--line);padding:10px;position:relative}
+  .gauge .g-lab{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint)}
+  .gauge .g-val{font-family:var(--mono);font-size:21px;margin:3px 0}
+  .gauge .g-bar{height:5px;background:var(--panel-2);overflow:hidden}
+  .gauge .g-bar i{display:block;height:100%}
+
+  .schematic{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .mod{border:1px solid var(--line);background:var(--inset);padding:9px;font-size:10.5px;
+    text-align:center;color:var(--ink-dim)}
+  .mod b{display:block;color:var(--ink);font-size:11px;margin-bottom:2px}
+  .mod .mono{color:var(--ink-faint);font-size:9px}
+  .mod.pwr{border-color:rgba(255,193,77,.4)} .mod.eclss{border-color:rgba(90,168,255,.4)}
+  .mod.hab{border-color:rgba(62,224,160,.4)} .mod.isru{border-color:rgba(185,139,255,.4)}
+
+  .stat{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px}
+  .stat::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--ink-faint);box-shadow:0 0 5px currentColor;color:var(--ink-faint)}
+  .stat.ok{color:var(--signal)} .stat.ok::before{background:var(--signal);color:var(--signal)}
+  .stat.cruise{color:var(--plot)} .stat.cruise::before{background:var(--plot);color:var(--plot)}
+  .stat.hold{color:var(--warn)} .stat.hold::before{background:var(--warn);color:var(--warn)}
+  .stat.fault{color:var(--alert)} .stat.fault::before{background:var(--alert);color:var(--alert)}
+
+  /* ---- Inspector ---- */
+  .insp{grid-area:insp;background:linear-gradient(180deg,#0c1118,#0a0e14);
+    border-left:1px solid var(--line);overflow-y:auto;padding:14px}
+  .insp .ihead{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+  .insp .ihead h3{font-size:14px;margin:0;letter-spacing:.04em}
+  .insp .pin{font-family:var(--mono);font-size:9px;color:var(--ink-faint);border:1px solid var(--line);padding:2px 7px}
+  .insp .obj-type{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--plot);margin-bottom:13px}
+  .insp .sec{display:flex;align-items:center;gap:7px;margin:14px 0 7px}
+  .insp .sec::after{content:"";flex:1;height:1px;background:var(--line)}
+  .insp .actions{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+  .insp .actions .btn{text-align:left;text-transform:none;letter-spacing:.02em}
+
+  /* ---- Event log ---- */
+  .log{grid-area:log;background:linear-gradient(180deg,#0c1118,#0a0e14);
+    border-top:1px solid var(--line);display:flex;flex-direction:column}
+  .log .lh{display:flex;align-items:center;gap:11px;padding:6px 14px;border-bottom:1px solid var(--line)}
+  .log .lh .lbl{margin-right:auto}
+  .log .feed{overflow-y:auto;padding:2px 0}
+  .logrow{display:grid;grid-template-columns:118px 70px 1fr auto;gap:12px;padding:5px 14px;
+    font-size:11.5px;align-items:center;border-bottom:1px solid var(--line)}
+  .logrow:hover{background:var(--panel-2)}
+  .logrow .t{font-family:var(--mono);color:var(--ink-faint);font-size:10.5px}
+  .logrow .cls{font-family:var(--mono);font-size:9px;letter-spacing:.08em}
+  .logrow .msg{color:var(--ink-dim)}
+  .logrow .msg b{color:var(--ink);font-weight:500}
+  .logrow .pausetag{font-family:var(--mono);font-size:9.5px;color:var(--warn)}
+  .cls.nav{color:var(--plot)} .cls.sci{color:var(--science)}
+  .cls.eco{color:var(--signal)} .cls.ops{color:var(--c-ops)} .cls.pol{color:var(--prestige)}
+
+  .hint{color:var(--ink-faint);font-size:10.5px;font-family:var(--mono);letter-spacing:.02em}
+  .stub{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:240px;
+    border:1px solid var(--line);color:var(--ink-faint);text-align:center;gap:7px;background:var(--inset)}
+  .stub .big{font-family:var(--mono);font-size:12px;color:var(--ink-dim);letter-spacing:.05em}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important}}
+  @media (max-width:1180px){.app{grid-template-columns:var(--nav-w) 1fr}.insp{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ===================== TOP BAR ===================== -->
+  <header class="top">
+    <div class="brand"><b>SOJOURN</b><span>MISSION CONSOLE</span></div>
+    <div class="callsign">
+      <span class="led plot"></span>
+      <div class="who"><b>ESA</b><small>FLIGHT OPS // EU</small></div>
+    </div>
+
+    <div class="clock">
+      <div class="stamp"><div class="date">2026-03-13</div><div class="since">T+071d 06:14:22</div></div>
+      <div class="runstate"><span class="led warn"></span><span id="runlabel">PAUSED</span></div>
+      <div class="warp" role="group" aria-label="Time controls">
+        <button class="pause" aria-pressed="true" title="Pause (Space)">❚❚</button>
+        <button aria-pressed="false">1×</button>
+        <button aria-pressed="false">1h</button>
+        <button aria-pressed="false">1d</button>
+        <button aria-pressed="false">10d</button>
+      </div>
+    </div>
+
+    <div class="currencies">
+      <div class="cur funds"><span class="l">Funds</span><span class="v">€7.94<small>bn</small></span></div>
+      <div class="cur prop"><span class="l">Propellant</span><span class="v">0.0<small>t</small></span></div>
+      <div class="cur mass"><span class="l">Mass→orb</span><span class="v">48<small>t/yr</small></span></div>
+      <div class="cur crew"><span class="l">Crew-time</span><span class="v">2140<small>h</small></span></div>
+      <div class="cur ops"><span class="l">Ops cap</span><span class="v">62<small>%</small></span></div>
+      <div class="cur pol"><span class="l">Pol cap</span><span class="v">+18</span></div>
+    </div>
+    <button class="bell" title="Alerts">◈<span class="badge">3</span></button>
+  </header>
+
+  <!-- ===================== LEFT NAV ===================== -->
+  <nav class="nav" aria-label="Screens">
+    <div class="grp lbl">Operate</div>
+    <button class="navitem" aria-current="true" data-screen="map"><span class="sx">S1</span>System Map</button>
+    <button class="navitem" data-screen="traj"><span class="sx">S2</span>Trajectory</button>
+    <button class="navitem" data-screen="fleet"><span class="sx">S5</span>Operations</button>
+    <button class="navitem" data-screen="bases"><span class="sx">S7</span>Bases</button>
+    <div class="grp lbl">Develop</div>
+    <button class="navitem" data-screen="rnd"><span class="sx">S3</span>Research &amp; Dev</button>
+    <button class="navitem" data-screen="vehicle"><span class="sx">S4</span>Vehicle Designer</button>
+    <button class="navitem" data-screen="econ"><span class="sx">S6</span>Economy</button>
+    <button class="navitem" data-screen="people"><span class="sx">S8</span>Personnel</button>
+    <div class="grp lbl">Discover</div>
+    <button class="navitem" data-screen="world"><span class="sx">S9</span>World / Politics</button>
+    <button class="navitem" data-screen="astro"><span class="sx">S10</span>Astrobiology</button>
+    <button class="navitem" data-screen="journal"><span class="sx">S11</span>Sojournal</button>
+    <button class="navitem" data-screen="alerts"><span class="sx">S12</span>Event Log</button>
+  </nav>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+
+    <!-- ---------- S1 SYSTEM MAP ---------- -->
+    <section class="screen active" id="map">
+      <div class="mapstage">
+
+        <!-- FULL-BLEED BACKGROUND MAP -->
+        <svg class="mapbg" viewBox="0 0 760 460" preserveAspectRatio="xMidYMid slice"
+             role="img" aria-label="Heliocentric system map">
+          <line class="node-edge" x1="380" y1="230" x2="476" y2="230"/>
+          <line class="node-edge" x1="476" y1="230" x2="560" y2="150"/>
+          <ellipse class="orbit" cx="380" cy="230" rx="48" ry="34"/>
+          <ellipse class="orbit" cx="380" cy="230" rx="86" ry="62"/>
+          <ellipse class="orbit hot" cx="380" cy="230" rx="128" ry="92"/>
+          <ellipse class="orbit" cx="380" cy="230" rx="196" ry="140"/>
+          <ellipse class="orbit" cx="380" cy="230" rx="250" ry="178" stroke-dasharray="1 6" stroke="#2a3142"/>
+          <ellipse class="orbit" cx="380" cy="230" rx="270" ry="192" stroke-dasharray="1 7" stroke="#222838"/>
+          <path class="traj" d="M476 230 Q 470 96 560 150"/>
+          <text class="mlabel" x="498" y="118" fill="#5aa8ff">Δv 3.94 km/s · TOF 248 d</text>
+          <circle cx="380" cy="230" r="9" fill="#ffd27a" stroke="#7a5a16"/>
+          <circle cx="380" cy="230" r="16" fill="none" stroke="#ffd27a" stroke-opacity=".16"/>
+          <text class="mlabel" x="380" y="253" text-anchor="middle" fill="#ffd27a">SOL</text>
+          <circle class="body" cx="428" cy="230" r="3" fill="#9a8d7a"/>
+          <circle class="body" cx="466" cy="208" r="5" fill="#d8b878"/>
+          <circle class="soi" cx="476" cy="230" r="22"/>
+          <circle class="reticle" cx="476" cy="230" r="15" fill="none" stroke-dasharray="3 4"/>
+          <line class="reticle" x1="476" y1="208" x2="476" y2="214"/><line class="reticle" x1="476" y1="246" x2="476" y2="252"/>
+          <line class="reticle" x1="454" y1="230" x2="460" y2="230"/><line class="reticle" x1="492" y1="230" x2="498" y2="230"/>
+          <circle class="body" cx="476" cy="230" r="6" fill="#5b9bd6"/>
+          <text class="mlabel" x="476" y="270" text-anchor="middle">EARTH · ISS · L4/L5</text>
+          <circle class="lp" cx="455" cy="206" r="2"/><circle class="lp" cx="497" cy="206" r="2"/>
+          <path class="craft" d="M486 214 l6 3 -6 3 1.6 -3 z"/>
+          <text class="mlabel" x="495" y="209" fill="#3ee0a0">CASTOR-1</text>
+          <circle class="body" cx="560" cy="150" r="5" fill="#c8694a"/>
+          <text class="mlabel" x="560" y="136" text-anchor="middle">MARS</text>
+          <circle class="body" cx="576" cy="230" r="8" fill="#cda982" opacity=".5"/>
+          <text class="mlabel" x="592" y="234" fill="#566273">JUPITER →</text>
+        </svg>
+
+        <!-- READABILITY SCRIMS -->
+        <div class="scrim top"></div>
+        <div class="scrim bottom"></div>
+
+        <!-- TACTICAL FRAME BRACKETS -->
+        <span class="tbracket tl"></span><span class="tbracket tr"></span>
+        <span class="tbracket bl"></span><span class="tbracket br"></span>
+
+        <!-- TOP OVERLAY: identifier + focus control -->
+        <div class="map-top">
+          <div class="map-id">
+            <span class="scode">S1</span>
+            <div><div class="t">System Map</div>
+              <div class="s">HELIOCENTRIC · INERTIAL · 1 AU ≈ 96 PX</div></div>
+          </div>
+          <div class="map-top-right">
+            <span class="livetag"><span class="led plot"></span> LIVE FEED</span>
+            <div class="seg" role="group"><button aria-pressed="true">Helio</button>
+              <button aria-pressed="false">Earth</button><button aria-pressed="false">Local</button></div>
+          </div>
+        </div>
+
+        <!-- RIGHT FLOATING HUD STACK -->
+        <div class="hud-stack">
+          <div class="panel hud">
+            <div class="ph"><span class="code">LYR</span><h2>Map Layers</h2><span class="right led idle"></span></div>
+            <div class="pb"><div class="chips">
+              <span class="chip" aria-pressed="true">Trajectories</span>
+              <span class="chip" aria-pressed="true">Transport graph</span>
+              <span class="chip" aria-pressed="false">Resources</span>
+              <span class="chip" aria-pressed="false">Comms</span>
+              <span class="chip" aria-pressed="false">PP zones</span>
+              <span class="chip" aria-pressed="false">Science</span>
+            </div></div>
+          </div>
+          <div class="panel hud">
+            <div class="ph"><span class="code">TRK</span><h2>Tracked Objects</h2><span class="right hint">07</span></div>
+            <table class="data">
+              <thead><tr><th>Object</th><th>Class</th><th style="text-align:right">State</th></tr></thead>
+              <tbody>
+                <tr class="sel"><td class="name">Castor-1</td><td>Electric tug</td><td class="num">spiral +0.31 N</td></tr>
+                <tr><td class="name">ISS</td><td>Station</td><td class="num">LEO 51.6°</td></tr>
+                <tr><td class="name">Sentinel-7</td><td>EO sat</td><td class="num">SSO</td></tr>
+                <tr><td class="name">Lumen-A</td><td>Lunar probe</td><td class="num">TLI plan</td></tr>
+                <tr><td class="name">2024 PT5</td><td>NEA target</td><td class="num">survey 41%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- BOTTOM OVERLAY CONTROLS -->
+        <div class="map-bl frame-ctl chips">
+          <span class="chip" aria-pressed="true">Inertial</span>
+          <span class="chip" aria-pressed="false">Rotating</span>
+        </div>
+        <div class="map-br"><span>0</span><i></i><span>1 AU</span></div>
+
+      </div>
+    </section>
+
+    <!-- ---------- S2 TRAJECTORY ---------- -->
+    <section class="screen" id="traj">
+      <div class="screen-head">
+        <div><h1><span class="scode">S2</span> Trajectory &amp; Manoeuvre Planner</h1>
+          <div class="sub">EARTH → MARS · 2026 WINDOW · VEH CASTOR-1</div></div>
+        <div class="seg"><button aria-pressed="true">Porkchop</button>
+          <button aria-pressed="false">Node editor</button><button aria-pressed="false">LT arc</button></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 300px">
+        <div class="panel">
+          <div class="ph"><span class="code">PKC</span><h2>Porkchop — Δv Contour</h2>
+            <span class="right hint">PICK DEP/ARR</span><span class="led plot"></span></div>
+          <div class="pb">
+            <svg viewBox="0 0 560 322" width="100%" height="300" role="img" aria-label="Porkchop plot">
+              <rect x="46" y="10" width="494" height="268" fill="var(--inset)" stroke="var(--line)"/>
+              <g stroke="#16202c">
+                <line x1="46" y1="77" x2="540" y2="77"/><line x1="46" y1="144" x2="540" y2="144"/>
+                <line x1="46" y1="211" x2="540" y2="211"/>
+                <line x1="170" y1="10" x2="170" y2="278"/><line x1="294" y1="10" x2="294" y2="278"/>
+                <line x1="418" y1="10" x2="418" y2="278"/>
+              </g>
+              <g transform="rotate(-24 300 150)">
+                <ellipse cx="300" cy="150" rx="190" ry="92" fill="none" stroke="#243349" stroke-width="10"/>
+                <ellipse cx="300" cy="150" rx="150" ry="70" fill="none" stroke="#2e4d77" stroke-width="9"/>
+                <ellipse cx="300" cy="150" rx="112" ry="50" fill="none" stroke="#3a6cad" stroke-width="8"/>
+                <ellipse cx="300" cy="150" rx="74" ry="32" fill="none" stroke="#4d8fdb" stroke-width="7"/>
+                <ellipse cx="300" cy="150" rx="38" ry="16" fill="none" stroke="#5aa8ff" stroke-width="6"/>
+              </g>
+              <circle cx="300" cy="150" r="4" fill="#3ee0a0" stroke="#04140d"/>
+              <line x1="300" y1="10" x2="300" y2="278" stroke="#3ee0a0" stroke-dasharray="3 3" stroke-opacity=".5"/>
+              <line x1="46" y1="150" x2="540" y2="150" stroke="#3ee0a0" stroke-dasharray="3 3" stroke-opacity=".5"/>
+              <text class="mlabel" x="312" y="146" fill="#3ee0a0">OPT · 3.94 km/s</text>
+              <text class="mlabel" x="293" y="298" text-anchor="middle" fill="#8593a6">DEPARTURE 2026-10 → 2027-01</text>
+              <text class="mlabel" x="16" y="150" transform="rotate(-90 16 150)" text-anchor="middle" fill="#8593a6">ARRIVAL DATE</text>
+            </svg>
+          </div>
+        </div>
+        <div class="grid" style="align-content:start;gap:9px">
+          <div class="panel">
+            <div class="ph"><span class="code">DVB</span><h2>Δv Budget — Castor-1</h2><span class="right led go"></span></div>
+            <div class="pb">
+              <div class="dvbar">
+                <div class="seg-row"><span class="lab">LEO → C3 esc</span>
+                  <span class="track"><span class="fill" style="width:62%;background:#5aa8ff"></span></span><span class="amt">3.94</span></div>
+                <div class="seg-row"><span class="lab">Mid-course</span>
+                  <span class="track"><span class="fill" style="width:6%;background:#5fd2e0"></span></span><span class="amt">0.12</span></div>
+                <div class="seg-row"><span class="lab">Mars capture</span>
+                  <span class="track"><span class="fill" style="width:0%"></span></span><span class="amt">aero</span></div>
+                <div class="seg-row" style="margin-top:6px;border-top:1px solid var(--line);padding-top:7px">
+                  <span class="lab" style="color:var(--ink)">REQUIRED</span>
+                  <span class="track"><span class="fill" style="width:68%;background:#5aa8ff"></span></span><span class="amt">4.06</span></div>
+                <div class="seg-row"><span class="lab" style="color:var(--signal)">AVAILABLE</span>
+                  <span class="track"><span class="fill" style="width:94%;background:#3ee0a0"></span></span><span class="amt">5.62</span></div>
+              </div>
+              <div class="hint" style="margin-top:9px">MARGIN +1.56 km/s (38%)</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="ph"><span class="code">CMT</span><h2>Plan → Preview → Commit</h2></div>
+            <div class="pb">
+              <div class="kv">
+                <span class="kv-k">Departure</span><span class="kv-v">2026-11-21</span>
+                <span class="kv-k">Arrival</span><span class="kv-v">2027-07-27</span>
+                <span class="kv-k">TOF</span><span class="kv-v">248 d</span>
+                <span class="kv-k">Regime</span><span class="kv-v">LT spiral</span>
+                <span class="kv-k">Auto-pause</span><span class="kv-v">ON</span>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:13px">
+                <button class="btn ghost">Preview</button><button class="btn primary">Queue plan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- S3 R&D ---------- -->
+    <section class="screen" id="rnd">
+      <div class="screen-head">
+        <div><h1><span class="scode">S3</span> Research &amp; Development</h1>
+          <div class="sub">SCIENCE RAISES UNDERSTANDING · ENGINEERING MATURES IT VIA TRL</div></div>
+        <div class="seg"><button aria-pressed="true">Science</button>
+          <button aria-pressed="false">Engineering</button><button aria-pressed="false">Tech tree</button></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="panel">
+          <div class="ph"><span class="code">SCI</span><h2>Domain Understanding (UL 0–100)</h2><span class="right hint">GHOST = WORLD TIDE</span></div>
+          <div class="pb">
+            <div class="ul"><div class="ulhead"><b>Astrodynamics</b><span class="v">55</span></div>
+              <div class="track"><div class="fill" style="width:55%"></div><div class="tide" style="left:60%"></div></div></div>
+            <div class="ul"><div class="ulhead"><b>In-situ resource chemistry</b><span class="v">31</span></div>
+              <div class="track"><div class="fill" style="width:31%"></div><div class="tide" style="left:38%"></div></div></div>
+            <div class="ul"><div class="ulhead"><b>Closed-ecology life support</b><span class="v">22</span></div>
+              <div class="track"><div class="fill" style="width:22%"></div><div class="tide" style="left:29%"></div></div></div>
+            <div class="ul"><div class="ulhead"><b>Nuclear-electric power</b><span class="v">18</span></div>
+              <div class="track"><div class="fill" style="width:18%"></div><div class="tide" style="left:33%"></div></div></div>
+            <div class="ul"><div class="ulhead"><b>Radiation biology</b><span class="v">27</span></div>
+              <div class="track"><div class="fill" style="width:27%"></div><div class="tide" style="left:30%"></div></div></div>
+            <div class="hint">Nuclear-electric trails world tide by 15 — catch-up cheaper than the frontier.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="code">ENG</span><h2>Engineering Programs</h2><span class="right led warn"></span></div>
+          <table class="data">
+            <thead><tr><th>Program</th><th>TRL</th><th>P50/P80</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Hall thruster cluster (5 kW)</td><td class="num">6</td><td class="num">€42/61M</td><td><span class="tag go">on track</span></td></tr>
+              <tr><td class="name">Lunar polar water prospector</td><td class="num">4</td><td class="num">€88/130M</td><td><span class="tag warn">+1 review</span></td></tr>
+              <tr><td class="name">Regolith O₂ pilot</td><td class="num">3</td><td class="num">€61/99M</td><td><span class="tag alert">dead-end risk</span></td></tr>
+              <tr><td class="name">Aerocapture TPS (Mars)</td><td class="num">2</td><td class="num">€120/210M</td><td><span class="tag">study</span></td></tr>
+            </tbody>
+          </table>
+          <div class="pb" style="border-top:1px solid var(--line)">
+            <div class="lbl" style="margin-bottom:7px">TRL Ladder — Hall thruster cluster</div>
+            <div class="trl">
+              <span class="step done">1</span><span class="step done">2</span><span class="step done">3</span>
+              <span class="step done">4</span><span class="step done">5</span><span class="step cur">6</span>
+              <span class="step">7</span><span class="step">8</span><span class="step">9</span>
+            </div>
+            <div class="hint" style="margin-top:7px">Next gate TRL 7 — thermal-vacuum campaign (lead: Dr M. Brandt)</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- S4 VEHICLE ---------- -->
+    <section class="screen" id="vehicle">
+      <div class="screen-head">
+        <div><h1><span class="scode">S4</span> Vehicle Designer</h1>
+          <div class="sub">CASTOR-CLASS ELECTRIC TUG · REV C · EVERY FIGURE DERIVED FROM COMPONENTS</div></div>
+        <div class="seg"><button aria-pressed="true">Compose</button><button aria-pressed="false">Compare</button></div>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 322px">
+        <div class="panel">
+          <div class="ph"><span class="code">CMP</span><h2>Components (researched only)</h2>
+            <button class="right btn ghost" style="padding:2px 9px">+ Add</button></div>
+          <table class="data">
+            <thead><tr><th>Component</th><th>Tech</th><th>Mass</th><th>Note</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Structural bus</td><td>Al-Li frame</td><td class="num">640 kg</td><td>—</td></tr>
+              <tr><td class="name">Hall thruster ×4</td><td>5 kW, TRL 6</td><td class="num">96 kg</td><td>Isp 1800 s</td></tr>
+              <tr><td class="name">Solar array</td><td>40 kW GaAs</td><td class="num">310 kg</td><td>1 AU</td></tr>
+              <tr><td class="name">Xenon tank + feed</td><td>COPV</td><td class="num">1354 kg</td><td>1200 kg Xe</td></tr>
+              <tr><td class="name">Avionics + comms</td><td>X-band 65 W</td><td class="num">120 kg</td><td>—</td></tr>
+              <tr><td class="name">Payload adapter</td><td>ESPA-class</td><td class="num">80 kg</td><td>800 kg</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid" style="align-content:start;gap:9px">
+          <div class="panel">
+            <div class="ph"><span class="code">PRF</span><h2>Derived Performance</h2><span class="right led go"></span></div>
+            <div class="pb"><div class="kv">
+              <span class="kv-k">Wet mass m₀</span><span class="kv-v">4 400 kg</span>
+              <span class="kv-k">Dry mass m_f</span><span class="kv-v">3 200 kg</span>
+              <span class="kv-k">Propellant</span><span class="kv-v">1 200 kg Xe</span>
+              <span class="kv-k"><span class="trace" title="Δv = Isp·g₀·ln(m₀/m_f) = 1800·9.80665·ln(4400/3200)">Δv ⓘ</span></span><span class="kv-v" style="color:var(--signal)">5.62 km/s</span>
+              <span class="kv-k">Thrust (4×)</span><span class="kv-v">0.33 N</span>
+              <span class="kv-k">Power</span><span class="kv-v">38 / 40 kW</span>
+              <span class="kv-k">Thermal margin</span><span class="kv-v">+11%</span>
+              <span class="kv-k">Reliability</span><span class="kv-v">0.91</span>
+              <span class="kv-k">Unit cost P50</span><span class="kv-v">€71 M</span>
+            </div></div>
+          </div>
+          <div class="panel" style="border-color:rgba(255,193,77,.4)">
+            <div class="ph"><span class="code">FLG</span><h2 style="color:var(--warn)">Realism Flags</h2><span class="right led warn"></span></div>
+            <div class="pb">
+              <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px">
+                <span class="tag warn">T/W</span>
+                <span style="color:var(--ink-dim);font-size:11px">Accel 7.5×10⁻⁵ g — spiral transfer only, weeks of thrusting.</span></div>
+              <div style="display:flex;gap:8px;align-items:flex-start">
+                <span class="tag go">OK</span>
+                <span style="color:var(--ink-dim);font-size:11px">Power, thermal, reliability within plausible bounds.</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- S6 ECONOMY ---------- -->
+    <section class="screen" id="econ">
+      <div class="screen-head">
+        <div><h1><span class="scode">S6</span> Economy &amp; Contracts</h1>
+          <div class="sub">APPROPRIATION TRACKER · RESOURCES ADDRESSED BY LOCATION (Δv)</div></div>
+        <div class="seg"><button aria-pressed="true">Ledger</button>
+          <button aria-pressed="false">Contracts</button><button aria-pressed="false">Facilities</button></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="panel">
+          <div class="ph"><span class="code">LDG</span><h2>Resource Ledger — by Location</h2></div>
+          <table class="data">
+            <thead><tr><th>Location</th><th>Δv from LEO</th><th>Commodity</th><th>Qty</th></tr></thead>
+            <tbody>
+              <tr><td class="name">LEO depot</td><td class="num">0 km/s</td><td>LOX/LH₂</td><td class="num">0.0 t</td></tr>
+              <tr><td class="name">EML-1 node</td><td class="num">3.77 km/s</td><td>—</td><td class="num">planned</td></tr>
+              <tr><td class="name">Lunar S. Pole</td><td class="num">5.93 km/s</td><td>H₂O in situ</td><td class="num">survey</td></tr>
+              <tr><td class="name">2024 PT5</td><td class="num">4.10 km/s</td><td>volatiles</td><td class="num">unknown</td></tr>
+              <tr><td class="name">Mars (Jezero)</td><td class="num">~6.0 km/s</td><td>CO₂ feed</td><td class="num">abundant</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="grid" style="align-content:start;gap:9px">
+          <div class="panel">
+            <div class="ph"><span class="code">FY26</span><h2>Appropriation FY2026</h2><span class="right led warn"></span></div>
+            <div class="pb"><div class="kv">
+              <span class="kv-k">Annual budget</span><span class="kv-v">€7.94 bn</span>
+              <span class="kv-k">Committed</span><span class="kv-v">€5.10 bn</span>
+              <span class="kv-k">Directed (geo-ret)</span><span class="kv-v">€2.21 bn</span>
+              <span class="kv-k">Discretionary</span><span class="kv-v" style="color:var(--signal)">€0.63 bn</span>
+              <span class="kv-k">Next vote</span><span class="kv-v" style="color:var(--warn)">2026-11</span>
+            </div></div>
+          </div>
+          <div class="panel">
+            <div class="ph"><span class="code">RFP</span><h2>Open Contracts / RFP Board</h2></div>
+            <table class="data">
+              <thead><tr><th>Contract</th><th>Type</th><th style="text-align:right">Value</th></tr></thead>
+              <tbody>
+                <tr><td class="name">LEO cargo · 8 t</td><td>service bid</td><td class="num">€96 M</td></tr>
+                <tr><td class="name">Lunar relay smallsat</td><td>RFP open</td><td class="num">€140 M</td></tr>
+                <tr><td class="name">ISS resupply slot</td><td>partnership</td><td class="num">barter</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- S5 FLEET ---------- -->
+    <section class="screen" id="fleet">
+      <div class="screen-head">
+        <div><h1><span class="scode">S5</span> Operations / Fleet</h1>
+          <div class="sub">ALL ASSETS · STATUS · TASK · DOSE &amp; OPS LOAD</div></div>
+        <div class="seg"><button aria-pressed="true">All</button><button aria-pressed="false">Crewed</button>
+          <button aria-pressed="false">Robotic</button></div>
+      </div>
+      <div class="panel">
+        <div class="ph"><span class="code">FLT</span><h2>Asset Register</h2><span class="right hint">05 ACTIVE</span></div>
+        <table class="data">
+          <thead><tr><th>Asset</th><th>Class</th><th>Location</th><th>Task</th><th>Prop</th><th>Health</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Castor-1</td><td>Electric tug</td><td>LEO → esc</td><td>Mars spiral</td><td class="num">71%</td><td class="num">0.98</td><td><span class="stat cruise">CRUISE</span></td></tr>
+            <tr><td class="name">ISS (Columbus)</td><td>Station seg</td><td>LEO 51.6°</td><td>μg ops</td><td class="num">n/a</td><td class="num">0.94</td><td><span class="stat ok">NOMINAL</span></td></tr>
+            <tr><td class="name">Lumen-A</td><td>Lunar probe</td><td>LEO park</td><td>Await TLI</td><td class="num">100%</td><td class="num">1.00</td><td><span class="stat hold">HOLD</span></td></tr>
+            <tr><td class="name">Sentinel-7</td><td>EO sat</td><td>SSO 690 km</td><td>Earth obs</td><td class="num">88%</td><td class="num">0.97</td><td><span class="stat ok">NOMINAL</span></td></tr>
+            <tr><td class="name">DSN · Cebreros</td><td>Ground seg</td><td>Earth</td><td>Castor-1 TLM</td><td class="num">—</td><td class="num">—</td><td><span class="stat fault">CONTENDED</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- S7 BASES ---------- -->
+    <section class="screen" id="bases">
+      <div class="screen-head">
+        <div><h1><span class="scode">S7</span> Bases &amp; Construction</h1>
+          <div class="sub">CONCEPT: SHACKLETON ISRU OUTPOST · EMERGENT PROPERTIES FROM MODULES</div></div>
+        <div class="seg"><button aria-pressed="true">Schematic</button><button aria-pressed="false">Sites</button>
+          <button aria-pressed="false">Build queue</button></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="panel">
+          <div class="ph"><span class="code">MOD</span><h2>Module Layout (concept)</h2><span class="right"><span class="tag warn">not sited</span></span></div>
+          <div class="pb"><div class="schematic">
+            <div class="mod pwr"><b>Fission 100 kWe</b><span class="mono">TRL 4</span></div>
+            <div class="mod hab"><b>Hab ×2</b><span class="mono">4 crew</span></div>
+            <div class="mod eclss"><b>ECLSS</b><span class="mono">78% closed</span></div>
+            <div class="mod isru"><b>Water ISRU</b><span class="mono">pilot</span></div>
+            <div class="mod"><b>Shield</b><span class="mono">regolith</span></div>
+            <div class="mod"><b>Logistics</b><span class="mono">2 berths</span></div>
+            <div class="mod isru"><b>O₂ plant</b><span class="mono">study</span></div>
+            <div class="mod"><b>Science</b><span class="mono">drill</span></div>
+          </div></div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="code">EMG</span><h2>Emergent Properties</h2><span class="right led alert"></span></div>
+          <div class="pb">
+            <div class="gauges">
+              <div class="gauge"><div class="g-lab">Power margin</div><div class="g-val" style="color:var(--warn)">+6%</div>
+                <div class="g-bar"><i style="width:53%;background:var(--warn)"></i></div></div>
+              <div class="gauge"><div class="g-lab">ECLSS closure</div><div class="g-val" style="color:var(--plot)">78%</div>
+                <div class="g-bar"><i style="width:78%;background:var(--plot)"></i></div></div>
+              <div class="gauge"><div class="g-lab">Sustainability</div><div class="g-val" style="color:var(--alert)">0.32</div>
+                <div class="g-bar"><i style="width:32%;background:var(--alert)"></i></div></div>
+            </div>
+            <div class="hint" style="margin-top:11px">Import-bound: every 30 d needs 2.4 t resupply until O₂ ISRU reaches TRL 6.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- S10 ASTROBIOLOGY ---------- -->
+    <section class="screen" id="astro">
+      <div class="screen-head">
+        <div><h1><span class="scode">S10</span> Science Returns &amp; Astrobiology</h1>
+          <div class="sub">EVIDENCE ACCRUES IN STAGES — NO SINGLE "LIFE FOUND" MOMENT</div></div>
+        <div class="seg"><button aria-pressed="true">Evidence</button><button aria-pressed="false">Belief-state</button>
+          <button aria-pressed="false">Discoveries</button></div>
+      </div>
+      <div class="grid cols-2">
+        <div class="panel">
+          <div class="ph"><span class="code">EVD</span><h2>Candidate Worlds</h2><span class="right led plot"></span></div>
+          <div class="pb">
+            <div class="evi">
+              <div class="ehead"><b>Mars — subsurface (Jezero)</b><span class="p">P(life) 0.06</span></div>
+              <div class="stages">
+                <div class="st active"><div class="bar"><i style="width:80%"></i></div><small>Habitab</small></div>
+                <div class="st active"><div class="bar"><i style="width:35%"></i></div><small>Biosig</small></div>
+                <div class="st"><div class="bar"><i style="width:0%"></i></div><small>Corrob</small></div>
+                <div class="st"><div class="bar"><i style="width:0%"></i></div><small>Consensus</small></div>
+              </div>
+            </div>
+            <div class="evi">
+              <div class="ehead"><b>Enceladus — plume</b><span class="p">P(life) 0.11</span></div>
+              <div class="stages">
+                <div class="st active"><div class="bar"><i style="width:65%"></i></div><small>Habitab</small></div>
+                <div class="st"><div class="bar"><i style="width:12%"></i></div><small>Biosig</small></div>
+                <div class="st"><div class="bar"><i style="width:0%"></i></div><small>Corrob</small></div>
+                <div class="st"><div class="bar"><i style="width:0%"></i></div><small>Consensus</small></div>
+              </div>
+            </div>
+            <div class="hint">Abiotic explanations remain competitive. Confidence rises only with independent measurements.</div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="ph"><span class="code">DAT</span><h2>Incoming Data</h2></div>
+          <table class="data">
+            <thead><tr><th>Source</th><th>Instrument</th><th style="text-align:right">Geo UL Δ</th></tr></thead>
+            <tbody>
+              <tr><td class="name">Sentinel-7</td><td>multispectral</td><td class="num">+0.3/wk</td></tr>
+              <tr><td class="name">Lumen-A (queued)</td><td>neutron spec</td><td class="num">pending</td></tr>
+              <tr><td class="name">2024 PT5 survey</td><td>radar / IR</td><td class="num">+1.1/wk</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- Stubs ---------- -->
+    <section class="screen" id="people"><div class="screen-head"><div>
+      <h1><span class="scode">S8</span> Personnel</h1>
+      <div class="sub">SCIENTISTS · ENGINEERS · PMs · ASTRONAUTS · CONTROLLERS · DIPLOMATS</div></div></div>
+      <div class="stub"><div class="big">S8 // PERSONNEL POOLS, TRAITS &amp; CREW PIPELINE</div>
+        <div class="hint">Recruitment / training / poaching · morale &amp; retention · radiation-dose careers.<br>Reuses the same instrument panels, tables and trait tags.</div></div></section>
+
+    <section class="screen" id="world"><div class="screen-head"><div>
+      <h1><span class="scode">S9</span> World / Politics</h1>
+      <div class="sub">RELATIONSHIPS · MOOD · POLICY · THE MILESTONE RACE</div></div></div>
+      <div class="grid cols-2">
+        <div class="panel"><div class="ph"><span class="code">RAC</span><h2>Milestone Race — selected firsts</h2></div>
+          <table class="data"><thead><tr><th>First</th><th>Holder</th><th style="text-align:right">Status</th></tr></thead>
+          <tbody>
+            <tr><td class="name">Crewed lunar return</td><td>NASA</td><td class="num"><span class="tag">claimed</span></td></tr>
+            <tr><td class="name">Lunar ISRU water</td><td>—</td><td class="num"><span class="tag warn">contested</span></td></tr>
+            <tr><td class="name">Sample-return from NEA</td><td>JAXA</td><td class="num"><span class="tag">claimed</span></td></tr>
+            <tr><td class="name">First Mars cargo landing</td><td>—</td><td class="num"><span class="tag go">open</span></td></tr>
+          </tbody></table></div>
+        <div class="panel"><div class="ph"><span class="code">MOD</span><h2>Public &amp; Political Mood</h2><span class="right led go"></span></div>
+          <div class="pb"><div class="kv">
+            <span class="kv-k">Approval (members)</span><span class="kv-v" style="color:var(--signal)">+18</span>
+            <span class="kv-k">Press sentiment</span><span class="kv-v">neutral</span>
+            <span class="kv-k">Nuclear-launch lic</span><span class="kv-v" style="color:var(--warn)">in review</span>
+            <span class="kv-k">PP stringency</span><span class="kv-v">COSPAR strict</span>
+          </div></div></div>
+      </div></section>
+
+    <section class="screen" id="journal"><div class="screen-head"><div>
+      <h1><span class="scode">S11</span> Sojournal</h1>
+      <div class="sub">SEARCHABLE · CROSS-LINKED · SOURCE-CITED ENCYCLOPEDIA &amp; SOFT TUTORIAL</div></div></div>
+      <div class="stub"><div class="big">S11 // EVERY ENTITY LINKS TO A SOURCED ENTRY</div>
+        <div class="hint">"Why is this Δv 5.62 km/s?" → the rocket equation, with citations.<br>The educational-honesty layer; always a hover away.</div></div></section>
+
+    <section class="screen" id="alerts"><div class="screen-head"><div>
+      <h1><span class="scode">S12</span> Alerts / Event Log</h1>
+      <div class="sub">CHRONOLOGICAL · FILTERABLE · CONFIGURE WHICH CLASSES PAUSE THE GAME</div></div></div>
+      <div class="panel"><div class="ph"><span class="code">LOG</span><h2>Full Feed</h2>
+        <span class="right chips"><span class="chip" aria-pressed="true">All</span><span class="chip" aria-pressed="false">Pausing only</span></span></div>
+        <table class="data"><thead><tr><th>Time</th><th>Class</th><th>Event</th><th style="text-align:right">Pause</th></tr></thead>
+        <tbody>
+          <tr><td class="num">T+71d 06:12</td><td><span class="cls nav">NAV</span></td><td>Castor-1 reached escape C3; spiral nominal</td><td class="num"><span class="pausetag">⏸ node</span></td></tr>
+          <tr><td class="num">T+69d 18:40</td><td><span class="cls sci">SCI</span></td><td>Enceladus habitability index revised upward</td><td class="num">—</td></tr>
+          <tr><td class="num">T+66d 09:05</td><td><span class="cls eco">ECO</span></td><td>Lunar relay RFP opened — bid by 2026-05-01</td><td class="num"><span class="pausetag">⏸ vote</span></td></tr>
+          <tr><td class="num">T+64d 11:20</td><td><span class="cls pol">POL</span></td><td>Nuclear-launch licence entered review</td><td class="num">—</td></tr>
+        </tbody></table></div></section>
+
+  </main>
+
+  <!-- ===================== INSPECTOR ===================== -->
+  <aside class="insp" aria-label="Inspector">
+    <div class="ihead"><h3>Castor-1</h3><span class="pin">PINNED</span></div>
+    <div class="obj-type">ELECTRIC TUG · REV C</div>
+
+    <div class="sec lbl">State vector</div>
+    <div class="kv">
+      <span class="kv-k">Frame</span><span class="kv-v">heliocentric</span>
+      <span class="kv-k">Regime</span><span class="kv-v">LT spiral</span>
+      <span class="kv-k">Accel</span><span class="kv-v">7.5×10⁻⁵ g</span>
+      <span class="kv-k">Δv left</span><span class="kv-v" style="color:var(--signal)">1.68 km/s</span>
+      <span class="kv-k">Xenon</span><span class="kv-v">852 kg</span>
+      <span class="kv-k">Comms</span><span class="kv-v">Cebreros · 14.2 min</span>
+    </div>
+
+    <div class="sec lbl">Crew</div>
+    <div class="hint">Uncrewed — robotic mission (lower difficulty multiplier).</div>
+
+    <div class="sec lbl">Context actions</div>
+    <div class="actions">
+      <button class="btn ghost">Plan transfer…</button>
+      <button class="btn ghost">Open in designer</button>
+      <button class="btn ghost">Assign standing order</button>
+      <button class="btn ghost">Show in Sojournal</button>
+    </div>
+  </aside>
+
+  <!-- ===================== EVENT LOG ===================== -->
+  <footer class="log">
+    <div class="lh">
+      <span class="lbl">Event Log</span>
+      <span class="chips">
+        <span class="chip" aria-pressed="true">All</span><span class="chip" aria-pressed="false">NAV</span>
+        <span class="chip" aria-pressed="false">SCI</span><span class="chip" aria-pressed="false">ECO</span>
+        <span class="chip" aria-pressed="false">POL</span>
+      </span>
+      <span class="hint">⏸ = pauses the game (configurable)</span>
+    </div>
+    <div class="feed">
+      <div class="logrow"><span class="t">T+71d 06:12:08</span><span class="cls nav">NAV</span>
+        <span class="msg"><b>Castor-1</b> reached escape C3; low-thrust spiral nominal, margin +38%</span>
+        <span class="pausetag">⏸ node</span></div>
+      <div class="logrow"><span class="t">T+69d 18:40:51</span><span class="cls sci">SCI</span>
+        <span class="msg">Enceladus plume reanalysis: habitability index revised upward (abiotic still competitive)</span><span></span></div>
+      <div class="logrow"><span class="t">T+66d 09:05:33</span><span class="cls eco">ECO</span>
+        <span class="msg"><b>Lunar relay smallsat</b> RFP opened — service bid window closes 2026-05-01</span>
+        <span class="pausetag">⏸ vote</span></div>
+      <div class="logrow"><span class="t">T+64d 11:20:02</span><span class="cls pol">POL</span>
+        <span class="msg">Member-state council placed <b>nuclear-launch licence</b> under review</span><span></span></div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  /* Presentation-only behaviour. No game logic. */
+  const items=document.querySelectorAll('.navitem');
+  const screens=document.querySelectorAll('.screen');
+  items.forEach(btn=>btn.addEventListener('click',()=>{
+    items.forEach(b=>b.setAttribute('aria-current','false'));
+    btn.setAttribute('aria-current','true');
+    const id=btn.dataset.screen;
+    screens.forEach(s=>s.classList.toggle('active',s.id===id));
+    document.querySelector('.main').scrollTo(0,0);
+  }));
+
+  function exclusive(sel){document.querySelectorAll(sel).forEach(g=>g.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b||!g.contains(b))return;
+    g.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');}));}
+  exclusive('.seg');
+
+  document.querySelectorAll('.chips,.frame-ctl').forEach(g=>g.addEventListener('click',e=>{
+    const c=e.target.closest('.chip'); if(!c)return;
+    c.setAttribute('aria-pressed',c.getAttribute('aria-pressed')==='true'?'false':'true');}));
+
+  // Time-warp + run-state indicator
+  const warp=document.querySelector('.warp');
+  const runLed=document.querySelector('.runstate .led');
+  const runLabel=document.getElementById('runlabel');
+  const runBox=document.querySelector('.runstate');
+  function setRun(paused){
+    runLabel.textContent=paused?'PAUSED':'RUNNING';
+    runLed.className='led '+(paused?'warn':'go');
+    runBox.style.color=paused?'var(--warn)':'var(--signal)';
+    runBox.style.borderColor=paused?'rgba(255,193,77,.35)':'rgba(62,224,160,.35)';
+    runBox.style.background=paused?'rgba(255,193,77,.06)':'rgba(62,224,160,.06)';
+  }
+  warp.addEventListener('click',e=>{
+    const b=e.target.closest('button'); if(!b)return;
+    warp.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    setRun(b.classList.contains('pause'));
+  });
+  document.addEventListener('keydown',e=>{
+    if(e.key===' '){const p=warp.querySelector('.pause');
+      warp.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+      p.setAttribute('aria-pressed','true'); setRun(true); e.preventDefault();}
+  });
+</script>
+</body>
+</html>

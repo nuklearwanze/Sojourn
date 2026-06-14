@@ -5,6 +5,8 @@
 /// A physical quantity kind, used to pick the SI unit + scaling.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Quantity {
+    /// Length / distance (m, km).
+    Length,
     /// Velocity / Δv (m/s, km/s).
     Velocity,
     /// Mass (kg, t).
@@ -37,6 +39,13 @@ pub fn format(q: Quantity, si_value: f64) -> String {
     let v = si_value;
     let a = v.abs();
     match q {
+        Quantity::Length => {
+            if a >= 1000.0 {
+                format!("{} km", round3(v / 1000.0))
+            } else {
+                format!("{} m", round3(v))
+            }
+        }
         Quantity::Velocity => {
             if a >= 1000.0 {
                 format!("{} km/s", round3(v / 1000.0))

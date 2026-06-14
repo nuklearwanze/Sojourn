@@ -73,8 +73,8 @@ query surface (R15).
 ### Implementation for User Story 1
 
 - [x] T019 [US1] Implement `viewmodel/map.rs` and `viewmodel/shell.rs` in `crates/sojourn-ui/src/viewmodel/` (data-model §5): pure builders mapping the astro/world/ops snapshots + `UiState` to `MapVM`/`ShellVM`.
-- [ ] T020 [US1] Implement `crates/sojourn-ui-desktop/src/screens/map.rs`: the custom map painter (logarithmic zoom, heliocentric↔planetocentric↔local-ops, toggleable layers, inertial/rotating frame, click→inspector, right-click context verbs).
-- [ ] T021 [US1] Wire the time-warp/pause controls, the inspector pin, and the **UI-ephemeral** focus/zoom/layer/screen state into `shell.rs`/`app.rs` (FR-UI-105/106/1505).
+- [x] T020 [US1] Implement `crates/sojourn-ui-desktop/src/screens/map.rs`: the custom map painter (logarithmic zoom, heliocentric↔planetocentric↔local-ops, toggleable layers, inertial/rotating frame, click→inspector, right-click context verbs).
+- [x] T021 [US1] Wire the time-warp/pause controls, the inspector pin, and the **UI-ephemeral** focus/zoom/layer/screen state into `shell.rs`/`app.rs` (FR-UI-105/106/1505).
 
 **Checkpoint**: a legible, navigable, pausable window into a live game — MVP.
 
@@ -336,8 +336,14 @@ finished here**. 35 of 76 tasks are done.
   honesty guard**, and the end-to-end **host** test that builds the real nine-module core) — **no
   renderer**, proving the decoupling (FR-UI-1506, SC-004).
 - **`sojourn-ui-desktop`** — the egui/eframe shell **compiles and runs** (top bar with date + time-warp/
-  pause, left nav, event ticker, and a working Map / Operations / Astrobiology / Alerts screen set
-  rendering the view-model live from the core).
+  pause, left nav, event ticker, and a working screen set rendering the view-model live from the core).
+- **Pass 2 — the System Map (the hero screen) is fully wired** (T020/T021): real heliocentric body
+  positions pulled from the **FA-02 astro surface** (the first R15 read-gap closure — `UiHost::map_bodies`
+  via `AstroSnapshot` + railed ephemerides), a custom 2D painter with **logarithmic zoom + pan**,
+  **level-of-detail** labelling through the tested `vm::map` seam, and **click-to-inspect** (a pinned
+  inspector showing SI radius + heliocentric distance); UI-ephemeral state stays off the deterministic
+  save. A host integration test asserts the map reads real bodies (Sun at origin + planets at real
+  distances).
 - The **architecture audit holds**: `cargo tree -p sojourn-core` is presentation-free (no egui/winit/wgpu
   in the core tree, SC-010); clippy + fmt clean; FA-01…09 suites stay green. CI wired (UI build + the
   view-model tests; the **determinism + core-audit jobs untouched**).

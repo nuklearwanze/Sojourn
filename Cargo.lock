@@ -3518,6 +3518,7 @@ dependencies = [
  "eframe",
  "egui",
  "egui_extras",
+ "libm",
  "sojourn-ui",
 ]
 
