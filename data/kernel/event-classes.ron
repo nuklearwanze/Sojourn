@@ -43,5 +43,11 @@
         (id: "isru-online",        default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-503 (plant reaches production)"),
         (id: "market-shock",       default_pause: Interrupt, source: "specs/007-economy-logistics FR-EC-601 (launch-price shock)"),
         (id: "ops-oversubscribed", default_pause: LogOnly,   source: "specs/007-economy-logistics FR-EC-206 (ops/comms pool exceeded)"),
+        // FA-07 bases & construction classes (specs/008-bases-construction contracts/base-commands.md)
+        (id: "module-commissioned",  default_pause: LogOnly,   source: "specs/008-bases-construction FR-BC-201 (module operational)"),
+        (id: "base-operational",     default_pause: LogOnly,   source: "specs/008-bases-construction FR-BC-201 (all modules commissioned)"),
+        (id: "pp-violation",         default_pause: Interrupt, source: "specs/008-bases-construction FR-BC-301 (planetary-protection violation)"),
+        (id: "embargo-result",       default_pause: LogOnly,   source: "specs/008-bases-construction FR-BC-502 (embargo stress test)"),
+        (id: "settlement-milestone", default_pause: Interrupt, source: "specs/008-bases-construction FR-BC-601 (settlement milestone, e.g. embargo-survivor)"),
     ],
 )

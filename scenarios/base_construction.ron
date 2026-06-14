@@ -1,0 +1,28 @@
+// FA-07 base scenario: found a surface base, add modules, open construction,
+// deliver/commission (incl. one regolith-built locally), and evaluate an embargo
+// stress test. Exercises the base composition, construction commissioning and the
+// settlement-milestone path for the double-run determinism + save/load gates.
+(
+    name: "base-construction",
+    seed: 7,
+    horizon_years: 100,
+    run_mode: SaveAnywhere,
+    synthetic: None,
+    base: true,
+    commands: [
+        (tick: 0, base: Some(FoundBase(faction: 0, site: "luna-shackleton", class: "surface-base"))),
+        (tick: 0, base: Some(AddModule(base: 0, module_type: "pwr-fission"))),
+        (tick: 0, base: Some(AddModule(base: 0, module_type: "hab-rigid"))),
+        (tick: 0, base: Some(AddModule(base: 0, module_type: "eclss-highclosure"))),
+        (tick: 0, base: Some(AddModule(base: 0, module_type: "shield-regolith"))),
+        (tick: 100, base: Some(OpenConstruction(base: 0))),
+        (tick: 200, base: Some(DeliverToBase(base: 0, module: 0, mass_kg: 10000000.0, crew_time_hr: 1000000.0))),
+        (tick: 300, base: Some(DeliverToBase(base: 0, module: 1, mass_kg: 10000000.0, crew_time_hr: 1000000.0))),
+        (tick: 400, base: Some(DeliverToBase(base: 0, module: 2, mass_kg: 10000000.0, crew_time_hr: 1000000.0))),
+        (tick: 500, base: Some(BuildLocal(base: 0, module: 3, local_mass_kg: 10000000.0))),
+        (tick: 600, base: Some(DeliverToBase(base: 0, module: 3, mass_kg: 0.0, crew_time_hr: 1000000.0))),
+        (tick: 700, base: Some(EvaluateEmbargo(base: 0, years: 5.0, survives: true))),
+    ],
+    checkpoints: [100, 700, 100000],
+    until_tick: 100000,
+)

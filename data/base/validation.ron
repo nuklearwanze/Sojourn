@@ -1,0 +1,13 @@
+// Analytic validation cases for `validate-data base` (contracts/base-data.md). The
+// harness checks power-margin additivity, shielding exp-attenuation (per material),
+// the limiting-factor index, and the embargo rate+buffer survival.
+(
+    shielding_case: (
+        material: "regolith",
+        areal_density_kg_m2: 700.0,
+        // exp(-700/700) = exp(-1) ≈ 0.3679; doubling ρx → exp(-2) ≈ 0.1353 = square.
+        expected_attenuation: 0.36787944117,
+        tolerance: 1e-6,
+    ),
+    source: "FA-07 analytic validation cases (specs/008-bases-construction/contracts/base-data.md)",
+)

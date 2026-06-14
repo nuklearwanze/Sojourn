@@ -1,0 +1,14 @@
+// FA-07 base-class templates (FR-BC-101). All archetypes are composed from the
+// same module catalogue; the template flags which checks apply.
+(
+    classes: [
+        (id: "orbital-station", orbital: true, crewed: true,
+         source: "design/03-ECONOMY.md §7 (LEO/cislunar commercial station)"),
+        (id: "surface-base", orbital: false, crewed: true,
+         source: "design/03-ECONOMY.md §8 (surface base from modules)"),
+        (id: "settlement", orbital: false, crewed: true,
+         source: "design/00-OVERVIEW.md §9 Homestead (self-sufficient settlement)"),
+        (id: "robotic-outpost", orbital: false, crewed: false,
+         source: "design/03-ECONOMY.md §8 (uncrewed ISRU/relay outpost)"),
+    ],
+)

@@ -1,0 +1,68 @@
+// FA-07 base module catalogue (FR-BC-101/107). Each module is typed by its
+// class-specific params and references the FA-05 technology that researches it.
+// Sourced real-hardware-class values; base properties emerge from these (II).
+(
+    modules: [
+        // --- habitat / accommodation ---
+        (id: "hab-inflatable", tech: "D3", dry_mass_kg: 16000.0, power_demand_w: 3000.0,
+         params: Habitat(crew_accommodation: 6, pressurized_volume_m3: 330.0),
+         source: "BEAM/B330-class expandable habitat (design/02-TECH-TREE.md D3)"),
+        (id: "hab-rigid", tech: "I11", dry_mass_kg: 12000.0, power_demand_w: 2500.0,
+         params: Habitat(crew_accommodation: 4, pressurized_volume_m3: 100.0),
+         source: "ISS-module-class rigid habitat (design/02-TECH-TREE.md I10/I11)"),
+
+        // --- power ---
+        (id: "pwr-solar", tech: "C1", dry_mass_kg: 1000.0, power_demand_w: 0.0,
+         params: Power(gen_w: 30000.0, solar: true),
+         source: "ROSA-class roll-out solar array ~30 kW at 1 AU (design/02-TECH-TREE.md C1)"),
+        (id: "pwr-fission", tech: "C3", dry_mass_kg: 1500.0, power_demand_w: 0.0,
+         params: Power(gen_w: 40000.0, solar: false),
+         source: "surface fission ~40 kWe through lunar night (design/02-TECH-TREE.md B4.1/C3)"),
+
+        // --- ECLSS ---
+        (id: "eclss-physchem", tech: "F2", dry_mass_kg: 4000.0, power_demand_w: 4000.0,
+         params: Eclss(closure_fraction: 0.9, per_crew_day_kg: 5.0, crew_support: 6),
+         source: "ISS-derived physico-chemical ECLSS ~90% water/air closure (design/02-TECH-TREE.md F2)"),
+        (id: "eclss-highclosure", tech: "F3", dry_mass_kg: 6000.0, power_demand_w: 6000.0,
+         params: Eclss(closure_fraction: 0.98, per_crew_day_kg: 5.0, crew_support: 6),
+         source: "high-closure ECLSS ≥98% for long Mars stays (design/02-TECH-TREE.md F3)"),
+
+        // --- greenhouse / food (the food self-sufficiency loop, G1) ---
+        (id: "greenhouse", tech: "F4", dry_mass_kg: 5000.0, power_demand_w: 8000.0,
+         params: Greenhouse(food_kg_per_day: 8.0, crew_fed: 6, power_demand_w: 8000.0),
+         source: "bioregenerative salad-machine → partial food production (design/02-TECH-TREE.md F4)"),
+
+        // --- ISRU host / manufacturing ---
+        (id: "isru-host", tech: "G3", dry_mass_kg: 3000.0, power_demand_w: 10000.0,
+         params: IsruHost(process_ref: "regolith-oxygen"),
+         source: "regolith oxygen/metals ISRU plant host (design/02-TECH-TREE.md G3)"),
+        (id: "fab-shop", tech: "D5", dry_mass_kg: 2500.0, power_demand_w: 5000.0,
+         params: Manufacturing(output_commodity: "spares", rate_kg_per_day: 5.0),
+         source: "in-space additive manufacturing of spares (design/02-TECH-TREE.md D5)"),
+        (id: "metal-fab", tech: "G6", dry_mass_kg: 4000.0, power_demand_w: 12000.0,
+         params: Manufacturing(output_commodity: "materials", rate_kg_per_day: 20.0),
+         source: "regolith → structural metals refining (design/02-TECH-TREE.md G6)"),
+
+        // --- science / storage ---
+        (id: "sci-lab", tech: "J2", dry_mass_kg: 2000.0, power_demand_w: 1500.0,
+         params: Science(data_rate: 1000.0),
+         source: "in-situ geochem/mineralogy lab (design/02-TECH-TREE.md J2)"),
+        (id: "store-consumables", tech: "I11", dry_mass_kg: 1500.0, power_demand_w: 200.0,
+         params: Storage(commodity: "consumables", buffer_capacity_kg: 20000.0),
+         source: "pressurised logistics/storage module (design/02-TECH-TREE.md I2/I11)"),
+        (id: "store-food", tech: "I11", dry_mass_kg: 1200.0, power_demand_w: 200.0,
+         params: Storage(commodity: "food", buffer_capacity_kg: 15000.0),
+         source: "food storage module (design/02-TECH-TREE.md I11)"),
+
+        // --- shielding ---
+        (id: "shield-regolith", tech: "D6", dry_mass_kg: 500.0, power_demand_w: 0.0,
+         params: Shielding(material: "regolith", areal_density_kg_m2: 1000.0),
+         source: "regolith-sintered shielding ~1000 kg/m² (design/02-TECH-TREE.md D4/D6)"),
+        (id: "shield-water", tech: "D4", dry_mass_kg: 3000.0, power_demand_w: 0.0,
+         params: Shielding(material: "water", areal_density_kg_m2: 300.0),
+         source: "water-wall shielding (design/02-TECH-TREE.md D4)"),
+        (id: "shield-poly", tech: "D4", dry_mass_kg: 800.0, power_demand_w: 0.0,
+         params: Shielding(material: "polyethylene", areal_density_kg_m2: 100.0),
+         source: "polyethylene radiation shielding (design/02-TECH-TREE.md D4)"),
+    ],
+)

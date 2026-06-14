@@ -1,0 +1,19 @@
+[package]
+name = "sojourn-base"
+description = "Sojourn bases & construction (FA-07): orbital stations and surface bases composed from modules with physics-derived emergent properties (power margin, ECLSS closure, population, mass-attenuation shielding, limiting-factor self-sufficiency, embargo), built by logistics-routed construction projects. SimModule on the sojourn-core kernel; cross-slice physics flows in as composed values (dep core only)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+sojourn-core = { path = "../sojourn-core" }
+blake3 = { workspace = true }
+serde = { workspace = true }
+postcard = { workspace = true }
+libm = { workspace = true }
+ron = { workspace = true }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

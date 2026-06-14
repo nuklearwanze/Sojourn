@@ -38,6 +38,9 @@ pub struct TimedCommand {
     /// An economy command (wrapped into `Command::ModulePayload` at submit).
     #[serde(default)]
     pub economy: Option<sojourn_economy::EconomyCommand>,
+    /// A base command (wrapped into `Command::ModulePayload` at submit).
+    #[serde(default)]
+    pub base: Option<sojourn_base::BaseCommand>,
 }
 
 impl TimedCommand {
@@ -50,15 +53,23 @@ impl TimedCommand {
             &self.research,
             &self.vehicle,
             &self.economy,
+            &self.base,
         ) {
-            (Some(c), None, None, None, None, None) => Ok(c.clone()),
-            (None, Some(a), None, None, None, None) => Ok(sojourn_astro::astro_payload(a)),
-            (None, None, Some(w), None, None, None) => Ok(sojourn_world::world_payload(w)),
-            (None, None, None, Some(r), None, None) => Ok(sojourn_research::research_payload(r)),
-            (None, None, None, None, Some(v), None) => Ok(sojourn_vehicle::vehicle_payload(v)),
-            (None, None, None, None, None, Some(e)) => Ok(sojourn_economy::economy_payload(e)),
+            (Some(c), None, None, None, None, None, None) => Ok(c.clone()),
+            (None, Some(a), None, None, None, None, None) => Ok(sojourn_astro::astro_payload(a)),
+            (None, None, Some(w), None, None, None, None) => Ok(sojourn_world::world_payload(w)),
+            (None, None, None, Some(r), None, None, None) => {
+                Ok(sojourn_research::research_payload(r))
+            }
+            (None, None, None, None, Some(v), None, None) => {
+                Ok(sojourn_vehicle::vehicle_payload(v))
+            }
+            (None, None, None, None, None, Some(e), None) => {
+                Ok(sojourn_economy::economy_payload(e))
+            }
+            (None, None, None, None, None, None, Some(b)) => Ok(sojourn_base::base_payload(b)),
             _ => bail!(
-                "each scenario command needs exactly one of `command`, `astro`, `world`, `research`, `vehicle` or `economy`"
+                "each scenario command needs exactly one of `command`, `astro`, `world`, `research`, `vehicle`, `economy` or `base`"
             ),
         }
     }
@@ -97,6 +108,9 @@ pub struct Scenario {
     /// Install the FA-06 economy module (loads `data/econ`).
     #[serde(default)]
     pub economy: bool,
+    /// Install the FA-07 base module (loads `data/base`).
+    #[serde(default)]
+    pub base: bool,
     /// Scripted commands (sorted by tick; ties in listed order).
     pub commands: Vec<TimedCommand>,
     /// Fingerprint checkpoints (ticks).
@@ -156,6 +170,11 @@ impl Scenario {
         if self.economy {
             let module = sojourn_economy::EconomyModule::load(Path::new("data/econ"))
                 .map_err(|e| anyhow::anyhow!("loading economy data: {e}"))?;
+            mods.push(Box::new(module));
+        }
+        if self.base {
+            let module = sojourn_base::BaseModule::load(Path::new("data/base"))
+                .map_err(|e| anyhow::anyhow!("loading base data: {e}"))?;
             mods.push(Box::new(module));
         }
         Ok(mods)

@@ -1,0 +1,24 @@
+// FA-07 tuning params (FR-BC-105/107/501). Shielding mass-attenuation lengths λ
+// per material (for exp(−Σ ρx/λ)), dose limit, construction labour, regolith→
+// shielding conversion, and per-crew/base loop demands. All sourced.
+(
+    solar_ref_m: 1.495978707e11,
+    crew_dose_limit_sv_yr: 0.5,
+    shield_materials: [
+        // λ ≈ mass-attenuation length (kg/m²) for galactic-cosmic-ray dose reduction.
+        (id: "regolith", attenuation_length_kg_m2: 700.0,
+         source: "regolith GCR dose-attenuation (mass shielding ~ e-fold near 70 g/cm²; design/02-TECH-TREE.md D4)"),
+        (id: "water", attenuation_length_kg_m2: 350.0,
+         source: "water hydrogen-rich shielding e-fold ~35 g/cm² (radiation-transport studies; D4)"),
+        (id: "polyethylene", attenuation_length_kg_m2: 300.0,
+         source: "polyethylene high-H shielding e-fold ~30 g/cm² (NASA shielding studies; D4)"),
+    ],
+    crew_hr_per_kg: 0.02,
+    regolith_to_shield_ratio: 0.8,
+    loop_demands: (
+        food_kg_per_crew_day: 1.8,
+        materials_kg_per_day: 10.0,
+        spares_kg_per_day: 3.0,
+    ),
+    source: "design/03-ECONOMY.md §8 construction + design/02-TECH-TREE.md D4/D6/F4 (base loop demands, shielding, labour)",
+)

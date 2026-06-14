@@ -348,6 +348,24 @@ fn main() -> Result<()> {
                         .map(|b| format!("{b:02x}"))
                         .collect::<String>()
                 );
+            } else if dir.join("modules.ron").exists() {
+                // FA-07 base data (FR-BC-701): schema + sources + ref resolution (in
+                // load) plus the analytic gates (shielding exp-attenuation).
+                let m = sojourn_base::BaseModule::load(&dir)
+                    .map_err(|e| anyhow::anyhow!("base data invalid: {e}"))?;
+                base_analytic_gates(&m)?;
+                println!(
+                    "DATA VALID (base): {} module types, {} classes, {} shield materials; \
+                     analytic gates PASS; base hash {}",
+                    m.catalogue.modules.len(),
+                    m.catalogue.classes.len(),
+                    m.catalogue.params.shield_materials.len(),
+                    m.catalogue
+                        .content_hash
+                        .iter()
+                        .map(|b| format!("{b:02x}"))
+                        .collect::<String>()
+                );
             } else if dir.join("commodities.ron").exists() {
                 // FA-06 economy data (FR-EC-801): schema + sources + ref resolution
                 // (in load) plus the analytic gates (break-even sign, P50<P80,
@@ -423,8 +441,14 @@ fn main() -> Result<()> {
                             .expect("economy data loads"),
                     )
                 }),
+                "base" => Box::new(|| {
+                    Box::new(
+                        sojourn_base::BaseModule::load(std::path::Path::new("data/base"))
+                            .expect("base data loads"),
+                    )
+                }),
                 other => bail!(
-                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle' or 'economy')"
+                    "unknown module '{other}' (use 'toy', 'synthetic', 'astro', 'world', 'research', 'vehicle', 'economy' or 'base')"
                 ),
             };
             let report = run_suite(&*factory, &data, 4242, ticks)?;
@@ -496,6 +520,33 @@ fn economy_analytic_gates(m: &sojourn_economy::EconomyModule) -> Result<()> {
         .context("no LEO price")?;
     if cheaper >= base {
         bail!("elasticity gate failed: doubling capacity did not lower $/kg ({cheaper} >= {base})");
+    }
+    Ok(())
+}
+
+/// FA-07 analytic validation gates (FR-BC-701, contracts/base-data.md): the
+/// shielding mass-attenuation `exp(−Σ ρx/λ)` is correct and composes per material.
+fn base_analytic_gates(m: &sojourn_base::BaseModule) -> Result<()> {
+    let params = &m.catalogue.params;
+    // For each shield material, exp(−λ/λ) at ρx = λ must equal e^-1; and doubling
+    // ρx must square the factor (per-material exponent linearity).
+    let e_inv = libm::exp(-1.0);
+    for mat in &params.shield_materials {
+        let lam = mat.attenuation_length_kg_m2;
+        let one = libm::exp(-lam / lam);
+        let two = libm::exp(-(2.0 * lam) / lam);
+        if (one - e_inv).abs() > 1e-9 {
+            bail!(
+                "shielding gate failed: exp(−ρx/λ) at ρx=λ ≠ e⁻¹ for '{}'",
+                mat.id
+            );
+        }
+        if (two - one * one).abs() > 1e-9 {
+            bail!(
+                "shielding gate failed: doubling ρx did not square the factor for '{}'",
+                mat.id
+            );
+        }
     }
     Ok(())
 }
